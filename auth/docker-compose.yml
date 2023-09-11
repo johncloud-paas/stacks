@@ -1,0 +1,85 @@
+version: "3.8"
+
+services:
+  keycloak_db:
+    image: postgres:13.2
+    container_name: keycloak_db
+    restart: unless-stopped
+    volumes:
+      - $JOHNCLOUD_ROOT/auth/keycloak_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DATABASE_NAME}
+      POSTGRES_USER: ${KEYCLOAK_DATABASE_USER}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DATABASE_PASSWORD}
+    labels:
+      - "traefik.enable=false"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    depends_on:
+      - keycloak_db
+    command:
+      - start
+      - "--features=token-exchange"
+      - "--hostname-strict-https=false"
+    ports:
+      - 17070:8080
+    environment:
+      KC_PROXY_ADDRESS_FORWARDING: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: $HOST
+      KC_PROXY: edge
+      KC_HTTP_ENABLED: "true"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/$KEYCLOAK_DATABASE_NAME?ssl=allow
+      KC_DB_USERNAME: $KEYCLOAK_DATABASE_USER
+      KC_DB_PASSWORD: $KEYCLOAK_DATABASE_PASSWORD
+      KEYCLOAK_ADMIN: $KEYCLOAK_USER
+      KEYCLOAK_ADMIN_PASSWORD: $KEYCLOAK_PASSWORD
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.rule=Host(`$HOST`)"
+      - "traefik.http.routers.keycloak.entrypoints=websecure"
+      - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+      # # Redirect '/' to '/admin'
+      # - "traefik.http.middlewares.custom-redirect.redirectregex.regex=^https:\\/\\/([^\\/]+)\\/?$$"
+      # - "traefik.http.middlewares.custom-redirect.redirectregex.replacement=https://$$1/admin"
+      # - "traefik.http.routers.keycloak.middlewares=default@file,custom-redirect"
+
+  ldap:
+    image: quay.io/389ds/dirsrv:latest
+    container_name: ldap
+    ## Optionally uncomment one or both ports to expose to the host
+    #ports:
+    #    - '389:3389/tcp'    # Unencrypted port
+    #    - '636:3636/tcp'    # SSL/TLS port 
+    environment:
+      DS_DM_PASSWORD: $KEYCLOAK_PASSWORD
+    volumes:
+      - $JOHNCLOUD_ROOT/auth/ldap_data:/data
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+
+  openldap-ui:
+    image: osixia/phpldapadmin:latest
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap
+      - PHPLDAPADMIN_HTTPS=false
+      - PHPLDAPADMIN_SERVER_PATH=/ui
+      - PHPLDAPADMIN_TRUST_PROXY_SSL=true
+    depends_on:
+      - ldap
+    ports:
+      - 18080:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ldap_ui.rule=Host(`$HOST`) && PathPrefix(`/ui`)"
+      - "traefik.http.routers.ldap_ui.entrypoints=websecure"
+      - "traefik.http.routers.ldap_ui.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
