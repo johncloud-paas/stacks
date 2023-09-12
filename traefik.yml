@@ -1,5 +1,10 @@
 # https://blog.filador.fr/je-supervise-mon-traefik-avec-prometheus-et-grafana/
 
+# Pour OVH
+# https://stackoverflow.com/questions/75435733/traefik-and-certbot-cannot-generate-certificate-on-ovh
+# https://go-acme.github.io/lego/dns/ovh/
+# https://help.ovhcloud.com/csm/en-gb-api-getting-started-ovhcloud-api?id=kb_article_view&sysparm_article=KB0042784
+
 version: "3"
 
 services:
@@ -28,7 +33,6 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
     restart: unless-stopped
     container_name: traefik
     volumes:
@@ -39,10 +43,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.$HOST`)"
       - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
-      - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
-  #     - "traefik.http.routers.dashboard.middlewares=forward-auth-verify"
+      - "traefik.http.routers.dashboard.entrypoints=web"
+      # - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      # - "traefik.http.routers.dashboard.middlewares=forward-auth-verify"
 
   # traefik-forward-auth:
   #   image: thomseddon/traefik-forward-auth:latest
