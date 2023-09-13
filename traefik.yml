@@ -43,57 +43,57 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.$HOST`)"
       - "traefik.http.routers.dashboard.service=api@internal"
-      - "traefik.http.routers.dashboard.entrypoints=web"
-      # - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
-      # - "traefik.http.routers.dashboard.middlewares=forward-auth-verify"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.middlewares=forward-auth-verify"
 
-  # traefik-forward-auth:
-  #   image: thomseddon/traefik-forward-auth:latest
-  #   container_name: traefik-forward-auth
-  #   environment:
-  #     - TZ=$TZ
-  #     - PROVIDERS_GOOGLE_CLIENT_ID=$PROVIDERS_GOOGLE_CLIENT_ID
-  #     - PROVIDERS_GOOGLE_CLIENT_SECRET=$PROVIDERS_GOOGLE_CLIENT_SECRET
-  #     - SECRET=$SECRET
-  #     - AUTH_HOST=oauth.$HOST
-  #     - COOKIE_DOMAIN=$COOKIE_DOMAIN
-  #     - WHITELIST=$WHITELIST
-  #     - INSECURE_COOKIE=$INSECURE_COOKIE
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.forward.rule=Host(`oauth.$HOST`)"   
-  #     - "traefik.http.routers.forward.entrypoints=websecure"
-  #     - "traefik.http.routers.forward.tls.certresolver=letsencrypt"
-  #     - "traefik.http.services.forward.loadbalancer.server.port=4181"
-  #     - "traefik.http.middlewares.forward-auth-verify.forwardauth.address=http://traefik-forward-auth:4181"      
-  #     - "traefik.http.middlewares.forward-auth-verify.forwardauth.authResponseHeaders=X-Forwarded-User"
-
-  whoami:
-    image: traefik/whoami:latest
+  traefik-forward-auth:
+    image: thomseddon/traefik-forward-auth:latest
+    container_name: traefik-forward-auth
+    environment:
+      - TZ=$TZ
+      - PROVIDERS_GOOGLE_CLIENT_ID=$PROVIDERS_GOOGLE_CLIENT_ID
+      - PROVIDERS_GOOGLE_CLIENT_SECRET=$PROVIDERS_GOOGLE_CLIENT_SECRET
+      - SECRET=$SECRET
+      - AUTH_HOST=oauth.$HOST
+      - COOKIE_DOMAIN=$COOKIE_DOMAIN
+      - WHITELIST=$WHITELIST
+      - INSECURE_COOKIE=$INSECURE_COOKIE
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.forward.rule=Host(`oauth.$HOST`)"   
       - "traefik.http.routers.forward.entrypoints=websecure"
       - "traefik.http.routers.forward.tls.certresolver=letsencrypt"
+      - "traefik.http.services.forward.loadbalancer.server.port=4181"
+      - "traefik.http.middlewares.forward-auth-verify.forwardauth.address=http://traefik-forward-auth:4181"      
+      - "traefik.http.middlewares.forward-auth-verify.forwardauth.authResponseHeaders=X-Forwarded-User"
 
-  # certdumper:
-  #   restart: unless-stopped
-  #   image: ldez/traefik-certs-dumper:v2.8.1
-  #   container_name: certdumper
-  #   entrypoint: sh -c '
-  #     apk add jq
-  #     ; while ! [ -e /traefik/acme.json ]
-  #     || ! [ `jq ".[] | .Certificates | length" /traefik/acme.json` != 0 ]; do
-  #     sleep 1
-  #     ; done
-  #     && traefik-certs-dumper file --version v2 --watch
-  #       --source /traefik/acme.json --dest /output
-  #       --domain-subdir --crt-ext=.pem --key-ext=.pem'
-  #   volumes:
-  #     - $JOHNCLOUD_ROOT/traefik/letsencrypt:/traefik:ro
-  #     - $JOHNCLOUD_ROOT/traefik/certs:/output
-  #   labels:
-  #     - "traefik.enable=false"
+#  whoami:
+#    image: traefik/whoami:latest
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.forward.rule=Host(`oauth.$HOST`)"   
+#      - "traefik.http.routers.forward.entrypoints=websecure"
+#      - "traefik.http.routers.forward.tls.certresolver=letsencrypt"
+
+  certdumper:
+    restart: unless-stopped
+    image: ldez/traefik-certs-dumper:v2.8.1
+    container_name: certdumper
+    entrypoint: sh -c '
+      apk add jq
+      ; while ! [ -e /traefik/acme.json ]
+      || ! [ `jq ".[] | .Certificates | length" /traefik/acme.json` != 0 ]; do
+      sleep 1
+      ; done
+      && traefik-certs-dumper file --version v2 --watch
+        --source /traefik/acme.json --dest /output
+         --domain-subdir --crt-ext=.pem --key-ext=.pem'
+    volumes:
+      - $JOHNCLOUD_ROOT/traefik/letsencrypt:/traefik:ro
+      - $JOHNCLOUD_ROOT/traefik/certs:/output
+    labels:
+      - "traefik.enable=false"
 
 networks:
   default:
