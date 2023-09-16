@@ -1,0 +1,29 @@
+# https://hub.docker.com/r/linuxserver/code-server
+
+version: "2.1"
+
+services:
+  app:
+    image: lscr.io/linuxserver/code-server:4.16.1
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=$TZ
+    volumes:
+      - $WORKSPACE_PATH:/config
+      - $JOHNCLOUD_ROOT/vscode/custom-cont-init.d:/custom-cont-init.d:ro
+    ports:
+      - 8741:8443
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.code.rule=Host(`$HOST`)"
+      - "traefik.http.routers.code.entrypoints=websecure"
+      - "traefik.http.routers.code.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.code.middlewares=forward-auth-verify"
+      
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
