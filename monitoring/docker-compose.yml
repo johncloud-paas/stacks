@@ -36,9 +36,7 @@ services:
         - "traefik.http.routers.grafana-secure.entrypoints=websecure"
         - "traefik.http.routers.grafana-secure.rule=Host(`$GF_HOST`)"
         - "traefik.http.routers.grafana-secure.middlewares=forward-auth-verify"
-        - "traefik.http.routers.grafana-secure.tls=true"
         - "traefik.http.routers.grafana-secure.tls.certresolver=letsencrypt"
-        - "traefik.http.routers.grafana-secure.service=grafana"
         - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   redis:
