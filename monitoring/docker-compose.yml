@@ -13,7 +13,7 @@ services:
       - GF_INSTALL_PLUGINS=$GF_INSTALL_PLUGINS
       - GF_SERVER_ROOT_URL=$GF_SERVER_ROOT_URL
     volumes:
-      - $JOHNCLOUD_ROOT/monitoring/grafana_data:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     depends_on:
@@ -34,7 +34,7 @@ services:
         - "traefik.enable=true"
         - "traefik.docker.network=traefik-proxy"
         - "traefik.http.routers.grafana-secure.entrypoints=websecure"
-        - "traefik.http.routers.grafana-secure.rule=Host(`$GF_HOST`)"
+        - "traefik.http.routers.grafana-secure.rule=Host(`$HOST`)"
         - "traefik.http.routers.grafana-secure.middlewares=forward-auth-verify"
         - "traefik.http.routers.grafana-secure.tls.certresolver=letsencrypt"
         - "traefik.http.services.grafana.loadbalancer.server.port=3000"
@@ -78,7 +78,7 @@ services:
     ports:
       - 3100:3100
     volumes:
-      - $JOHNCLOUD_ROOT/monitoring/loki:/loki
+      - loki:/loki
     command: -config.file=/etc/loki/loki-config.yaml
     environment:
       - TZ=$TZ
@@ -104,7 +104,7 @@ services:
     networks:
       - traefik-proxy
     configs:
-      - source: loki_config.yml
+      - source: promtail_config.yml
         target: /etc/promtail/docker-config.yaml
     deploy:
       labels:
@@ -114,7 +114,7 @@ services:
     image: prom/prometheus:v2.15.2
     user: "0:0"
     volumes:
-      - $JOHNCLOUD_ROOT/monitoring/prometheus/db:/prometheus
+      - prometheus:/prometheus
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     command:
@@ -138,6 +138,14 @@ services:
       labels:
         - "traefik.enable=false"
 
+volumes:
+  grafana_data:
+    external: true
+  loki:
+    external: true
+  prometheus:
+    external: true
+
 configs:
   docker_dashboard.json:
     external: true
@@ -150,6 +158,8 @@ configs:
   loki_config.yml:
     external: true
   prometheus_config.yml:
+    external: true
+  promtail_config.yml:
     external: true
   prometheus_alert.rules:
     external: true
