@@ -92,7 +92,7 @@ services:
     deploy:
       labels:
         - "traefik.enable=false"
-        
+
   promtail:
     image:  grafana/promtail:latest
     volumes:
@@ -140,6 +140,22 @@ services:
       labels:
         - "traefik.enable=false"
 
+configs:
+  docker_dashboard.json:
+    external: true
+  traefik_dashboard.json:
+    external: true
+  grafana_dashboards.yml:
+    external: true
+  grafana_datasources.yml:
+    external: true
+  loki_config.yml:
+    external: true
+  prometheus_config.yml:
+    external: true
+  prometheus_alert.rules:
+    external: true
+    
 networks:
   traefik-proxy:
     external: true
