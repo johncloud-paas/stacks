@@ -14,13 +14,21 @@ services:
       - GF_SERVER_ROOT_URL=$GF_SERVER_ROOT_URL
     volumes:
       - $JOHNCLOUD_ROOT/monitoring/grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - prometheus
     networks:
       - traefik-proxy
+    configs:
+      - source: docker_dashboard.json
+        target: /etc/grafana/provisioning/dashboards/docker-monitoring.json
+      - source: traefik_dashboard.json
+        target: /etc/grafana/provisioning/dashboards/traefik_dashboard.json
+      - source: grafana_dashboards.yml
+        target: /etc/grafana/provisioning/dashboards/dashboards.yml
+      - source: grafana_datasources.yml
+        target: /etc/grafana/provisioning/datasources/datasource.yml
     deploy:
       labels:
         - "traefik.enable=true"
@@ -73,12 +81,14 @@ services:
       - 3100:3100
     volumes:
       - $JOHNCLOUD_ROOT/monitoring/loki:/loki
-      - ./loki/config.yml:/etc/loki/loki-config.yaml
     command: -config.file=/etc/loki/loki-config.yaml
     environment:
       - TZ=$TZ
     networks:
       - traefik-proxy
+    configs:
+      - source: loki_config.yml
+        target: /etc/loki/loki-config.yaml
     deploy:
       labels:
         - "traefik.enable=false"
@@ -86,7 +96,6 @@ services:
   promtail:
     image:  grafana/promtail:latest
     volumes:
-      - ./promtail/config.yml:/etc/promtail/docker-config.yaml
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/docker-config.yaml
@@ -96,6 +105,9 @@ services:
       - loki
     networks:
       - traefik-proxy
+    configs:
+      - source: loki_config.yml
+        target: /etc/promtail/docker-config.yaml
     deploy:
       labels:
         - "traefik.enable=false"
@@ -104,7 +116,6 @@ services:
     image: prom/prometheus:v2.15.2
     user: "0:0"
     volumes:
-      - ./prometheus/:/etc/prometheus/
       - $JOHNCLOUD_ROOT/monitoring/prometheus/db:/prometheus
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -116,6 +127,11 @@ services:
       - "--web.console.libraries=/usr/share/prometheus/console_libraries"
       - "--web.console.templates=/usr/share/prometheus/consoles"
       - "--web.enable-lifecycle"
+    configs:
+      - source: prometheus_config.yml
+        target: /etc/prometheus/prometheus.yml
+      - source: prometheus_alert.rules
+        target: /etc/prometheus/prometheus_alert.rules
     environment:
       - TZ=$TZ
     networks:
