@@ -3,7 +3,6 @@ version: '3.8'
 services:
   grafana:
     image: grafana/grafana:10.1.0
-    restart: unless-stopped
     user: "0:0"
     environment:
       - TZ=$TZ
@@ -20,15 +19,19 @@ services:
       - /etc/localtime:/etc/localtime:ro
     depends_on:
       - prometheus
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.grafana-secure.entrypoints=websecure"
-      - "traefik.http.routers.grafana-secure.rule=Host(`$GF_HOST`)"
-      - "traefik.http.routers.grafana-secure.middlewares=forward-auth-verify"
-      - "traefik.http.routers.grafana-secure.tls=true"
-      - "traefik.http.routers.grafana-secure.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.grafana-secure.service=grafana"
-      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    networks:
+      - traefik-proxy
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik-proxy"
+        - "traefik.http.routers.grafana-secure.entrypoints=websecure"
+        - "traefik.http.routers.grafana-secure.rule=Host(`$GF_HOST`)"
+        - "traefik.http.routers.grafana-secure.middlewares=forward-auth-verify"
+        - "traefik.http.routers.grafana-secure.tls=true"
+        - "traefik.http.routers.grafana-secure.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.grafana-secure.service=grafana"
+        - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   redis:
     image: redis:7.2.0
@@ -37,8 +40,11 @@ services:
       - ENABLE_OVERCOMMIT_MEMORY=true
     ports:
     - 6379:6379
-    labels:
-      - "traefik.enable=false"
+    networks:
+      - traefik-proxy
+    deploy:
+      labels:
+        - "traefik.enable=false"
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.2
@@ -54,8 +60,11 @@ services:
       - TZ=$TZ
     depends_on:
       - redis
-    labels:
-      - "traefik.enable=false"
+    networks:
+      - traefik-proxy
+    deploy:
+      labels:
+        - "traefik.enable=false"
 
   loki:
     image: grafana/loki:latest
@@ -68,8 +77,11 @@ services:
     command: -config.file=/etc/loki/loki-config.yaml
     environment:
       - TZ=$TZ
-    labels:
-      - "traefik.enable=false"
+    networks:
+      - traefik-proxy
+    deploy:
+      labels:
+        - "traefik.enable=false"
         
   promtail:
     image:  grafana/promtail:latest
@@ -82,12 +94,14 @@ services:
       - TZ=$TZ
     depends_on:
       - loki
-    labels:
-      - "traefik.enable=false"
+    networks:
+      - traefik-proxy
+    deploy:
+      labels:
+        - "traefik.enable=false"
         
   prometheus:
     image: prom/prometheus:v2.15.2
-    restart: unless-stopped
     user: "0:0"
     volumes:
       - ./prometheus/:/etc/prometheus/
@@ -104,11 +118,13 @@ services:
       - "--web.enable-lifecycle"
     environment:
       - TZ=$TZ
-    labels:
-      - "traefik.enable=false"
+    networks:
+      - traefik-proxy
+    deploy:
+      labels:
+        - "traefik.enable=false"
 
 networks:
-  default:
+  traefik-proxy:
     external: true
-    name: traefik-proxy
       
