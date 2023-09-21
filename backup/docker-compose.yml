@@ -30,7 +30,7 @@ services:
         - $JOHNCLOUD_ROOT:/source
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backup.rule=Host(`$HOST`)"
+      - "traefik.http.routers.backup.rule=Host(`backup.$HOST`)"
       - "traefik.http.routers.backup.entrypoints=websecure"
       - "traefik.http.routers.backup.tls.certresolver=letsencrypt"
       - "traefik.http.services.backup.loadbalancer.server.port=51515"
