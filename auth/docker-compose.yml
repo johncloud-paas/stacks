@@ -48,16 +48,17 @@ services:
       # - "traefik.http.routers.keycloak.middlewares=default@file,custom-redirect"
 
   ldap:
-    image: quay.io/389ds/dirsrv:latest
-    container_name: ldap
-    ## Optionally uncomment one or both ports to expose to the host
-    #ports:
-    #    - '389:3389/tcp'    # Unencrypted port
-    #    - '636:3636/tcp'    # SSL/TLS port 
+    image: osixia/openldap:latest
+    container_name: ldap 
     environment:
-      DS_DM_PASSWORD: $KEYCLOAK_PASSWORD
+      LDAP_ORGANISATION: $LDAP_ORGANISATION
+      LDAP_DOMAIN: $LDAP_DOMAIN
+      LDAP_BASE_DN: ${LDAP_BASE_DN:-}
+      LDAP_ADMIN_PASSWORD: $LDAP_ADMIN_PASSWORD
+      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD:-$LDAP_ADMIN_PASSWORD}
     volumes:
-      - $JOHNCLOUD_ROOT/auth/ldap_data:/data
+      - $JOHNCLOUD_ROOT/auth/ldap_data:/var/lib/ldap
+      - $JOHNCLOUD_ROOT/auth/ldap_config:/etc/ldap/slapd.d
     restart: unless-stopped
     labels:
       - "traefik.enable=false"
