@@ -64,7 +64,10 @@ services:
       - $JOHNCLOUD_ROOT/auth/ldap_config:/etc/ldap/slapd.d
     restart: unless-stopped
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+      - "traefik.http.routers.ldap.rule=Host(`$HOST`)"
+      - "traefik.http.routers.ldap.entrypoints=websecure"
+      - "traefik.http.routers.ldap.tls.certresolver=letsencrypt"
 
   openldap-ui:
     image: osixia/phpldapadmin:latest
