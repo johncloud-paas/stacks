@@ -37,10 +37,9 @@ services:
       - '$JOHNCLOUD_ROOT/gitlab/data:/var/opt/gitlab'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=Host(`$HOST`)"
-      - "traefik.http.routers.keycloak.entrypoints=websecure"
-      - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
-      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+      - "traefik.http.routers.gitlab.rule=Host(`$HOST`)"
+      - "traefik.http.routers.gitlab.entrypoints=websecure"
+      - "traefik.http.routers.gitlab.tls.certresolver=letsencrypt"
 
   gitlab-runner:
     image: gitlab/gitlab-runner:alpine
