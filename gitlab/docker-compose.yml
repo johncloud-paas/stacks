@@ -1,0 +1,37 @@
+# https://community.traefik.io/t/issues-with-tls-enabled-tcp-router-to-openldap/3949
+
+version: "3.8"
+
+services:
+  web:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: ${RESTART_POLICY}
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost'
+    volumes:
+      - '$JOHNCLOUD_ROOT/gitlab/config:/etc/gitlab'
+      - '$JOHNCLOUD_ROOT/gitlab/logs:/var/log/gitlab'
+      - '$JOHNCLOUD_ROOT/gitlab/data:/var/opt/gitlab'
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.rule=Host(`$HOST`)"
+      - "traefik.http.routers.keycloak.entrypoints=websecure"
+      - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    restart: ${RESTART_POLICY}
+    depends_on:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - '$JOHNCLOUD_ROOT/gitlab/gitlab-runner:/etc/gitlab-runner'
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
