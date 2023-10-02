@@ -1,4 +1,4 @@
-# https://community.traefik.io/t/issues-with-tls-enabled-tcp-router-to-openldap/3949
+# https://www.czerniga.it/2021/11/14/how-to-install-gitlab-using-docker-compose/
 
 version: "3.8"
 
@@ -9,6 +9,9 @@ services:
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://localhost'
+    ports:
+      - '8345:80'
+      # - '8443:443'
     volumes:
       - '$JOHNCLOUD_ROOT/gitlab/config:/etc/gitlab'
       - '$JOHNCLOUD_ROOT/gitlab/logs:/var/log/gitlab'
