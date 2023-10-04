@@ -5,7 +5,6 @@ version: "3.8"
 services:
   web:
     image: 'gitlab/gitlab-ce:latest'
-    hostname: '$HOST'
     restart: ${RESTART_POLICY}
     environment:
       GITLAB_OMNIBUS_CONFIG: |
@@ -38,7 +37,7 @@ services:
       - '$JOHNCLOUD_ROOT/gitlab/data:/var/opt/gitlab'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gitlab.rule=Host(`$HOST`)"
+      - "traefik.http.routers.gitlab.rule=Host(`gitlab.$HOST`)"
       - "traefik.http.routers.gitlab.entrypoints=websecure"
       - "traefik.http.routers.gitlab.tls.certresolver=letsencrypt"
 
