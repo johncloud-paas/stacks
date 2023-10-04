@@ -1,10 +1,11 @@
-# https://www.czerniga.it/2021/11/14/how-to-install-gitlab-using-docker-compose/
+# https://cloudinfrastructureservices.co.uk/how-to-setup-gitlab-docker-compose-container-image/
 
 version: "3.8"
 
 services:
   web:
     image: 'gitlab/gitlab-ce:latest'
+    hostname: '$HOST'
     restart: ${RESTART_POLICY}
     environment:
       GITLAB_OMNIBUS_CONFIG: |
@@ -29,8 +30,8 @@ services:
         external_url 'https://gitlab.$HOST'
         gitlab_rails['lfs_enabled'] = true
     ports:
-      - '8345:80'
-      # - '8443:443'
+      - '7948:80'
+      - '7949:443'
     volumes:
       - '$JOHNCLOUD_ROOT/gitlab/config:/etc/gitlab'
       - '$JOHNCLOUD_ROOT/gitlab/logs:/var/log/gitlab'
@@ -43,6 +44,7 @@ services:
 
   gitlab-runner:
     image: gitlab/gitlab-runner:alpine
+    container_name: gitlab-runner
     restart: ${RESTART_POLICY}
     depends_on:
       - web
