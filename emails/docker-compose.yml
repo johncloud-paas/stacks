@@ -630,8 +630,8 @@ services:
       - "traefik.http.routers.webmail.rule=Host(`$TRAEFIK_DOMAIN`) && PathPrefix(`$WEB_WEBMAIL`)"
       - "traefik.http.routers.webmail.entrypoints=websecure"
       - "traefik.http.routers.webmail.tls.certresolver=letsencrypt"
-  #     - "traefik.http.middlewares.webmail-stripprefix.stripprefix.prefixes=$WEB_WEBMAIL"
-  #     - "traefik.http.routers.webmail.middlewares=webmail-stripprefix@docker"
+      - "traefik.http.middlewares.webmail-stripprefix.stripprefix.prefixes=$WEB_WEBMAIL"
+      - "traefik.http.routers.webmail.middlewares=webmail-stripprefix@docker"
 
 networks:
   default:
