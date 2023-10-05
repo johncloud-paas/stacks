@@ -83,7 +83,7 @@ services:
       - "$REAL_IP_FROM:993:993"
     networks:
       - default
-      - webmail
+      # - webmail
     volumes:
       - $JOHNCLOUD_ROOT/mailu/overrides/nginx:/overrides:ro
       - $JOHNCLOUD_ROOT/traefik/certs/$TRAEFIK_DOMAIN/certificate.pem:/certs/cert.pem
@@ -565,80 +565,80 @@ services:
     labels:
       - "traefik.enable=false"
 
-  webmail:
-    image: ${DOCKER_ORG:-ghcr.io/mailu}/${DOCKER_PREFIX:-}webmail:${MAILU_VERSION:-2.0}
-    restart: unless-stopped
-    container_name: webmail
-    environment:
-      - ADMIN=$ADMIN
-      - ANTIVIRUS=$ANTIVIRUS
-      - API=$API
-      - API_TOKEN=$API_TOKEN
-      - AUTH_RATELIMIT_IP=$AUTH_RATELIMIT_IP
-      - AUTH_RATELIMIT_USER=$AUTH_RATELIMIT_USER
-      - COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME
-      - COMPRESSION=$COMPRESSION
-      - COMPRESSION_LEVEL=$COMPRESSION_LEVEL
-      - CREDENTIAL_ROUNDS=$CREDENTIAL_ROUNDS
-      - DEFAULT_SPAM_THRESHOLD=$DEFAULT_SPAM_THRESHOLD
-      - DISABLE_STATISTICS=$DISABLE_STATISTICS
-      - DMARC_RUA=$DMARC_RUA
-      - DMARC_RUF=$DMARC_RUF
-      - DOMAIN=$DOMAIN
-      - FETCHMAIL_DELAY=$FETCHMAIL_DELAY
-      - FETCHMAIL_ENABLED=$FETCHMAIL_ENABLED
-      - HOSTNAMES=$HOSTNAMES
-      - INITIAL_ADMIN_ACCOUNT=$INITIAL_ADMIN_ACCOUNT
-      - INITIAL_ADMIN_DOMAIN=$INITIAL_ADMIN_DOMAIN
-      - INITIAL_ADMIN_MODE=$INITIAL_ADMIN_MODE
-      - INITIAL_ADMIN_PW=$INITIAL_ADMIN_PW
-      - LOG_LEVEL=$LOG_LEVEL
-      - MESSAGE_RATELIMIT=$MESSAGE_RATELIMIT
-      - MESSAGE_SIZE_LIMIT=$MESSAGE_SIZE_LIMIT
-      - POSTMASTER=$POSTMASTER
-      - REAL_IP_FROM=$REAL_IP_FROM
-      - REAL_IP_HEADER=$REAL_IP_HEADER
-      - RECIPIENT_DELIMITER=$RECIPIENT_DELIMITER
-      - REJECT_UNLISTED_RECIPIENT=$REJECT_UNLISTED_RECIPIENT
-      - RELAYHOST=$RELAYHOST
-      - RELAYNETS=$RELAYNETS
-      - SCAN_MACROS=$SCAN_MACROS
-      - SECRET_KEY=$SECRET_KEY
-      - SITENAME=$SITENAME
-      - SUBNET=$SUBNET
-      - TLS_FLAVOR=$TLS_FLAVOR
-      - TZ=$TZ
-      - WEB_ADMIN=$WEB_ADMIN
-      - WEB_API=$WEB_API
-      - WEB_WEBMAIL=$WEB_WEBMAIL
-      - WEBDAV=$WEBDAV
-      - WEBMAIL=$WEBMAIL
-      - WEBROOT_REDIRECT=$WEBROOT_REDIRECT
-      - WEBSITE=$WEBSITE
-      - WELCOME=$WELCOME
-      - WELCOME_BODY=$WELCOME_BODY
-      - WELCOME_SUBJECT=$WELCOME_SUBJECT
-    volumes:
-      - "$JOHNCLOUD_ROOT/mailu/webmail:/data"
-      - "$JOHNCLOUD_ROOT/mailu/overrides/roundcube:/overrides:ro"
-    depends_on:
-      - front
-    networks:
-      - webmail
-    labels:
-      - "traefik.enable=false"
-      - "traefik.http.routers.webmail.rule=Host(`$TRAEFIK_DOMAIN`) && PathPrefix(`$WEB_WEBMAIL`)"
-      - "traefik.http.routers.webmail.entrypoints=websecure"
-      - "traefik.http.routers.webmail.tls.certresolver=letsencrypt"
-      - "traefik.http.middlewares.webmail-stripprefix.stripprefix.prefixes=$WEB_WEBMAIL"
-      - "traefik.http.routers.webmail.middlewares=webmail-stripprefix@docker"
+  # webmail:
+  #   image: ${DOCKER_ORG:-ghcr.io/mailu}/${DOCKER_PREFIX:-}webmail:${MAILU_VERSION:-2.0}
+  #   restart: unless-stopped
+  #   container_name: webmail
+  #   environment:
+  #     - ADMIN=$ADMIN
+  #     - ANTIVIRUS=$ANTIVIRUS
+  #     - API=$API
+  #     - API_TOKEN=$API_TOKEN
+  #     - AUTH_RATELIMIT_IP=$AUTH_RATELIMIT_IP
+  #     - AUTH_RATELIMIT_USER=$AUTH_RATELIMIT_USER
+  #     - COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME
+  #     - COMPRESSION=$COMPRESSION
+  #     - COMPRESSION_LEVEL=$COMPRESSION_LEVEL
+  #     - CREDENTIAL_ROUNDS=$CREDENTIAL_ROUNDS
+  #     - DEFAULT_SPAM_THRESHOLD=$DEFAULT_SPAM_THRESHOLD
+  #     - DISABLE_STATISTICS=$DISABLE_STATISTICS
+  #     - DMARC_RUA=$DMARC_RUA
+  #     - DMARC_RUF=$DMARC_RUF
+  #     - DOMAIN=$DOMAIN
+  #     - FETCHMAIL_DELAY=$FETCHMAIL_DELAY
+  #     - FETCHMAIL_ENABLED=$FETCHMAIL_ENABLED
+  #     - HOSTNAMES=$HOSTNAMES
+  #     - INITIAL_ADMIN_ACCOUNT=$INITIAL_ADMIN_ACCOUNT
+  #     - INITIAL_ADMIN_DOMAIN=$INITIAL_ADMIN_DOMAIN
+  #     - INITIAL_ADMIN_MODE=$INITIAL_ADMIN_MODE
+  #     - INITIAL_ADMIN_PW=$INITIAL_ADMIN_PW
+  #     - LOG_LEVEL=$LOG_LEVEL
+  #     - MESSAGE_RATELIMIT=$MESSAGE_RATELIMIT
+  #     - MESSAGE_SIZE_LIMIT=$MESSAGE_SIZE_LIMIT
+  #     - POSTMASTER=$POSTMASTER
+  #     - REAL_IP_FROM=$REAL_IP_FROM
+  #     - REAL_IP_HEADER=$REAL_IP_HEADER
+  #     - RECIPIENT_DELIMITER=$RECIPIENT_DELIMITER
+  #     - REJECT_UNLISTED_RECIPIENT=$REJECT_UNLISTED_RECIPIENT
+  #     - RELAYHOST=$RELAYHOST
+  #     - RELAYNETS=$RELAYNETS
+  #     - SCAN_MACROS=$SCAN_MACROS
+  #     - SECRET_KEY=$SECRET_KEY
+  #     - SITENAME=$SITENAME
+  #     - SUBNET=$SUBNET
+  #     - TLS_FLAVOR=$TLS_FLAVOR
+  #     - TZ=$TZ
+  #     - WEB_ADMIN=$WEB_ADMIN
+  #     - WEB_API=$WEB_API
+  #     - WEB_WEBMAIL=$WEB_WEBMAIL
+  #     - WEBDAV=$WEBDAV
+  #     - WEBMAIL=$WEBMAIL
+  #     - WEBROOT_REDIRECT=$WEBROOT_REDIRECT
+  #     - WEBSITE=$WEBSITE
+  #     - WELCOME=$WELCOME
+  #     - WELCOME_BODY=$WELCOME_BODY
+  #     - WELCOME_SUBJECT=$WELCOME_SUBJECT
+  #   volumes:
+  #     - "$JOHNCLOUD_ROOT/mailu/webmail:/data"
+  #     - "$JOHNCLOUD_ROOT/mailu/overrides/roundcube:/overrides:ro"
+  #   depends_on:
+  #     - front
+  #   networks:
+  #     - webmail
+  #   labels:
+  #     - "traefik.enable=false"
+  #     - "traefik.http.routers.webmail.rule=Host(`$TRAEFIK_DOMAIN`) && PathPrefix(`$WEB_WEBMAIL`)"
+  #     - "traefik.http.routers.webmail.entrypoints=websecure"
+  #     - "traefik.http.routers.webmail.tls.certresolver=letsencrypt"
+  #     - "traefik.http.middlewares.webmail-stripprefix.stripprefix.prefixes=$WEB_WEBMAIL"
+  #     - "traefik.http.routers.webmail.middlewares=webmail-stripprefix@docker"
 
 networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-  webmail:
-    driver: bridge
+  # webmail:
+  #   driver: bridge
   noinet:
     driver: bridge
     internal: true
