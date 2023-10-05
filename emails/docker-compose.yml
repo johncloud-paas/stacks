@@ -83,6 +83,7 @@ services:
       - "$REAL_IP_FROM:993:993"
     networks:
       - default
+      - webmail
     volumes:
       - $JOHNCLOUD_ROOT/mailu/overrides/nginx:/overrides:ro
       - $JOHNCLOUD_ROOT/traefik/certs/$TRAEFIK_DOMAIN/certificate.pem:/certs/cert.pem
@@ -624,7 +625,7 @@ services:
     depends_on:
       - front
     networks:
-      - default
+      - webmail
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.webmail.rule=Host(`$TRAEFIK_DOMAIN`) && PathPrefix(`$WEB_WEBMAIL`)"
@@ -637,6 +638,8 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  webmail:
+    driver: bridge
   noinet:
     driver: bridge
     internal: true
