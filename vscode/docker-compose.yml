@@ -10,7 +10,7 @@ services:
       - PGID=1000
       - TZ=$TZ
     volumes:
-      - $WORKSPACE_PATH:/config
+      - $WORKSPACE_PATH:/config/workspace
       - $JOHNCLOUD_ROOT/vscode/custom-cont-init.d:/custom-cont-init.d:ro
     ports:
       - 8741:8443
