@@ -568,6 +568,7 @@ services:
   webmail:
     image: ${DOCKER_ORG:-ghcr.io/mailu}/${DOCKER_PREFIX:-}webmail:${MAILU_VERSION:-2.0}
     restart: unless-stopped
+    container_name: webmail
     environment:
       - ADMIN=$ADMIN
       - ANTIVIRUS=$ANTIVIRUS
@@ -622,6 +623,8 @@ services:
       - "$JOHNCLOUD_ROOT/mailu/overrides/roundcube:/overrides:ro"
     depends_on:
       - front
+    networks:
+      - default
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.webmail.rule=Host(`$TRAEFIK_DOMAIN`) && PathPrefix(`$WEB_WEBMAIL`)"
@@ -629,8 +632,6 @@ services:
       - "traefik.http.routers.webmail.tls.certresolver=letsencrypt"
       - "traefik.http.middlewares.webmail-stripprefix.stripprefix.prefixes=$WEB_WEBMAIL"
       - "traefik.http.routers.webmail.middlewares=webmail-stripprefix@docker"
-      # - "traefik.http.routers.webmail.service=mailu-websecure-svc"
-      # - "traefik.http.services.mailu-websecure-svc.loadbalancer.server.port=80"
 
 networks:
   default:
