@@ -16,7 +16,7 @@ services:
       DB_NAME: $DB_NAME
       DB_USER: $DB_USER
       DB_PASSWORD: $DB_PASSWORD
-      REDIS_HOST: $REDIS_HOST
+      REDIS_HOST: kutt_redis
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kuttit.rule=Host(`$HOST`)"
@@ -25,6 +25,7 @@ services:
 
   redis:
     image: redis:6.0-alpine
+    container_name: kutt_redis
     restart: unless-stopped
     environment:
       TZ: $TZ
