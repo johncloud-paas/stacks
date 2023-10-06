@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  kutt:
+    image: kutt/kutt
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
+    command: ["./wait-for-it.sh", "postgres:5432", "--", "npm", "start"]
+    ports:
+      - "3000:3000"
+    environment:
+      TZ: $TZ
+      DB_HOST: kutt_db
+      DB_NAME: $DB_NAME
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      REDIS_HOST: $REDIS_HOST
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kuttit.rule=Host(`$HOST`)"
+      - "traefik.http.routers.kuttit.entrypoints=websecure"
+      - "traefik.http.routers.kuttit.tls.certresolver=letsencrypt"
+
+  redis:
+    image: redis:6.0-alpine
+    restart: unless-stopped
+    environment:
+      TZ: $TZ
+    volumes:
+      - $JOHNCLOUD_ROOT/kutt.it/redis_data:/data
+    labels:
+      - "traefik.enable=false"
+
+  postgres:
+    image: postgres:12-alpine
+    container_name: kutt_db
+    restart: unless-stopped
+    environment:
+      TZ: $TZ
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB: $DB_NAME
+    volumes:
+      - $JOHNCLOUD_ROOT/kutt.it/postgres_data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
