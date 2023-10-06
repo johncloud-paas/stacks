@@ -7,7 +7,7 @@ services:
     depends_on:
       - postgres
       - redis
-    command: ["./wait-for-it.sh", "postgres:5432", "--", "npm", "start"]
+    command: ["./wait-for-it.sh", "$DB_HOST:5432", "--", "npm", "start"]
     ports:
       - "3000:3000"
     environment:
