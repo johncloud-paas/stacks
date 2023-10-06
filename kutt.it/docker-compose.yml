@@ -44,7 +44,7 @@ services:
       - "traefik.http.routers.kuttit.rule=Host(`$HOST`)"
       - "traefik.http.routers.kuttit.entrypoints=websecure"
       - "traefik.http.routers.kuttit.tls.certresolver=letsencrypt"
-      - "traefik.http.services.routers.loadbalancer.server.port=3000"
+      - "traefik.http.services.kuttit.loadbalancer.server.port=3000"
 
   redis:
     image: redis:6.0-alpine
