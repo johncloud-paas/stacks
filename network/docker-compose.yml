@@ -6,6 +6,8 @@ services:
     restart: unless-stopped
     ports:
       - "3034:3034"
+    depends_on:
+      - db
     environment:
       ROOT_PATH: $ROOT_PATH
       DATABASE_URI: postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@network_db/$POSTGRES_DB
