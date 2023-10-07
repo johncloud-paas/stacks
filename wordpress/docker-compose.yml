@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   app:
-    image: wordpress:latest
+    image: wordpress:6.3
     ports:
       - 8082:80
     environment:
@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
 
   wordpress_db:
-    image: mysql:latest
+    image: mysql:8.1.0
     environment:
       TZ: $TZ
       MYSQL_DATABASE: $DB_NAME
