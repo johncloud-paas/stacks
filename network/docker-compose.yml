@@ -23,8 +23,6 @@ services:
     image: postgres:11.3
     container_name: network_db
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
