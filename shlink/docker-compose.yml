@@ -6,12 +6,12 @@ services:
     restart: unless-stopped
     environment:
       TZ: $TZ
-      SHLINK_SERVER_URL: https://$HOST
+      SHLINK_SERVER_URL: https://s.$BASE_HOST
       SHLINK_SERVER_API_KEY: $INITIAL_API_KEY
       SHLINK_SERVER_NAME: $SHLINK_SERVER_NAME
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.shlink_ui.rule=Host(`admin.$HOST`)"
+      - "traefik.http.routers.shlink_ui.rule=Host(`shlink.$BASE_HOST`)"
       - "traefik.http.routers.shlink_ui.entrypoints=websecure"
       - "traefik.http.routers.shlink_ui.tls.certresolver=letsencrypt"
       - "traefik.http.routers.shlink_ui.middlewares=forward-auth-verify"
@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: $TZ
-      DEFAULT_DOMAIN: $HOST
+      DEFAULT_DOMAIN: s.$BASE_HOST
       IS_HTTPS_ENABLED: false
       GEOLITE_LICENSE_KEY: $GEOLITE_LICENSE_KEY
       INITIAL_API_KEY: $INITIAL_API_KEY
@@ -32,7 +32,7 @@ services:
       DB_HOST: $COMPOSE_PROJECT_NAME-shlink_db-1
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.shlink.rule=Host(`$HOST`)"
+      - "traefik.http.routers.shlink.rule=Host(`s.$BASE_HOST`)"
       - "traefik.http.routers.shlink.entrypoints=websecure"
       - "traefik.http.routers.shlink.tls.certresolver=letsencrypt"
       - "traefik.http.services.shlink.loadbalancer.server.port=8080"
