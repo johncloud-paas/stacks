@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  wgeasy:
+    environment:
+      - WG_HOST=$HOST
+      - PASSWORD=$PASSWORD
+      - WG_PORT=$WG_PORT
+      - WG_DEFAULT_ADDRESS=$WG_DEFAULT_ADDRESS
+      - WG_DEFAULT_DNS=$WG_DEFAULT_DNS
+      - WG_MTU=$WG_MTU
+      - WG_ALLOWED_IPS=$WG_ALLOWED_IPS
+      - WG_PRE_UP=$WG_PRE_UP
+      - WG_POST_UP=$WG_POST_UP
+      - WG_PRE_DOWN=$WG_PRE_DOWN
+      - WG_POST_DOWN=$WG_POST_DOWN
+    image: weejewel/wg-easy
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/etc/wireguard
+    ports:
+      - "51820:51820/udp"
+      - "51821:51821/tcp"
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=51821"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    

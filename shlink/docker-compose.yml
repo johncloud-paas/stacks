@@ -1,0 +1,57 @@
+version: "3"
+
+services:
+  shlink_ui:
+    image: shlinkio/shlink-web-client
+    restart: unless-stopped
+    environment:
+      TZ: $TZ
+      SHLINK_SERVER_URL: https://s.$BASE_HOST
+      SHLINK_SERVER_API_KEY: $INITIAL_API_KEY
+      SHLINK_SERVER_NAME: $SHLINK_SERVER_NAME
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.shlink_ui.rule=Host(`shlink.$BASE_HOST`)"
+      - "traefik.http.routers.shlink_ui.entrypoints=websecure"
+      - "traefik.http.routers.shlink_ui.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.shlink_ui.middlewares=forward-auth-verify"
+
+  shlink:
+    image: shlinkio/shlink:stable-roadrunner
+    restart: unless-stopped
+    environment:
+      TZ: $TZ
+      DEFAULT_DOMAIN: s.$BASE_HOST
+      IS_HTTPS_ENABLED: false
+      GEOLITE_LICENSE_KEY: $GEOLITE_LICENSE_KEY
+      INITIAL_API_KEY: $INITIAL_API_KEY
+      DB_DRIVER: mysql
+      DB_NAME: $DB_NAME
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_HOST: $COMPOSE_PROJECT_NAME-shlink_db-1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.shlink.rule=Host(`s.$BASE_HOST`)"
+      - "traefik.http.routers.shlink.entrypoints=websecure"
+      - "traefik.http.routers.shlink.tls.certresolver=letsencrypt"
+      - "traefik.http.services.shlink.loadbalancer.server.port=8080"
+
+  shlink_db:
+    image: mysql:8.1.0
+    environment:
+      TZ: $TZ
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+      MYSQL_RANDOM_ROOT_PASSWORD: $DB_RANDOM_ROOT_PASSWORD
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/mysql
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    

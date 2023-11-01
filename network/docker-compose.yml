@@ -1,0 +1,45 @@
+version: "3.4"
+
+services:
+  network:
+    image: ydethe/network:latest
+    restart: unless-stopped
+    ports:
+      - "3034:3034"
+    depends_on:
+      - db
+    environment:
+      ROOT_PATH: $ROOT_PATH
+      DATABASE_URI: postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@network_db/$POSTGRES_DB
+      HOST: $HOST
+      NB_WORKERS: $NB_WORKERS
+      PORT: 3034
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.network.rule=Host(`$HOST`)"
+      - "traefik.http.routers.network.entrypoints=websecure"
+      - "traefik.http.routers.network.tls.certresolver=letsencrypt"
+      - "traefik.http.services.network.loadbalancer.server.port=3034"
+    
+  db:
+    image: postgres:11.3
+    container_name: network_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_DB=$POSTGRES_DB
+    healthcheck:
+      test: [ "CMD-SHELL", "su postgres -c \"pg_isready -U $POSTGRES_USER\"" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - $JOHNCLOUD_ROOT/network/pgdata:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+      
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
