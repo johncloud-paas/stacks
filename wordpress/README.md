@@ -1,4 +1,2 @@
-To initialize the wordpress instance, visit https://wordpress.domain.tld/install.php
-
-(see the HOST variable in .env file to know the instance address)
-
+> **Warning**
+> Do not forget to create the directory `$JOHNCLOUD_ROOT/wordpress`, and to give it the `1001:1001` permissions

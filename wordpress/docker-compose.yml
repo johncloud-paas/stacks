@@ -2,17 +2,30 @@ version: '3.1'
 
 services:
   app:
-    image: wordpress:6.3.0
-    ports:
-      - 8082:80
+    image: bitnami/wordpress:latest
     environment:
       TZ: $TZ
-      WORDPRESS_DB_HOST: wordpress_db
-      WORDPRESS_DB_USER: $DB_USER
-      WORDPRESS_DB_PASSWORD: $DB_PASSWORD
-      WORDPRESS_DB_NAME: $DB_NAME
+      USER: 0
+      APACHE_HTTP_PORT_NUMBER: 8080
+      WORDPRESS_ENABLE_REVERSE_PROXY: yes
+      WORDPRESS_USERNAME: $WORDPRESS_USERNAME
+      WORDPRESS_PASSWORD: $WORDPRESS_PASSWORD
+      WORDPRESS_EMAIL: $WORDPRESS_EMAIL
+      WORDPRESS_FIRST_NAME: $WORDPRESS_FIRST_NAME
+      WORDPRESS_LAST_NAME: $WORDPRESS_LAST_NAME
+      WORDPRESS_BLOG_NAME: $WORDPRESS_BLOG_NAME
+      WORDPRESS_RESET_DATA_PERMISSIONS: yes
+      WORDPRESS_DATABASE_HOST: $COMPOSE_PROJECT_NAME-wordpress_db-1
+      WORDPRESS_DATABASE_PORT_NUMBER: 3306
+      WORDPRESS_DATABASE_NAME: $DB_NAME
+      WORDPRESS_DATABASE_USER: $DB_USER
+      WORDPRESS_DATABASE_PASSWORD: $DB_PASSWORD
+      WORDPRESS_SMTP_HOST: $WORDPRESS_SMTP_HOST
+      WORDPRESS_SMTP_PORT: $WORDPRESS_SMTP_PORT
+      WORDPRESS_SMTP_USER: $WORDPRESS_SMTP_USER
+      WORDPRESS_SMTP_PASSWORD: $WORDPRESS_SMTP_PASSWORD
     volumes:
-      - $JOHNCLOUD_ROOT/wordpress/data:/var/www/html
+      - $JOHNCLOUD_ROOT/wordpress/data:/bitnami/wordpress
     depends_on:
       - wordpress_db
     labels:
@@ -20,17 +33,21 @@ services:
       - "traefik.http.routers.wordpress.rule=Host(`$HOST`)"
       - "traefik.http.routers.wordpress.entrypoints=websecure"
       - "traefik.http.routers.wordpress.tls.certresolver=letsencrypt"
+      - "traefik.http.services.wordpress.loadbalancer.server.port=8080"
 
   wordpress_db:
-    image: mysql:5.7
+    image: bitnami/mariadb:latest
     environment:
       TZ: $TZ
-      MYSQL_DATABASE: $DB_NAME
-      MYSQL_USER: $DB_USER
-      MYSQL_PASSWORD: $DB_PASSWORD
-      MYSQL_RANDOM_ROOT_PASSWORD: $DB_RANDOM_ROOT_PASSWORD
+      USER: 0
+      MARIADB_ROOT_USER: $DB_ROOT_USER
+      MARIADB_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MARIADB_DATABASE: $DB_NAME
+      MARIADB_USER: $DB_USER
+      MARIADB_PASSWORD: $DB_PASSWORD
+      DB_SKIP_TEST_DB: $DB_SKIP_TEST_DB
     volumes:
-      - $JOHNCLOUD_ROOT/wordpress/db:/var/lib/mysql
+      - $JOHNCLOUD_ROOT/wordpress/db:/bitnami/mariadb
     labels:
       - "traefik.enable=false"
 
