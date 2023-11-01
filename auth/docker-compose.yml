@@ -26,6 +26,7 @@ services:
       - "--hostname-strict-https=false"
     ports:
       - 17070:8080
+    restart: unless-stopped
     environment:
       KC_PROXY_ADDRESS_FORWARDING: "true"
       KC_HOSTNAME_STRICT: "false"
@@ -55,20 +56,11 @@ services:
       LDAP_ADMIN_PASSWORD: $LDAP_ADMIN_PASSWORD
       LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD:-$LDAP_ADMIN_PASSWORD}
       LDAP_TLS: false
-      # LDAP_TLS_VERIFY_CLIENT: try
-      # LDAP_TLS_CRT_FILENAME: certificate.pem
-      # LDAP_TLS_KEY_FILENAME: privatekey.pem
-      # LDAP_TLS_CA_CRT_FILENAME: ca.cert
-    # ports:
-    #   - 389:389
-    #   - 636:636
     expose:
       - 389
     volumes:
       - $JOHNCLOUD_ROOT/auth/ldap_data:/var/lib/ldap
       - $JOHNCLOUD_ROOT/auth/ldap_config:/etc/ldap/slapd.d
-      # certificate.pem  privatekey.pem
-      # - $JOHNCLOUD_ROOT/traefik/certs/auth.johncloud.fr:/container/service/slapd/assets/certs
     restart: unless-stopped
     labels:
       - "traefik.enable=false"
@@ -84,6 +76,7 @@ services:
       - ldap
     ports:
       - 18080:80
+    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ldap_ui.rule=Host(`$HOST`) && PathPrefix(`/ui`)"
