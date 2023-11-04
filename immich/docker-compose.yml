@@ -8,6 +8,12 @@ services:
     volumes:
       - ${JOHNCLOUD_ROOT}/immich/app:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
+    environment:
+      DB_HOSTNAME: ${DB_HOSTNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_DATABASE_NAME: ${DB_DATABASE_NAME}
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
     depends_on:
       - redis
       - database
@@ -30,6 +36,12 @@ services:
       - redis
       - database
       - typesense
+    environment:
+      DB_HOSTNAME: ${DB_HOSTNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_DATABASE_NAME: ${DB_DATABASE_NAME}
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
     restart: unless-stopped
     labels:
       - "traefik.enable=false"
@@ -56,6 +68,7 @@ services:
     environment:
       - TYPESENSE_API_KEY=${TYPESENSE_API_KEY}
       - TYPESENSE_DATA_DIR=/data
+      - TYPESENSE_HOST=${TYPESENSE_HOST}
       # remove this to get debug messages
       - GLOG_minloglevel=1
     volumes:
