@@ -22,18 +22,13 @@ services:
       - "traefik.http.services.network.loadbalancer.server.port=3034"
     
   db:
-    image: postgres:11.3
+    image: postgres:13.2
     container_name: network_db
     restart: unless-stopped
     environment:
-      - POSTGRES_USER=$POSTGRES_USER
-      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-      - POSTGRES_DB=$POSTGRES_DB
-    healthcheck:
-      test: [ "CMD-SHELL", "su postgres -c \"pg_isready -U $POSTGRES_USER\"" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_DB: $POSTGRES_DB
     volumes:
       - $JOHNCLOUD_ROOT/network/pgdata:/var/lib/postgresql/data
     labels:
