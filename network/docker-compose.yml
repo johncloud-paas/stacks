@@ -4,13 +4,12 @@ services:
   network:
     image: ydethe/network:latest
     restart: unless-stopped
-    ports:
-      - "3034:3034"
     depends_on:
-      - db
+      network_db:
+        condition: service_healthy
     environment:
       ROOT_PATH: $ROOT_PATH
-      DATABASE_URI: postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@network_db/$POSTGRES_DB
+      DATABASE_URI: postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@$COMPOSE_PROJECT_NAME-network_db-1/$POSTGRES_DB
       HOST: $HOST
       NB_WORKERS: $NB_WORKERS
       PORT: 3034
@@ -20,11 +19,17 @@ services:
       - "traefik.http.routers.network.entrypoints=websecure"
       - "traefik.http.routers.network.tls.certresolver=letsencrypt"
       - "traefik.http.services.network.loadbalancer.server.port=3034"
+      - "traefik.http.middlewares.network-stripprefix.stripprefix.prefixes=$ROOT_PATH"
+      - "traefik.http.routers.network.middlewares=network-stripprefix@docker"
     
-  db:
-    image: postgres:13.2
-    container_name: network_db
+  network_db:
+    image: postgres:11.3
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     environment:
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
