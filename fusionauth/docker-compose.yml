@@ -62,11 +62,6 @@ services:
       SEARCH_SERVERS: http://$COMPOSE_PROJECT_NAME-search-1:9200
       SEARCH_TYPE: elasticsearch
     restart: unless-stopped
-    # ports:
-    #   - 9011:9011
-    # volumes:
-      # - ${JOHNCLOUD_ROOT}/fusionauth/fusionauth/config:/usr/local/fusionauth/config:rw
-      # - ${JOHNCLOUD_ROOT}/fusionauth/fusionauth/logs:/usr/local/fusionauth/logs:rw
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.fusionauth.rule=Host(`$HOST`)"
