@@ -18,6 +18,14 @@ services:
     labels:
       - "traefik.enable=false"
 
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    volumes:
+      - $JOHNCLOUD_ROOT/nextcloud/redis:/data
+    labels:
+      - "traefik.enable=false"
+
   app:
     image: nextcloud:27.0.2
     restart: unless-stopped
@@ -39,6 +47,7 @@ services:
       - MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS
     depends_on:
       - db
+      - redis
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.permanent=true"
@@ -57,7 +66,7 @@ services:
       - "traefik.http.routers.cloud.rule=Host(`$HOST`)"
       - "traefik.http.routers.cloud.entrypoints=websecure"
       - "traefik.http.routers.cloud.tls.certresolver=letsencrypt"
-
+        
 networks:
   default:
     external: true
