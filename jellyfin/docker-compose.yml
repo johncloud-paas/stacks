@@ -1,0 +1,30 @@
+version: '3.1'
+
+services:
+  app:
+    image: jellyfin/jellyfin:latest
+    user: 1000:1000
+    volumes:
+      - $JOHNCLOUD_ROOT/jellyfin/config:/config
+      - $JOHNCLOUD_ROOT/jellyfin/cache:/cache
+      - $JOHNCLOUD_ROOT/jellyfin/media:/media
+      - $JOHNCLOUD_ROOT/jellyfin/media2:/media2:ro
+    restart: unless-stopped
+    environment:
+      - TZ=$TZ
+    # Optional - alternative address used for autodiscovery
+    #   - JELLYFIN_PublishedServerUrl=http://example.com
+    # Optional - may be necessary for docker healthcheck to pass if running in host network mode
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`$HOST`)"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
