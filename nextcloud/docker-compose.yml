@@ -3,8 +3,7 @@ version: '3.8'
 
 services:
   db:
-    image: mariadb:lts
-    container_name: nextcloud_db
+    image: mariadb:10.5
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     volumes:
@@ -35,7 +34,7 @@ services:
       - $JOHNCLOUD_ROOT/nextcloud/data:/var/www/html
     environment:
       - TZ=$TZ
-      - MYSQL_HOST=nextcloud_db # Nom du conteneur de la base de données
+      - MYSQL_HOST=$COMPOSE_PROJECT_NAME-db-1 # Nom du conteneur de la base de données
       - MYSQL_DATABASE=$NEXTCLOUD_MYSQL_DATABASE # Nom de la base de données
       - MYSQL_USER=$NEXTCLOUD_MYSQL_USER # Nom de l'utilisateur de la base de données
       - MYSQL_PASSWORD=$NEXTCLOUD_MYSQL_PASSWORD # Mot de passe de l'utilisateur de la base de données

@@ -14,7 +14,7 @@ services:
       WORDPRESS_LAST_NAME: $WORDPRESS_LAST_NAME
       WORDPRESS_BLOG_NAME: $WORDPRESS_BLOG_NAME
       WORDPRESS_RESET_DATA_PERMISSIONS: yes
-      WORDPRESS_DATABASE_HOST: $COMPOSE_PROJECT_NAME-wordpress_db-1
+      WORDPRESS_DATABASE_HOST: $COMPOSE_PROJECT_NAME-db-1
       WORDPRESS_DATABASE_PORT_NUMBER: 3306
       WORDPRESS_DATABASE_NAME: $DB_NAME
       WORDPRESS_DATABASE_USER: $DB_USER
@@ -26,7 +26,7 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/wordpress/data:/bitnami/wordpress
     depends_on:
-      - wordpress_db
+      - db
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.wordpress.rule=Host(`$HOST`)"
@@ -34,7 +34,7 @@ services:
       - "traefik.http.routers.wordpress.tls.certresolver=letsencrypt"
       - "traefik.http.services.wordpress.loadbalancer.server.port=8080"
 
-  wordpress_db:
+  db:
     image: bitnami/mariadb:latest
     environment:
       TZ: $TZ
