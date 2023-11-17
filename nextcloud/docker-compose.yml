@@ -28,12 +28,14 @@ services:
       - "traefik.enable=false"
 
   app:
-    image: nextcloud:27.0.2
+    image: linuxserver/nextcloud:latest
     restart: unless-stopped
     volumes:
-      - $JOHNCLOUD_ROOT/nextcloud/data:/var/www/html
+      - $JOHNCLOUD_ROOT/nextcloud/data:/data
     environment:
       - TZ=$TZ
+      - PUID=$PUID
+      - PGID=$PGID
       - MYSQL_HOST=$COMPOSE_PROJECT_NAME-db-1 # Nom du conteneur de la base de données
       - MYSQL_DATABASE=$NEXTCLOUD_MYSQL_DATABASE # Nom de la base de données
       - MYSQL_USER=$NEXTCLOUD_MYSQL_USER # Nom de l'utilisateur de la base de données
@@ -49,22 +51,24 @@ services:
       - redis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.permanent=true"
-      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.regex=https://(.*)/.well-known/(?:card|cal)dav"
-      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.replacement=https://$${1}/remote.php/dav"
-      - "traefik.http.middlewares.nginx.headers.referrerPolicy=no-referrer"
-      - "traefik.http.middlewares.nginx.headers.SSLRedirect=true"
-      - "traefik.http.middlewares.nginx.headers.STSSeconds=315360000"
-      - "traefik.http.middlewares.nginx.headers.browserXSSFilter=true"
-      - "traefik.http.middlewares.nginx.headers.contentTypeNosniff=true"
-      - "traefik.http.middlewares.nginx.headers.forceSTSHeader=true"
-      - "traefik.http.middlewares.nginx.headers.STSIncludeSubdomains=true"
-      - "traefik.http.middlewares.nginx.headers.STSPreload=true"
-      - "traefik.http.middlewares.nginx.headers.customFrameOptionsValue=SAMEORIGIN"
-      - "traefik.http.routers.cloud.middlewares=nextcloud_redirectregex,nginx"
+      # - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.permanent=true"
+      # - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.regex=https://(.*)/.well-known/(?:card|cal)dav"
+      # - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.replacement=https://$${1}/remote.php/dav"
+      # - "traefik.http.middlewares.nginx.headers.referrerPolicy=no-referrer"
+      # - "traefik.http.middlewares.nginx.headers.SSLRedirect=true"
+      # - "traefik.http.middlewares.nginx.headers.STSSeconds=315360000"
+      # - "traefik.http.middlewares.nginx.headers.browserXSSFilter=true"
+      # - "traefik.http.middlewares.nginx.headers.contentTypeNosniff=true"
+      # - "traefik.http.middlewares.nginx.headers.forceSTSHeader=true"
+      # - "traefik.http.middlewares.nginx.headers.STSIncludeSubdomains=true"
+      # - "traefik.http.middlewares.nginx.headers.STSPreload=true"
+      # - "traefik.http.middlewares.nginx.headers.customFrameOptionsValue=SAMEORIGIN"
+      # - "traefik.http.routers.cloud.middlewares=nextcloud_redirectregex,nginx"
       - "traefik.http.routers.cloud.rule=Host(`$HOST`)"
       - "traefik.http.routers.cloud.entrypoints=websecure"
       - "traefik.http.routers.cloud.tls.certresolver=letsencrypt"
+      # - "traefik.http.services.cloud.loadbalancer.serverstransport=ignorecert"
+      # - "traefik.http.services.cloud.loadbalancer.server.scheme=https"
         
 networks:
   default:
