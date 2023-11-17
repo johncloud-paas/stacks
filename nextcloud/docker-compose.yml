@@ -3,10 +3,11 @@ version: '3.8'
 
 services:
   db:
-    image: linuxserver/mariadb:latest
+    image: mariadb:lts
     restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     volumes:
-      - $JOHNCLOUD_ROOT/nextcloud/db:/config
+      - $JOHNCLOUD_ROOT/nextcloud/db:/var/lib/mysql
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -39,6 +40,7 @@ services:
       - TZ=$TZ
       - PUID=$PUID
       - PGID=$PGID
+      - REDIS_HOST=$COMPOSE_PROJECT_NAME-redis-1
       - MYSQL_HOST=$COMPOSE_PROJECT_NAME-db-1 # Nom du conteneur de la base de données
       - MYSQL_DATABASE=$NEXTCLOUD_MYSQL_DATABASE # Nom de la base de données
       - MYSQL_USER=$NEXTCLOUD_MYSQL_USER # Nom de l'utilisateur de la base de données
