@@ -3,13 +3,14 @@ version: '3.8'
 
 services:
   db:
-    image: mariadb:lts
+    image: linuxserver/mariadb:latest
     restart: unless-stopped
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     volumes:
-      - $JOHNCLOUD_ROOT/nextcloud/db:/var/lib/mysql
+      - $JOHNCLOUD_ROOT/nextcloud/db:/config
     environment:
       - TZ=$TZ
+      - PUID=$PUID
+      - PGID=$PGID
       - MYSQL_ROOT_PASSWORD=$NEXTCLOUD_MYSQL_ROOT_PASSWORD # Mot de passe de l'utilisateur root de mariadb
       - MYSQL_DATABASE=$NEXTCLOUD_MYSQL_DATABASE # Nom de la base de données à créer à l'initialisation du conteneur
       - MYSQL_USER=$NEXTCLOUD_MYSQL_USER # Nom de l'utilisateur de la base de données créée
@@ -22,16 +23,18 @@ services:
     restart: unless-stopped
     environment:
       - TZ=$TZ
+      - PUID=$PUID
+      - PGID=$PGID
     volumes:
       - $JOHNCLOUD_ROOT/nextcloud/redis:/data
     labels:
       - "traefik.enable=false"
 
   app:
-    image: linuxserver/nextcloud:latest
+    image: nextcloud:latest
     restart: unless-stopped
     volumes:
-      - $JOHNCLOUD_ROOT/nextcloud/data:/data
+      - $JOHNCLOUD_ROOT/nextcloud/data:/var/www/html
     environment:
       - TZ=$TZ
       - PUID=$PUID
