@@ -119,11 +119,9 @@ services:
       - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Musique:/music:ro"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.funkwhale-api.rule=Host(`$HOST`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.funkwhale-api.rule=Host(`api.$HOST`)"
       - "traefik.http.routers.funkwhale-api.entrypoints=websecure"
       - "traefik.http.routers.funkwhale-api.tls.certResolver=letsencrypt"
-      - "traefik.http.middlewares.funkwhale-stripprefix.stripprefix.prefixes=/api"
-      - "traefik.http.routers.funkwhale-api.funkwhale=funkwhale-stripprefix@docker"
 
   front:
     restart: unless-stopped
