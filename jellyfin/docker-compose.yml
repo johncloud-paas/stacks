@@ -7,7 +7,6 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/jellyfin/config:/config
       - $JOHNCLOUD_ROOT/jellyfin/cache:/cache
-      - $JOHNCLOUD_ROOT/jellyfin/media:/media
       - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Musique:/media2:ro
     restart: unless-stopped
     environment:

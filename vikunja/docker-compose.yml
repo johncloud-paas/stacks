@@ -1,0 +1,62 @@
+version: '3'
+
+services:
+  api:
+    image: vikunja/api
+    environment:
+      VIKUNJA_DATABASE_HOST: $COMPOSE_PROJECT_NAME-db-1
+      VIKUNJA_DATABASE_TYPE: mysql
+      VIKUNJA_DATABASE_PASSWORD: $DB_PASSWORD
+      VIKUNJA_DATABASE_USER: $DB_USER
+      VIKUNJA_DATABASE_DATABASE: $DB_NAME
+      VIKUNJA_SERVICE_JWTSECRET: $VIKUNJA_SERVICE_JWTSECRET
+      VIKUNJA_SERVICE_FRONTENDURL: $HOST
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: $VIKUNJA_SERVICE_ENABLEREGISTRATION
+      VIKUNJA_SERVICE_TIMEZONE: $TZ
+      VIKUNJA_MAILER_ENABLED: true
+      VIKUNJA_MAILER_AUTHTYPE: login
+      VIKUNJA_MAILER_HOST: $MAILER_HOST
+      VIKUNJA_MAILER_PORT: $MAILER_PORT
+      VIKUNJA_MAILER_USERNAME: $MAILER_USERNAME
+      VIKUNJA_MAILER_PASSWORD: $MAILER_PASSWORD
+      VIKUNJA_MAILER_FROMEMAIL: $MAILER_FROMEMAIL
+      VIKUNJA_MAILER_FORCESSL: $MAILER_FORCESSL
+    volumes: 
+      - $JOHNCLOUD_ROOT/vikunja/files:/app/vikunja/files
+    depends_on:
+      - db
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vikunja-api.rule=Host(`$HOST`) && (PathPrefix(`/api/v1`) || PathPrefix(`/dav/`) || PathPrefix(`/.well-known/`))"
+      - "traefik.http.routers.vikunja-api.entrypoints=websecure"
+      - "traefik.http.routers.vikunja-api.tls.certResolver=letsencrypt"
+  
+  frontend:
+    image: vikunja/frontend
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vikunja-frontend.rule=Host(`$HOST`)"
+      - "traefik.http.routers.vikunja-frontend.entrypoints=websecure"
+      - "traefik.http.routers.vikunja-frontend.tls.certResolver=letsencrypt"
+  
+  db:
+    image: mariadb:10
+    command: --max-connections=1000 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD 
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+      MYSQL_DATABASE: $DB_NAME
+    volumes:
+      - $JOHNCLOUD_ROOT/vikunja/db:/var/lib/mysql
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
