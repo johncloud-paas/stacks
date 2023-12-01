@@ -21,6 +21,7 @@ services:
     restart: unless-stopped
     environment:
       TZ: $TZ
+      SHELL_VERBOSITY: $SHELL_VERBOSITY
       DEFAULT_DOMAIN: s.$BASE_HOST
       IS_HTTPS_ENABLED: false
       GEOLITE_LICENSE_KEY: $GEOLITE_LICENSE_KEY
