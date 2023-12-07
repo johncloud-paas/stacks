@@ -1,0 +1,23 @@
+# Not working yet !!!
+
+version: '3.7'
+
+services:
+  node-red:
+    image: nodered/node-red:latest
+    restart: unless-stopped
+    user: node-red:dialout
+    environment:
+      - TZ=$TZ
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK

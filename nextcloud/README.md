@@ -15,4 +15,8 @@ Finally, follow the guide here to deploy the stack: https://docs.portainer.io/us
 
 To scan the content of the folder data:
 
-    sudo docker exec -ti --user www-data nextcloud-app /var/www/html/occ files:scan --all
+    sudo docker exec -ti --user www-data nextcloud-app-1 /var/www/html/occ files:scan --all
+
+If needed:
+
+    convmv -f utf-8 -t utf-8 -r --notest --nfc --replace <nextcloud-data-folder>
