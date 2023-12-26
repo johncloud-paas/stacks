@@ -1,15 +1,18 @@
-version: "2.1"
+version: "3"
 
 services:
-  heimdall:
-    image: lscr.io/linuxserver/heimdall:latest
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    restart: unless-stopped
     environment:
-      - PUID=1000
-      - PGID=1000
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DOCKER_PORT=8080
       - TZ=$TZ
     volumes:
-      - $JOHNCLOUD_ROOT/homepage/config:/config
-    restart: unless-stopped
+      - /var/run/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/configs:/app/data/configs
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/icons:/app/public/icons
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
     labels:
         - "traefik.enable=true"
         - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
@@ -21,4 +24,3 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-
