@@ -5,11 +5,8 @@ services:
     image: ghcr.io/ajnart/homarr:latest
     restart: unless-stopped
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - DOCKER_PORT=8080
       - TZ=$TZ
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/configs:/app/data/configs
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/icons:/app/public/icons
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
