@@ -24,7 +24,7 @@ services:
       - "homepage.group=Media"
       - "homepage.name=Jellyfin"
       - "homepage.icon=https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/icon-transparent-vue.svg"
-      - "homepage.href=$HOST"
+      - "homepage.href=https://$HOST"
       - "homepage.description=Jellyfin media server"
 
 networks:

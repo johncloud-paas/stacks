@@ -4,6 +4,7 @@ services:
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     restart: unless-stopped
+    user: $UID:$GID 
     # ports:
     #   - 3000:3000
     volumes:
