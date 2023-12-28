@@ -1,15 +1,14 @@
 version: "3"
 
 services:
-  homarr:
-    image: ghcr.io/ajnart/homarr:latest
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
     restart: unless-stopped
-    environment:
-      - TZ=$TZ
+    # ports:
+    #   - 3000:3000
     volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/configs:/app/data/configs
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/icons:/app/public/icons
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/app/config # Make sure your local config directory exists
+      - /var/run/docker.sock:/var/run/docker.sock # (optional) For docker integrations
     labels:
         - "traefik.enable=true"
         - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
