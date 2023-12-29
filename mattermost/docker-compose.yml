@@ -3,22 +3,6 @@
 version: "3.7"
 
 services:
-  node-red:
-    image: nodered/node-red:latest
-    environment:
-      - TZ=Europe/Amsterdam
-    ports:
-      - "1880:1880"
-    networks:
-      - node-red-net
-    volumes:
-      - node-red-data:/data
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.mattermost.rule=Host(`$DOMAIN`)"
-      - "traefik.http.routers.mattermost.entrypoints=websecure"
-      - "traefik.http.routers.mattermost.tls.certresolver=letsencrypt"
-
   db:
     image: postgres:${POSTGRES_IMAGE_TAG}
     restart: ${RESTART_POLICY}
@@ -86,6 +70,11 @@ services:
       - "traefik.http.routers.mattermost.rule=Host(`$DOMAIN`)"
       - "traefik.http.routers.mattermost.entrypoints=websecure"
       - "traefik.http.routers.mattermost.tls.certresolver=letsencrypt"
+      - "homepage.group=Bureautique"
+      - "homepage.name=Mattermost"
+      # - "homepage.icon=https://github.com/kopia/kopia/blob/aafcee3ecc681bb235ec40f2baa325b85274ef59/icons/kopia-app-1024.svg"
+      - "homepage.href=https://$DOMAIN"
+      - "homepage.description=Secure Collaboration for Technical Teams"
 
 networks:
   default:
