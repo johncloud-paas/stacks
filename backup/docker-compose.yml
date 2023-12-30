@@ -35,7 +35,7 @@ services:
       - "traefik.http.routers.backup.tls.certresolver=letsencrypt"
       - "traefik.http.services.backup.loadbalancer.server.port=51515"
       - "traefik.http.routers.backup.middlewares=forward-auth-verify"
-      - "homepage.group=Plateforme"
+      - "homepage.group=Platform"
       - "homepage.name=Kopia"
       - "homepage.icon=https://github.com/kopia/kopia/blob/aafcee3ecc681bb235ec40f2baa325b85274ef59/icons/kopia-app-1024.svg"
       - "homepage.href=https://backup.$HOST"
