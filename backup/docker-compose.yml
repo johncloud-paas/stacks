@@ -6,8 +6,8 @@ services:
     container_name: backup_app
     hostname: backup_app
     restart: unless-stopped
-    ports:
-        - 51515:51515
+    # ports:
+    #     - 51515:51515
     # Setup the server that provides the web gui
     command:
         - server
