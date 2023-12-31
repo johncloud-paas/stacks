@@ -2,14 +2,17 @@ version: '3.1'
 
 services:
   app:
-    image: jellyfin/jellyfin:latest
-    user: $USERID:$GROUPID
+    image: lscr.io/linuxserver/jellyfin:latest
     volumes:
       - $JOHNCLOUD_ROOT/jellyfin/config:/config
-      - $JOHNCLOUD_ROOT/jellyfin/cache:/cache
-      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Musique:/media2:ro
+      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Musique:/data:ro
     restart: unless-stopped
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
     environment:
+      - PUID=$USERID
+      - PGID=$GROUPID
       - TZ=$TZ
     # Optional - alternative address used for autodiscovery
     #   - JELLYFIN_PublishedServerUrl=http://example.com
