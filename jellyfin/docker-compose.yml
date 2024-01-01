@@ -14,8 +14,7 @@ services:
       - PUID=$USERID
       - PGID=$GROUPID
       - TZ=$TZ
-    # Optional - alternative address used for autodiscovery
-    #   - JELLYFIN_PublishedServerUrl=http://example.com
+      - JELLYFIN_PublishedServerUrl=https://$HOST
     # Optional - may be necessary for docker healthcheck to pass if running in host network mode
     # extra_hosts:
     #   - "host.docker.internal:host-gateway"
