@@ -26,9 +26,9 @@ services:
       - mariadb
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dolibarr.rule=Host(`$HOST`)"
-      - "traefik.http.routers.dolibarr.entrypoints=websecure"
-      - "traefik.http.routers.dolibarr.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "homepage.group=Productivité"
       - "homepage.name=Dolibarr"
       # - "homepage.icon=https://raw.githubusercontent.com/dolibarr/dolibarr-ux/master/branding/SVG/icon-transparent-vue.svg"
