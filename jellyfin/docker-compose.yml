@@ -26,7 +26,7 @@ services:
       - "traefik.http.routers.jellyfin.tls.certresolver=letsencrypt"
       - "homepage.group=Media"
       - "homepage.name=Jellyfin"
-      - "homepage.icon=https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/icon-transparent-vue.svg"
+      - "homepage.icon=jellyfin.svg"
       - "homepage.href=https://$HOST"
       - "homepage.description=Jellyfin media server"
 

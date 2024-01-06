@@ -17,7 +17,7 @@ services:
       - "traefik.http.routers.shlink_ui.middlewares=forward-auth-verify"
       - "homepage.group=Bureautique"
       - "homepage.name=Shlink"
-      # - "homepage.icon=https://github.com/kopia/kopia/blob/aafcee3ecc681bb235ec40f2baa325b85274ef59/icons/kopia-app-1024.svg"
+      - "homepage.icon=shlink.svg"
       - "homepage.href=https://shlink.$BASE_HOST"
       - "homepage.description=URL shortener"
 

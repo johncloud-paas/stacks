@@ -76,7 +76,7 @@ services:
       # - "traefik.http.services.cloud.loadbalancer.server.scheme=https"
       - "homepage.group=Bureautique"
       - "homepage.name=Nextcloud"
-      # - "homepage.icon=https://github.com/kopia/kopia/blob/aafcee3ecc681bb235ec40f2baa325b85274ef59/icons/kopia-app-1024.svg"
+      - "homepage.icon=nextcloud.svg"
       - "homepage.href=https://$HOST"
       - "homepage.description=Online collaboration platform"
         

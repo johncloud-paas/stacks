@@ -72,7 +72,7 @@ services:
       - "traefik.http.routers.mattermost.tls.certresolver=letsencrypt"
       - "homepage.group=Bureautique"
       - "homepage.name=Mattermost"
-      # - "homepage.icon=https://github.com/kopia/kopia/blob/aafcee3ecc681bb235ec40f2baa325b85274ef59/icons/kopia-app-1024.svg"
+      - "homepage.icon=mattermost.svg"
       - "homepage.href=https://$DOMAIN"
       - "homepage.description=Secure Collaboration for Technical Teams"
 

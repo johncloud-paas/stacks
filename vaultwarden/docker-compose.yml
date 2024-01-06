@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
       - "homepage.group=Bureautique"
       - "homepage.name=Vaultwarden"
-      # - "homepage.icon=https://github.com/kopia/kopia/blob/aafcee3ecc681bb235ec40f2baa325b85274ef59/icons/kopia-app-1024.svg"
+      - "homepage.icon=vaultwarden.svg"
       - "homepage.href=https://$HOST"
       - "homepage.description=Password manager"
 
