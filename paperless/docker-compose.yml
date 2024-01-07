@@ -42,9 +42,9 @@ services:
     image: docker.io/library/postgres:15
     restart: unless-stopped
     environment:
-      POSTGRES_DB: paperless
-      POSTGRES_USER: paperless
-      POSTGRES_PASSWORD: paperless
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgresql:/var/lib/postgresql/data
     labels:
@@ -62,21 +62,25 @@ services:
       timeout: 10s
       retries: 5
     environment:
-      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_REDIS: redis://$COMPOSE_PROJECT_NAME-broker-1:6379
       PAPERLESS_DBHOST: $COMPOSE_PROJECT_NAME-db-1
+      PAPERLESS_DBNAME: $POSTGRES_DB
+      PAPERLESS_DBUSER: $POSTGRES_USER
+      PAPERLESS_DBPASS: $POSTGRES_PASSWORD
 # The UID and GID of the user used to run paperless in the container. Set this
 # to your UID and GID on the host so that you have write access to the
 # consumption directory.
-      USERMAP_UID: 1000
-      USERMAP_GID: 1000
+      USERMAP_UID: $UID
+      USERMAP_GID: $GID
 # Adjust this key if you plan to make paperless available publicly. It should
 # be a very long sequence of random characters. You don't need to remember it.
-      #PAPERLESS_SECRET_KEY: change-me
+      PAPERLESS_SECRET_KEY: $PAPERLESS_SECRET_KEY
 # Use this variable to set a timezone for the Paperless Docker containers. If not specified, defaults to UTC.
       PAPERLESS_TIME_ZONE: $TZ
 # The default language to use for OCR. Set this to the language most of your
 # documents are written in.
-      PAPERLESS_OCR_LANGUAGE: fr
+      PAPERLESS_OCR_LANGUAGE: fra
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/data:/usr/src/paperless/data
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/media:/usr/src/paperless/media
@@ -87,6 +91,11 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "homepage.group=Bureautique"
+      - "homepage.name=Paperless-ngx"
+      - "homepage.icon=paperless-ngx.svg"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=Document management system"
 
 networks:
   default:
