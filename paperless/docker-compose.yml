@@ -112,6 +112,8 @@ services:
       PAPERLESS_ADMIN_USER: $PAPERLESS_ADMIN_USER
       PAPERLESS_ADMIN_PASSWORD: $PAPERLESS_ADMIN_PASSWORD
       PAPERLESS_CONSUMER_RECURSIVE: $PAPERLESS_CONSUMER_RECURSIVE
+      PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: $PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS
+      PAPERLESS_CONSUMER_IGNORE_PATTERNS: '[".DS_STORE/*", "*.h", "*.hpp", "*.c", "*.cpp", "*.cxx", "*.py", "*.jpg", "*.png", "._*", ".stfolder/*", ".git/*", ".stversions/*", ".localized/*", "desktop.ini", "@eaDir/*"]'
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/data:/usr/src/paperless/data
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/media:/usr/src/paperless/media
