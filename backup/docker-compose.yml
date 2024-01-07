@@ -40,8 +40,6 @@ services:
       - "homepage.icon=kopia.svg"
       - "homepage.href=https://backup.$HOST"
       - "homepage.description=Backup system"
-      - "homepage.widget.type=kopia"
-      - "homepage.widget.url=backup_app"
 
 networks:
   default:
