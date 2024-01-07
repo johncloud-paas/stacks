@@ -30,6 +30,18 @@
 
 version: "3.4"
 services:
+  tika:
+    image: apache/tika
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+
+  gotenberg:
+    image: gotenberg/gotenberg
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+
   broker:
     image: docker.io/library/redis:7
     restart: unless-stopped
@@ -56,12 +68,18 @@ services:
     depends_on:
       - db
       - broker
+      - tika
+      - gotenberg
     healthcheck:
       test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
       interval: 30s
       timeout: 10s
       retries: 5
     environment:
+      PAPERLESS_URL: https://$HOST
+      ALLOWED_HOSTS: https://$HOST
+      CORS_ALLOWED_HOSTS: https://$HOST
+      CSRF_TRUSTED_ORIGINS: https://$HOST
       PAPERLESS_DBENGINE: postgresql
       PAPERLESS_REDIS: redis://$COMPOSE_PROJECT_NAME-broker-1:6379
       PAPERLESS_DBHOST: $COMPOSE_PROJECT_NAME-db-1
@@ -81,11 +99,23 @@ services:
 # The default language to use for OCR. Set this to the language most of your
 # documents are written in.
       PAPERLESS_OCR_LANGUAGE: fra
+      PAPERLESS_TIKA_ENABLED: true
+      PAPERLESS_TIKA_ENDPOINT: http://$COMPOSE_PROJECT_NAME-tika-1:9998
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://$COMPOSE_PROJECT_NAME-gotenberg-1:3000
+      PAPERLESS_EMAIL_HOST: $PAPERLESS_EMAIL_HOST
+      PAPERLESS_EMAIL_PORT: $PAPERLESS_EMAIL_PORT
+      PAPERLESS_EMAIL_HOST_USER: $PAPERLESS_EMAIL_HOST_USER
+      PAPERLESS_EMAIL_FROM: $PAPERLESS_EMAIL_FROM
+      PAPERLESS_EMAIL_HOST_PASSWORD: $PAPERLESS_EMAIL_HOST_PASSWORD
+      PAPERLESS_EMAIL_USE_TLS: $PAPERLESS_EMAIL_USE_TLS
+      PAPERLESS_ADMIN_MAIL: $PAPERLESS_EMAIL_FROM
+      PAPERLESS_ADMIN_USER: $PAPERLESS_ADMIN_USER
+      PAPERLESS_ADMIN_PASSWORD: $PAPERLESS_ADMIN_PASSWORD
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/data:/usr/src/paperless/data
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/media:/usr/src/paperless/media
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/export:/usr/src/paperless/export
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/consume:/usr/src/paperless/consume
+      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files:/usr/src/paperless/consume
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
