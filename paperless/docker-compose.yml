@@ -115,7 +115,7 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/data:/usr/src/paperless/data
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/media:/usr/src/paperless/media
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/paperless/export:/usr/src/paperless/export
-      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files:/usr/src/paperless/consume
+      - $CONSUMPTION_DIR:/usr/src/paperless/consume
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
