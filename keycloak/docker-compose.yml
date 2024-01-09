@@ -18,25 +18,29 @@ services:
       - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/db:/var/lib/postgresql/data
 
   keycloak:
-    image: bitnami/keycloak:latest
+    image: quay.io/keycloak/keycloak:latest
     restart: unless-stopped
     depends_on:
       - db
+    command: start
     environment:
-      - TZ=$TZ
-      - KEYCLOAK_DATABASE_HOST=$COMPOSE_PROJECT_NAME-db-1
-      - KEYCLOAK_USER=$KEYCLOAK_ADMIN
-      - KEYCLOAK_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD
-      - KEYCLOAK_DATABASE_NAME=$DB_NAME
-      - KEYCLOAK_DATABASE_USER=$DB_USER
-      - KEYCLOAK_DATABASE_PASSWORD=$DB_PASSWORD
-      - DB_VENDOR=POSTGRES
-      - PROXY_ADDRESS_FORWARDING=true
+      KC_PROXY_ADDRESS_FORWARDING: "true"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME: $HOST
+      KC_PROXY: edge
+      KC_HTTP_ENABLED: "true"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://$COMPOSE_PROJECT_NAME-db-1:5432/$DB_NAME?ssl=allow
+      KC_DB_USERNAME: $DB_USER
+      KC_DB_PASSWORD: $DB_PASSWORD
+      KEYCLOAK_ADMIN: $KEYCLOAK_ADMIN
+      KEYCLOAK_ADMIN_PASSWORD: $KEYCLOAK_ADMIN_PASSWORD
+      PROXY_ADDRESS_FORWARDING: "true"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.route-auth.rule=Host(`$HOST`)"
       - "traefik.http.services.route-auth.loadbalancer.server.port=8080"
-      - "traefik.http.routers.route-auth.middlewares=default@file"
+      # - "traefik.http.routers.route-auth.middlewares=default@file"
       - "traefik.http.routers.route-auth.entrypoints=websecure"
       - "traefik.http.routers.route-auth.tls.certresolver=letsencrypt"
       - "homepage.group=Platform"
