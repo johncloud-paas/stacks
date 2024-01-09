@@ -4,45 +4,38 @@ services:
   db:
     image: postgres:12.9
     environment:
-      PUID: $USERID
-      PGID: $GROUPID
       TZ: $TZ
-      POSTGRES_DB: ${DB_NAME}
-      PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+    # healthcheck:
+    #   test: [ "CMD-SHELL", "pg_isready -U $DB_USER -d $DB_NAME" ]
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 5
     restart: unless-stopped
     volumes:
       - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/db:/var/lib/postgresql/data
 
   keycloak:
-    # internal: keycloak on port 8080
-    image: quay.io/keycloak/keycloak:latest
+    image: bitnami/keycloak:latest
     restart: unless-stopped
-    command: start --db postgres --db-url=jdbc:postgresql://$COMPOSE_PROJECT_NAME-db-1:5432/$DB_NAME --db-username=postgres --db-password=$DB_PASSWORD
+    depends_on:
+      - db
     environment:
-      PUID: $USERID
-      PGID: $GROUPID
-      TZ: $TZ
-      KC_HOSTNAME: '$HOST'
-      KC_PROXY: 'edge'
-      KEYCLOAK_ADMIN: '$KEYCLOAK_ADMIN'
-      KEYCLOAK_ADMIN_PASSWORD: '$KEYCLOAK_ADMIN_PASSWORD'
-    volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/app:/opt/keycloak/data
+      - TZ=$TZ
+      - KEYCLOAK_DATABASE_HOST=$COMPOSE_PROJECT_NAME-db-1
+      - KEYCLOAK_USER=$KEYCLOAK_ADMIN
+      - KEYCLOAK_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD
+      - KEYCLOAK_DATABASE_NAME=$DB_NAME
+      - KEYCLOAK_DATABASE_USER=$DB_USER
+      - KEYCLOAK_DATABASE_PASSWORD=$DB_PASSWORD
+      - DB_VENDOR=POSTGRES
+      - PROXY_ADDRESS_FORWARDING=true
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.route-auth.rule=Host(`$HOST`)"
       - "traefik.http.services.route-auth.loadbalancer.server.port=8080"
-      # Redirect '/' to '/admin'
-      # - "traefik.http.middlewares.custom-redirect.redirectregex.regex=^https:\\/\\/([^\\/]+)\\/?$$"
-      # - "traefik.http.middlewares.custom-redirect.redirectregex.replacement=https://$$1/admin"
-      # - "traefik.http.routers.route-auth.middlewares=default@file,custom-redirect"
       - "traefik.http.routers.route-auth.middlewares=default@file"
       - "traefik.http.routers.route-auth.entrypoints=websecure"
       - "traefik.http.routers.route-auth.tls.certresolver=letsencrypt"
