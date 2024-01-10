@@ -25,8 +25,14 @@ services:
     depends_on:
       - db
     command: start
+    healthcheck:
+      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:8080/health/live']
+      interval: 5s
+      timeout: 5s
+      retries: 30
     environment:
       KC_PROXY_ADDRESS_FORWARDING: "true"
+      KC_HEALTH_ENABLED: true
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME: $HOST
       KC_PROXY: edge
@@ -80,8 +86,24 @@ services:
       - "traefik.http.routers.route-authproxy.entrypoints=websecure"
       - "traefik.http.routers.route-authproxy.tls.certresolver=letsencrypt"
     depends_on:
-      - keycloak
-    
+      keycloak:
+        condition: service_healthy
+  
+  whoami:
+    image: traefik/whoami
+    restart: unless-stopped
+    command:
+       # It tells whoami to start listening on 2001 instead of 80
+       - --port=2001
+       - --name=iamfoo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.$DOMAIN`)"
+      - "traefik.http.services.whoami.loadbalancer.server.port=2001"
+      - "traefik.http.routers.whoami.middlewares=oauth@file"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
+          
 networks:
   default:
     external: true
