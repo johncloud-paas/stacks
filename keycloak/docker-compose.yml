@@ -71,8 +71,8 @@ services:
       OAUTH2_PROXY_COOKIE_CSRF_EXPIRE: '5m'
       OAUTH2_PROXY_CUSTOM_TEMPLATES_DIR: "/templates"
       OAUTH2_PROXY_REVERSE_PROXY: true
-    # volumes:
-    #   - ./conf/oauth2-proxy/templates:/templates:ro
+    volumes:
+      - .${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/oauth2-proxy/templates:/templates:ro
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.route-authproxy.rule=(Host(`$HOST`) && PathPrefix(`/oauth2/`)) || (PathPrefix(`/oauth2/`))"
