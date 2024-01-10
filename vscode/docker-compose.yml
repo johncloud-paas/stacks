@@ -9,6 +9,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=$TZ
+      - DOCKER_MODS=linuxserver/mods:code-server-python3
     volumes:
       - $WORKSPACE_PATH:/config/workspace
       - $JOHNCLOUD_ROOT/vscode/custom-cont-init.d:/custom-cont-init.d:ro
