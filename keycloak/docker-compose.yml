@@ -1,164 +1,83 @@
-version: '3.1'
-
-# https://joeeey.com/blog/selfhosting-sso-with-traefik-oauth2-proxy-part-2/
+version: "3.8"
 
 services:
-  ldap:
-    image: quay.io/389ds/dirsrv:latest
-    restart: unless-stopped
-    # Optionally uncomment one or both ports to expose to the host
-    # ports:
-    #   - '389:3389/tcp'    # Unencrypted port
-    #   - '636:3636/tcp'    # SSL/TLS port 
-    environment:
-      DS_DM_PASSWORD: $LDAP_ADMIN_PASSWORD
-    volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ldap:/data
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ldap.rule=Host(`ldap.$DOMAIN`)"
-      - "traefik.http.routers.ldap.entrypoints=ldaps"
-      - "traefik.http.routers.ldap.tls.certresolver=letsencrypt"
-
-  openldap-ui:
-    image: wheelybird/ldap-user-manager:v1.5
-    restart: unless-stopped
-    environment:
-      - LDAP_URI=ldap://$COMPOSE_PROJECT_NAME-ldap-1:3389
-      - LDAP_BASE_DN=$LDAP_ROOT
-      - LDAP_REQUIRE_STARTTLS=FALSE
-      - LDAP_ADMINS_GROUP=admins
-      - LDAP_ADMIN_BIND_DN=cn=Directory Manager
-      - LDAP_ADMIN_BIND_PWD=$KEYCLOAK_ADMIN_PASSWORD
-      - LDAP_IGNORE_CERT_ERRORS=true
-      - NO_HTTPS=TRUE
-      - PASSWORD_HASH=SSHA
-      - SERVER_HOSTNAME=ldap.$DOMAIN
-      - SMTP_HOSTNAME=$SMTP_HOSTNAME
-      - SMTP_HOST_PORT=$SMTP_HOST_PORT
-      - SMTP_USERNAME=$SMTP_USERNAME
-      - SMTP_PASSWORD=$SMTP_PASSWORD
-      - SMTP_USE_TLS=$SMTP_USE_TLS
-      - EMAIL_FROM_ADDRESS=$EMAIL_FROM_ADDRESS
-      - EMAIL_FROM_NAME=$EMAIL_FROM_NAME
-    depends_on:
-      - ldap
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ldap-ui.rule=Host(`ldap.$DOMAIN`)"
-      - "traefik.http.routers.ldap-ui.entrypoints=websecure"
-      - "traefik.http.routers.ldap-ui.tls.certresolver=letsencrypt"
-      - "homepage.group=Platform"
-      - "homepage.name=LDAP"
-      - "homepage.icon=keycloak.svg"
-      - "homepage.href=https://ldap.$DOMAIN"
-      - "homepage.description=LDAP Server Management"
-
-  db:
-    image: postgres:12.9
-    environment:
-      TZ: $TZ
-      POSTGRES_DB: $DB_NAME
-      POSTGRES_USER: $DB_USER
-      POSTGRES_PASSWORD: $DB_PASSWORD
-    # healthcheck:
-    #   test: [ "CMD-SHELL", "pg_isready -U $DB_USER -d $DB_NAME" ]
-    #   interval: 5s
-    #   timeout: 5s
-    #   retries: 5
+  keycloak_db:
+    image: postgres:13.2
+    container_name: keycloak_db
     restart: unless-stopped
     volumes:
-      - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/db:/var/lib/postgresql/data
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/keycloak_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DATABASE_NAME}
+      POSTGRES_USER: ${KEYCLOAK_DATABASE_USER}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DATABASE_PASSWORD}
+    labels:
+      - "traefik.enable=false"
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
-    restart: unless-stopped
     depends_on:
-      - db
-      - ldap
-    command: start
-    healthcheck:
-      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:8080/health/live']
-      interval: 5s
-      timeout: 5s
-      retries: 30
+      - keycloak_db
+    command:
+      - start
+      - "--features=token-exchange"
+      - "--hostname-strict-https=false"
+    ports:
+      - 17070:8080
     environment:
       KC_PROXY_ADDRESS_FORWARDING: "true"
-      KC_HEALTH_ENABLED: true
       KC_HOSTNAME_STRICT: "false"
       KC_HOSTNAME: $HOST
       KC_PROXY: edge
       KC_HTTP_ENABLED: "true"
       KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://$COMPOSE_PROJECT_NAME-db-1:5432/$DB_NAME?ssl=allow
-      KC_DB_USERNAME: $DB_USER
-      KC_DB_PASSWORD: $DB_PASSWORD
-      KEYCLOAK_ADMIN: $KEYCLOAK_ADMIN
-      KEYCLOAK_ADMIN_PASSWORD: $KEYCLOAK_ADMIN_PASSWORD
-      PROXY_ADDRESS_FORWARDING: "true"
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/$KEYCLOAK_DATABASE_NAME?ssl=allow
+      KC_DB_USERNAME: $KEYCLOAK_DATABASE_USER
+      KC_DB_PASSWORD: $KEYCLOAK_DATABASE_PASSWORD
+      KEYCLOAK_ADMIN: $KEYCLOAK_USER
+      KEYCLOAK_ADMIN_PASSWORD: $KEYCLOAK_PASSWORD
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.route-auth.rule=Host(`$HOST`)"
-      - "traefik.http.services.route-auth.loadbalancer.server.port=8080"
-      # - "traefik.http.routers.route-auth.middlewares=default@file"
-      - "traefik.http.routers.route-auth.entrypoints=websecure"
-      - "traefik.http.routers.route-auth.tls.certresolver=letsencrypt"
-      - "homepage.group=Platform"
-      - "homepage.name=Keycloak"
-      - "homepage.icon=keycloak.svg"
-      - "homepage.href=https://$HOST/admin"
-      - "homepage.description=Open Source Identity and Access Management"
+      - "traefik.http.routers.keycloak.rule=Host(`$HOST`)"
+      - "traefik.http.routers.keycloak.entrypoints=websecure"
+      - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+      # # Redirect '/' to '/admin'
+      # - "traefik.http.middlewares.custom-redirect.redirectregex.regex=^https:\\/\\/([^\\/]+)\\/?$$"
+      # - "traefik.http.middlewares.custom-redirect.redirectregex.replacement=https://$$1/admin"
+      # - "traefik.http.routers.keycloak.middlewares=default@file,custom-redirect"
 
-  oauth2proxy:
-    image: quay.io/oauth2-proxy/oauth2-proxy:latest
-    restart: unless-stopped
+  ldap:
+    image: osixia/openldap:latest
+    container_name: ldap 
     environment:
-      OAUTH2_PROXY_HTTP_ADDRESS: '0.0.0.0:4180'
-      OAUTH2_PROXY_COOKIE_SECRET: '$OAUTH2_PROXY_COOKIE_SECRET'
-      OAUTH2_PROXY_COOKIE_DOMAINS: '.$DOMAIN' # Required so cookie can be read on all subdomains.
-      OAUTH2_PROXY_WHITELIST_DOMAINS: '.$DOMAIN' # Required to allow redirection back to original requested target.
-      # Configure to use Keycloak
-      OAUTH2_PROXY_PROVIDER: 'oidc'
-      OAUTH2_PROXY_CLIENT_ID: 'oauth2-proxy'
-      OAUTH2_PROXY_CLIENT_SECRET: '$OAUTH2_PROXY_CLIENT_SECRET'
-      OAUTH2_PROXY_EMAIL_DOMAINS: '*'
-      OAUTH2_PROXY_OIDC_ISSUER_URL: 'https://$HOST/realms/master'
-      OAUTH2_PROXY_REDIRECT_URL: 'https://$HOST/oauth2/callback'
-      #
-      OAUTH2_PROXY_COOKIE_CSRF_PER_REQUEST: true
-      OAUTH2_PROXY_COOKIE_CSRF_EXPIRE: '5m'
-      OAUTH2_PROXY_CUSTOM_TEMPLATES_DIR: "/templates"
-      OAUTH2_PROXY_REVERSE_PROXY: true
-      OAUTH2_PROXY_SET_XAUTHREQUEST: true # To pass the authenticated username/email in an HTTP header
+      LDAP_ORGANISATION: $LDAP_ORGANISATION
+      LDAP_DOMAIN: $LDAP_DOMAIN
+      LDAP_BASE_DN: ${LDAP_BASE_DN:-}
+      LDAP_ADMIN_PASSWORD: $LDAP_ADMIN_PASSWORD
+      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD:-$LDAP_ADMIN_PASSWORD}
     volumes:
-      - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/oauth2-proxy/templates:/templates:ro
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.route-authproxy.rule=(Host(`$HOST`) && PathPrefix(`/oauth2/`)) || (PathPrefix(`/oauth2/`))"
-      - "traefik.http.services.route-authproxy.loadbalancer.server.port=4180"
-      - "traefik.http.routers.route-authproxy.entrypoints=websecure"
-      - "traefik.http.routers.route-authproxy.tls.certresolver=letsencrypt"
-    depends_on:
-      keycloak:
-        condition: service_healthy
-  
-  whoami:
-    image: traefik/whoami
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ldap_data:/var/lib/ldap
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ldap_config:/etc/ldap/slapd.d
     restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+
+  openldap-ui:
+    image: osixia/phpldapadmin:latest
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=ldap
+      - PHPLDAPADMIN_HTTPS=false
+      - PHPLDAPADMIN_SERVER_PATH=/
+      - PHPLDAPADMIN_TRUST_PROXY_SSL=true
     depends_on:
-      - oauth2proxy
-    command:
-       # It tells whoami to start listening on 2001 instead of 80
-       - --port=2001
-       - --name=iamfoo
+      - ldap
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.$DOMAIN`)"
-      - "traefik.http.services.whoami.loadbalancer.server.port=2001"
-      - "traefik.http.routers.whoami.middlewares=oauth@file"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=letsencrypt"
-          
+      - "traefik.http.routers.ldap_ui.rule=Host(`ldap.$DOMAIN`)"
+      - "traefik.http.routers.ldap_ui.entrypoints=websecure"
+      - "traefik.http.routers.ldap_ui.tls.certresolver=letsencrypt"
+
 networks:
   default:
     external: true
