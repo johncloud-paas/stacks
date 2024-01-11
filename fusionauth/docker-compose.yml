@@ -1,6 +1,23 @@
 version: '3'
 
 services:
+  ldap:
+    image: quay.io/389ds/dirsrv:latest
+    restart: unless-stopped
+    # Optionally uncomment one or both ports to expose to the host
+    # ports:
+    #   - '389:3389/tcp'    # Unencrypted port
+    #   - '636:3636/tcp'    # SSL/TLS port 
+    environment:
+      DS_DM_PASSWORD: $LDAP_ADMIN_PASSWORD
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ldap:/data
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.ldap.rule=Host(`ldap.$DOMAIN`)"
+    #   - "traefik.http.routers.ldap.entrypoints=ldaps"
+    #   - "traefik.http.routers.ldap.tls.certresolver=letsencrypt"
+
   db:
     image: postgres:12.9
     environment:
@@ -15,7 +32,7 @@ services:
       retries: 5
     restart: unless-stopped
     volumes:
-      - ${JOHNCLOUD_ROOT}/fusionauth/db_data:/var/lib/postgresql/data
+      - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/db_data:/var/lib/postgresql/data
     labels:
       - "traefik.enable=false"
 
@@ -38,8 +55,8 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ${JOHNCLOUD_ROOT}/fusionauth/search/logs:/usr/share/elasticsearch/logs/
-      - ${JOHNCLOUD_ROOT}/fusionauth/search/data:/usr/share/elasticsearch/data/
+      - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/search/logs:/usr/share/elasticsearch/logs/
+      - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/search/data:/usr/share/elasticsearch/data/
     labels:
       - "traefik.enable=false"
 
@@ -50,12 +67,14 @@ services:
         condition: service_healthy
       search:
         condition: service_healthy
+      ldap:
+        condition: service_started
     environment:
       DATABASE_URL: jdbc:postgresql://$COMPOSE_PROJECT_NAME-db-1:5432/fusionauth
       DATABASE_ROOT_USERNAME: ${POSTGRES_USER}
       DATABASE_ROOT_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_USERNAME: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       FUSIONAUTH_APP_MEMORY: ${FUSIONAUTH_APP_MEMORY}
       FUSIONAUTH_APP_RUNTIME_MODE: production
       FUSIONAUTH_APP_URL: https://$HOST
