@@ -70,7 +70,7 @@ services:
       - "traefik.http.services.fusionauth.loadbalancer.server.port=9011"
       - "homepage.group=Platform"
       - "homepage.name=FusionAuth"
-      - "homepage.icon=keycloak.svg"
+      - "homepage.icon=https://www.vectorlogo.zone/logos/fusionauthio/fusionauthio-icon.svg"
       - "homepage.href=https://$HOST"
       - "homepage.description=Authentication & Authorization"
 
