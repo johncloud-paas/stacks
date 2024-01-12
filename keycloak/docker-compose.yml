@@ -58,36 +58,35 @@ services:
       - "homepage.href=https://$HOST/admin"
       - "homepage.description=Open Source Identity and Access Management"
 
-  ldap:
-    image: osixia/openldap:latest
-    environment:
-      LDAP_ORGANISATION: $LDAP_ORGANISATION
-      LDAP_DOMAIN: $LDAP_DOMAIN
-      LDAP_BASE_DN: ${LDAP_BASE_DN:-}
-      LDAP_ADMIN_PASSWORD: $LDAP_ADMIN_PASSWORD
-      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD:-$LDAP_ADMIN_PASSWORD}
-    volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ldap/data:/var/lib/ldap
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ldap/config:/etc/ldap/slapd.d
+  # https://github.com/lldap/lldap/blob/main/example_configs/keycloak.md
+  # https://blog.raspot.in/fr/blog/installation-et-configuration-de-lldap-et-authelia-pour-limiter-lacces-a-lapplication-web-lufi
+  # https://joeeey.com/blog/selfhosting-sso-with-traefik-keycloak-part-1/
+  lldap:
+    image: lldap/lldap:stable
     restart: unless-stopped
-    labels:
-      - "traefik.enable=false"
-
-  # Connect with cn=admin,dc=domain,dc=tld
-  openldap-ui:
-    image: osixia/phpldapadmin:latest
+    # ports:
+      # For LDAP
+      # - "3890:3890"
+      # For LDAPS (LDAP Over SSL), enable port if LLDAP_LDAPS_OPTIONS__ENABLED set true, look env below
+      # - "6360:6360"
+      # For the web front-end
+      # - "17170:17170"
     environment:
-      - PHPLDAPADMIN_LDAP_HOSTS=$COMPOSE_PROJECT_NAME-ldap-1
-      - PHPLDAPADMIN_HTTPS=false
-      - PHPLDAPADMIN_SERVER_PATH=/
-      - PHPLDAPADMIN_TRUST_PROXY_SSL=true
-    depends_on:
-      - ldap
+      - UID=$UID
+      - GID=$GID
+      - TZ=$TZ
+      - LLDAP_JWT_SECRET=$LLDAP_JWT_SECRET
+      - LLDAP_LDAP_USER_PASS=$LLDAP_LDAP_USER_PASS
+      - LLDAP_LDAP_BASE_DN=$LDAP_BASE_DN
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ldap/data:/data
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ldap/secrets:/secrets
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ldap_ui.rule=Host(`ldap.$DOMAIN`)"
       - "traefik.http.routers.ldap_ui.entrypoints=websecure"
       - "traefik.http.routers.ldap_ui.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ldap_ui.loadbalancer.server.port=17170"
       - "homepage.group=Platform"
       - "homepage.name=LDPA"
       - "homepage.icon=https://blog.raspot.in/user/pages/01.blog/installation-et-configuration-de-lldap-et-authelia-pour-limiter-lacces-a-lapplication-web-lufi/nginx-authelia-lldap-lufi.png"
