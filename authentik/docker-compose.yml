@@ -113,7 +113,6 @@ services:
       - redis
     labels:
       - "traefik.enable=false"
-      
 
 networks:
   default:
