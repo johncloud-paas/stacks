@@ -126,7 +126,6 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik"
       - "homepage.group=Bureautique"
       - "homepage.name=Paperless-ngx"
       - "homepage.icon=paperless-ngx.svg"
