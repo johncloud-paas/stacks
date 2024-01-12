@@ -86,6 +86,8 @@ services:
       PAPERLESS_DBNAME: $POSTGRES_DB
       PAPERLESS_DBUSER: $POSTGRES_USER
       PAPERLESS_DBPASS: $POSTGRES_PASSWORD
+      PAPERLESS_ENABLE_HTTP_REMOTE_USER: TRUE
+      PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME: HTTP_X_AUTHENTIK_USERNAME
 # The UID and GID of the user used to run paperless in the container. Set this
 # to your UID and GID on the host so that you have write access to the
 # consumption directory.
