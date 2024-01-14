@@ -1,37 +1,54 @@
-version: '2'
+version: '3'
+
 services:
-  app:
-    image: machines/filestash
+  db:
+    image: docker.io/library/postgres:12-alpine
     restart: unless-stopped
-    environment:
-    - APPLICATION_URL=$HOST
-    # - GDRIVE_CLIENT_ID=<gdrive_client>
-    # - GDRIVE_CLIENT_SECRET=<gdrive_secret>
-    # - DROPBOX_CLIENT_ID=<dropbox_key>
-    - ONLYOFFICE_URL=http://$COMPOSE_PROJECT_NAME-onlyoffice-1
-    # ports:
-    # - "8334:8334"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
     volumes:
-    - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME:/app/data/state/
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?database password required}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    labels:
+      - "traefik.enable=false"
+
+  app:
+    image: hudik/hoodik:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATA_DIR=/data
+      - APP_URL=https://$HOST
+      - MAILER_TYPE='smtp'
+      - HTTP_PORT=5443
+      - SMTP_ADDRESS=$SMTP_ADDRESS
+      - SMTP_USERNAME=$SMTP_USERNAME
+      - SMTP_PASSWORD=$SMTP_PASSWORD
+      - SMTP_PORT=$SMTP_PORT
+      - SMTP_DEFAULT_FROM=$SMTP_DEFAULT_FROM
+      - DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$COMPOSE_PROJECT_NAME-db-1:5432/$POSTGRES_DB
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/app:/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8334"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=5443"
       - "homepage.group=Bureautique"
-      - "homepage.name=Filestash"
-      - "homepage.icon=https://downloads.filestash.app/brand/logo_grey.svg"
+      - "homepage.name=Hoodik"
+      - "homepage.icon=https://hoodik.io/images/hoodik-lg.svg"
       - "homepage.href=https://$HOST"
       - "homepage.description=File Manager"
-
-  onlyoffice:
-    image: onlyoffice/documentserver
-    restart: unless-stopped
-    security_opt:
-      - seccomp:unconfined
-    labels:
-      - "traefik.enable=false"
 
 networks:
   default:
