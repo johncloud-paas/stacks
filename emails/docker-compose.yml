@@ -692,6 +692,11 @@ services:
       - "traefik.http.routers.webmail.tls.certresolver=letsencrypt"
       - "traefik.http.middlewares.webmail-stripprefix.stripprefix.prefixes=$WEB_WEBMAIL"
       - "traefik.http.routers.webmail.middlewares=webmail-stripprefix@docker"
+      - "homepage.group=Bureautique"
+      - "homepage.name=Webmail"
+      - "homepage.icon=roundcube.svg"
+      - "homepage.href=https://$TRAEFIK_DOMAIN/$WEB_WEBMAIL"
+      - "homepage.description=Roundcube webmail"
 
 networks:
   default:
