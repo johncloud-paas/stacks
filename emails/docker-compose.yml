@@ -5,9 +5,8 @@ services:
   redis:
     image: redis:7.2.0-alpine
     restart: unless-stopped
-    # container_name: redis
     volumes:
-      - "$JOHNCLOUD_ROOT/mailu/redis:/data"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis:/data"
     depends_on:
       - resolver
     dns:
@@ -83,9 +82,8 @@ services:
       - "$REAL_IP_FROM:993:993"
     networks:
       - default
-      # - webmail
     volumes:
-      - $JOHNCLOUD_ROOT/mailu/overrides/nginx:/overrides:ro
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/overrides/nginx:/overrides:ro
       - $JOHNCLOUD_ROOT/traefik/certs/$TRAEFIK_DOMAIN/certificate.pem:/certs/cert.pem
       - $JOHNCLOUD_ROOT/traefik/certs/$TRAEFIK_DOMAIN/privatekey.pem:/certs/key.pem
     depends_on:
@@ -218,8 +216,8 @@ services:
       options:
         tag: mailu-admin
     volumes:
-      - "$JOHNCLOUD_ROOT/mailu/data:/data"
-      - "$JOHNCLOUD_ROOT/mailu/dkim:/dkim"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/dkim:/dkim"
     depends_on:
       - redis
       - resolver
@@ -286,8 +284,8 @@ services:
       options:
         tag: mailu-imap
     volumes:
-      - "$JOHNCLOUD_ROOT/mailu/mail:/mail"
-      - "$JOHNCLOUD_ROOT/mailu/overrides/dovecot:/overrides:ro"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mail:/mail"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/overrides/dovecot:/overrides:ro"
     depends_on:
       - front
       - resolver
@@ -354,8 +352,8 @@ services:
       options:
         tag: mailu-smtp
     volumes:
-      - "$JOHNCLOUD_ROOT/mailu/mailqueue:/queue"
-      - "$JOHNCLOUD_ROOT/mailu/overrides/postfix:/overrides:ro"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mailqueue:/queue"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/overrides/postfix:/overrides:ro"
     depends_on:
       - front
       - resolver
@@ -489,8 +487,8 @@ services:
       - default
       - noinet
     volumes:
-      - "$JOHNCLOUD_ROOT/mailu/filter:/var/lib/rspamd"
-      - "$JOHNCLOUD_ROOT/mailu/overrides/rspamd:/overrides:ro"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/filter:/var/lib/rspamd"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/overrides/rspamd:/overrides:ro"
     depends_on:
       - front
       - redis
@@ -557,7 +555,7 @@ services:
       - WELCOME_BODY=$WELCOME_BODY
       - WELCOME_SUBJECT=$WELCOME_SUBJECT
     volumes:
-      - "$JOHNCLOUD_ROOT/mailu/filter:/data"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/filter:/data"
     depends_on:
       - resolver
     dns:
@@ -565,10 +563,22 @@ services:
     labels:
       - "traefik.enable=false"
 
+  # db:
+  #   image: mysql:8.1.0
+  #   environment:
+  #     TZ: $TZ
+  #     MYSQL_DATABASE: $DB_NAME
+  #     MYSQL_USER: $DB_USER
+  #     MYSQL_PASSWORD: $DB_PASSWORD
+  #     MYSQL_RANDOM_ROOT_PASSWORD: $DB_RANDOM_ROOT_PASSWORD
+  #   volumes:
+  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/mysql
+  #   labels:
+  #     - "traefik.enable=false"
+
   # webmail:
   #   image: ${DOCKER_ORG:-ghcr.io/mailu}/${DOCKER_PREFIX:-}webmail:${MAILU_VERSION:-2.0}
   #   restart: unless-stopped
-  #   container_name: webmail
   #   environment:
   #     - ADMIN=$ADMIN
   #     - ANTIVIRUS=$ANTIVIRUS
@@ -619,8 +629,8 @@ services:
   #     - WELCOME_BODY=$WELCOME_BODY
   #     - WELCOME_SUBJECT=$WELCOME_SUBJECT
   #   volumes:
-  #     - "$JOHNCLOUD_ROOT/mailu/webmail:/data"
-  #     - "$JOHNCLOUD_ROOT/mailu/overrides/roundcube:/overrides:ro"
+  #     - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/webmail:/data"
+  #     - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/overrides/roundcube:/overrides:ro"
   #   depends_on:
   #     - front
   #   networks:
@@ -637,8 +647,6 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-  # webmail:
-  #   driver: bridge
   noinet:
     driver: bridge
     internal: true
