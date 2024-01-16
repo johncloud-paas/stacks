@@ -51,6 +51,9 @@ services:
       - SMTP_NAME=$SMTP_NAME
       - SMTP_PASSWORD=$SMTP_PASSWORD
       - MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS
+      - TRUSTED_PROXIES=$TRUSTED_PROXIES
+      - OVERWRITEHOST=$HOST
+      - OVERWRITEPROTOCOL=https
     depends_on:
       - db
       - redis
