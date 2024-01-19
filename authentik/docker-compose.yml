@@ -106,7 +106,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/media:/media
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/certs:/certs
+      - $JOHNCLOUD_ROOT/traefik/certs:/certs
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/custom-templates:/templates
     depends_on:
       - postgresql

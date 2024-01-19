@@ -20,3 +20,11 @@ To scan the content of the folder data:
 If needed:
 
     convmv -f utf-8 -t utf-8 -r --notest --nfc --replace <nextcloud-data-folder>
+
+To set phone region:
+
+    sudo docker exec --user www-data nextcloud-app-1 php occ config:system:set default_phone_region --value="yourvalue"
+
+For oauth2
+
+    sudo docker exec --user www-data nextcloud-app-1 php occ config:app:set --value=0 user_oidc allow_multiple_user_backends
