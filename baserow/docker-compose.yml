@@ -3,9 +3,36 @@
 version: "3.4"
 
 services:
-  app:
-    image: baserow/baserow:1.13.2
+  db:
+    image: docker.io/library/postgres:12-alpine
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_DB: ${DATABASE_NAME}
+    labels:
+      - "traefik.enable=false"
+
+  app:
+    image: baserow/baserow:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ./baserow.sh backend-cmd backend-healthcheck
+      interval: 60s
+      retries: 5
+      start_period: 20s
+      timeout: 10s
     environment:
       TZ: $TZ
       BASEROW_PUBLIC_URL: https://$HOST
@@ -17,16 +44,17 @@ services:
       EMAIL_SMTP_PORT: $EMAIL_SMTP_PORT
       EMAIL_SMTP_USER: $EMAIL_SMTP_USER
       EMAIL_SMTP_PASSWORD: $EMAIL_SMTP_PASSWORD
-    ports:
-      - "8059:80"
-      # - "443:443"
+      DATABASE_HOST: $COMPOSE_PROJECT_NAME-db-1
+      DATABASE_NAME: $DATABASE_NAME
+      DATABASE_USER: $DATABASE_USER
+      DATABASE_PASSWORD: $DATABASE_PASSWORD
     volumes:
-      - $JOHNCLOUD_ROOT/baserow/data:/baserow/data
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/baserow/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.baserow.rule=Host(`$HOST`)"
-      - "traefik.http.routers.baserow.entrypoints=websecure"
-      - "traefik.http.routers.baserow.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "homepage.group=Bureautique"
       - "homepage.name=Baserow"
       - "homepage.icon=baserow.svg"
