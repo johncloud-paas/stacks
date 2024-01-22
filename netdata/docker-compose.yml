@@ -10,10 +10,10 @@ services:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
-    environment:
-      - NETDATA_CLAIM_TOKEN=NETDATA_CLAIM_TOKEN
-      - NETDATA_CLAIM_URL=$NETDATA_CLAIM_URL
-      - NETDATA_CLAIM_ROOMS=$NETDATA_CLAIM_ROOMS
+    # environment:
+    #   - NETDATA_CLAIM_TOKEN=NETDATA_CLAIM_TOKEN
+    #   - NETDATA_CLAIM_URL=$NETDATA_CLAIM_URL
+    #   - NETDATA_CLAIM_ROOMS=$NETDATA_CLAIM_ROOMS
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/etc/netdata
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/lib:/var/lib/netdata
