@@ -31,7 +31,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "homepage.group=Productivité"
       - "homepage.name=Dolibarr"
-      - "homepage.icon=https://raw.githubusercontent.com/dolibarr/dolibarr-ux/master/branding/SVG/icon-transparent-vue.svg"
+      - "homepage.icon=https://user-images.githubusercontent.com/24292300/64095022-ef2f0700-cd5d-11e9-8855-d6be38b31bdd.png"
       - "homepage.href=https://$HOST"
       - "homepage.description=Open Source ERP & CRM pour l'entreprise"
 
