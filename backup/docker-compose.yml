@@ -29,8 +29,9 @@ services:
         - $BACKUP_ROOT/backup/logs:/app/logs
         - $JOHNCLOUD_ROOT:/source
     networks:
-      default:
-        ipv4_address: 192.168.203.17
+      default: null
+      frontend:
+        ipv4_address: 192.168.205.30
     labels:
       - "traefik.enable=false"
       # - "traefik.enable=true"
@@ -43,11 +44,15 @@ services:
       - "homepage.name=Kopia"
       - "homepage.icon=kopia.svg"
       # - "homepage.href=https://backup.$HOST"
-      - "homepage.href=http://192.168.203.17:51515"
+      - "homepage.href=http://192.168.205.30:51515"
       - "homepage.description=Backup system"
 
 networks:
   default:
     external: true
     name: traefik-proxy
+  frontend:
+    external: true
+    name: platform-network
+
     
