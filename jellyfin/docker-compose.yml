@@ -6,7 +6,8 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/jellyfin/config:/config
       - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Musique:/data:ro
-      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Vidéos:/video:ro
+      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Vidéos/Movies:/movies:ro
+      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Vidéos/Shows:/shows:ro
       - $JOHNCLOUD_ROOT/traefik/certs/$HOST/privatekey.pem:/config/key.pem
     restart: unless-stopped
     ports:
