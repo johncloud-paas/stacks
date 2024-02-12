@@ -5,9 +5,9 @@ services:
     image: lscr.io/linuxserver/jellyfin:latest
     volumes:
       - $JOHNCLOUD_ROOT/jellyfin/config:/config
-      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Musique:/data:ro
-      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Vidéos/Movies:/movies:ro
-      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Vidéos/Shows:/shows:ro
+      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Musique:/data
+      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Vidéos/Movies:/movies
+      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Vidéos/Shows:/shows
       - $JOHNCLOUD_ROOT/traefik/certs/$HOST/privatekey.pem:/config/key.pem
     restart: unless-stopped
     ports:
