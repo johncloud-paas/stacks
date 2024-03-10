@@ -4,24 +4,24 @@ version: "2.1"
 
 services:
   app:
-    image: lscr.io/linuxserver/code-server:4.16.1
+    image: lscr.io/linuxserver/code-server:latest
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=$TZ
       - DOCKER_MODS=linuxserver/mods:code-server-python3
     volumes:
-      - $WORKSPACE_PATH:/config/workspace
+      # - $WORKSPACE_PATH:/config/workspace
       - $JOHNCLOUD_ROOT/vscode/custom-cont-init.d:/custom-cont-init.d:ro
-    ports:
-      - 8741:8443
+    # ports:
+    #   - 8741:8443
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.code.rule=Host(`$HOST`)"
-      - "traefik.http.routers.code.entrypoints=websecure"
-      - "traefik.http.routers.code.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.code.middlewares=forward-auth-verify"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
       
 networks:
   default:
