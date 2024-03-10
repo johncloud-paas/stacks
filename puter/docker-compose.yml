@@ -12,6 +12,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=4000"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
       - "homepage.group=Bureautique"
       - "homepage.name=Puter"
       - "homepage.icon=https://camo.githubusercontent.com/45728src/favicons/apple-icon-180x180.png"
