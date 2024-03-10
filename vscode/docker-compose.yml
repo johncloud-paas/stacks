@@ -22,6 +22,11 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
+      - "homepage.group=Développement"
+      - "homepage.name=VSCode"
+      - "homepage.icon=vscode.svg"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=Code editing. Redefined."
       
 networks:
   default:
