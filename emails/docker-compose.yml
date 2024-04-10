@@ -101,7 +101,7 @@ services:
       - "homepage.group=Bureautique"
       - "homepage.name=Mailu"
       - "homepage.icon=mailu.png"
-      - "homepage.href=https://$TRAEFIK_DOMAIN"
+      - "homepage.href=https://$TRAEFIK_DOMAIN/admin"
       - "homepage.description=Mail domain administration"
 
   resolver:
