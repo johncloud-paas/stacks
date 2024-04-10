@@ -100,7 +100,7 @@ services:
       - "traefik.http.services.mailu-websecure-svc.loadbalancer.server.port=80"
       - "homepage.group=Bureautique"
       - "homepage.name=Mailu"
-      - "homepage.icon=mailu.svg"
+      - "homepage.icon=mailu.png"
       - "homepage.href=https://$TRAEFIK_DOMAIN"
       - "homepage.description=Mail domain administration"
 
