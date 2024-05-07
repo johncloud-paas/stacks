@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+  homebox:
+    image: ghcr.io/hay-kot/homebox:latest
+    restart: unless-stopped
+    environment:
+    - HBOX_LOG_LEVEL=info
+    - HBOX_LOG_FORMAT=json
+    - HBOX_WEB_PORT=17745
+    - HBOX_WEB_MAX_UPLOAD_SIZE=10
+    - HBOX_MAILER_HOST=$HBOX_MAILER_HOST
+    - HBOX_MAILER_PORT=$HBOX_MAILER_PORT
+    - HBOX_MAILER_USERNAME=$HBOX_MAILER_USERNAME
+    - HBOX_MAILER_PASSWORD=$HBOX_MAILER_PASSWORD
+    - HBOX_MAILER_FROM=$HBOX_MAILER_FROM
+    - HBOX_OPTIONS_ALLOW_REGISTRATION=$HBOX_OPTIONS_ALLOW_REGISTRATION
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=17745"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
