@@ -59,7 +59,7 @@ services:
       - "homepage.name=Baserow"
       - "homepage.icon=baserow.svg"
       - "homepage.href=https://$HOST"
-      - "homepage.description=Backup system"
+      - "homepage.description=No-code open source database and application builder"
 
 networks:
   default:
