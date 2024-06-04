@@ -7,6 +7,8 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME:/appsmith-stacks
     restart: unless-stopped
+    depends_on:
+      - postgres
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
@@ -18,6 +20,24 @@ services:
       - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
+
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U affine']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB: $DB_NAME
+      PGDATA: /var/lib/postgresql/data/pgdata
+    labels:
+      - "traefik.enable=false"
 
 networks:
   default:
