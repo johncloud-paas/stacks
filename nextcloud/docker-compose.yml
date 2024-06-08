@@ -1,6 +1,4 @@
 # https://sparwan.com/articles/post/creer-votre-serveur-cloud-tuto-d-installation-de-nextcloud-via-docker-compose.html
-version: '3.8'
-
 services:
   db:
     image: mariadb:lts
@@ -8,6 +6,8 @@ services:
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     volumes:
       - $JOHNCLOUD_ROOT/nextcloud/db:/var/lib/mysql
+    networks:
+      - backend
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -22,6 +22,8 @@ services:
   redis:
     image: redis:latest
     restart: unless-stopped
+    networks:
+      - backend
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -36,6 +38,9 @@ services:
     restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/nextcloud/data:/var/www/html
+    networks:
+      - backend
+      - default
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -68,14 +73,17 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       # - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.serverstransport=ignorecert"
       # - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.scheme=https"
-      - "homepage.group=Bureautique"
-      - "homepage.name=Nextcloud"
-      - "homepage.icon=nextcloud.svg"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://$HOST"
-      - "homepage.description=Online collaboration platform"
-        
+      - "homepage.description=$HOME_DESCRIPTION"
+
 networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: nextcloud-network
+
     

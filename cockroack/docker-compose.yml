@@ -2,13 +2,16 @@ services:
   cockroach:
     image: cockroachdb/cockroach:v24.1.0
     restart: unless-stopped
-    environment:
-      - COCKROACH_DATABASE=${DATABASE_NAME}
-      - COCKROACH_USER=${USER_NAME}
-      - COCKROACH_PASSWORD=${PASSWORD}
-    # ports:
-    #   - 26257:26257
+    # environment:
+    #   - COCKROACH_DATABASE=${DATABASE_NAME}
+    #   - COCKROACH_USER=${USER_NAME}
+    #   - COCKROACH_PASSWORD=${PASSWORD}
+    ports:
+      - 26257:26257
     #   - 8080:8080
+    # depends_on:
+    #   postgres:
+    #     condition: service_healthy
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/cockroach/cockroach-data
     command: ["start-single-node", "--insecure"]
@@ -23,6 +26,24 @@ services:
       - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
+
+  # postgres:
+  #   image: postgres
+  #   restart: unless-stopped
+  #   volumes:
+  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ['CMD-SHELL', 'pg_isready -U ${USER_NAME}']
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   environment:
+  #     POSTGRES_USER: $USER_NAME
+  #     POSTGRES_PASSWORD: $PASSWORD
+  #     POSTGRES_DB: $DATABASE_NAME
+  #     PGDATA: /var/lib/postgresql/data/pgdata
+  #   labels:
+  #     - "traefik.enable=false"
 
 networks:
   default:
