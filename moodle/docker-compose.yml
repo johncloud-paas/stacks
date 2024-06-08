@@ -9,7 +9,7 @@ services:
     #   - '8090:8080'
     restart: unless-stopped
     networks:
-      - moodle-network
+      - backend
       - default
     environment:
       - TZ=$TZ
@@ -38,7 +38,7 @@ services:
     image: mariadb:lts
     restart: unless-stopped
     networks:
-      - moodle-network
+      - backend
     environment:
       - TZ=$TZ
       - MARIADB_PASSWORD=$DB_PASSWORD
