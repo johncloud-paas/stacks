@@ -4,7 +4,7 @@ name: moodle
 
 services:
   app:
-    image: docker.io/bitnami/moodle:4.1.4-debian-11-r43
+    image: docker.io/bitnami/moodle:4.3.4-debian-12-r6
     # ports:
     #   - '8090:8080'
     restart: unless-stopped
