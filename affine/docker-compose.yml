@@ -13,6 +13,9 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+    networks:
+      - backend
+      - default
     volumes:
       # custom configurations
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/root/.affine/config
@@ -49,6 +52,8 @@ services:
   redis:
     image: redis
     restart: unless-stopped
+    networks:
+      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis:/data
     healthcheck:
@@ -62,6 +67,8 @@ services:
   postgres:
     image: postgres
     restart: unless-stopped
+    networks:
+      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres:/var/lib/postgresql/data
     healthcheck:
@@ -81,3 +88,6 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: affine-network
+    

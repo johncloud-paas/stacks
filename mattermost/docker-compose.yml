@@ -11,6 +11,8 @@ services:
       - no-new-privileges:true
     pids_limit: 100
     read_only: true
+    networks:
+      - mattermost-network
     tmpfs:
       - /tmp
       - /var/run/postgresql
@@ -35,6 +37,9 @@ services:
       - ${APP_PORT}:8065
       - ${CALLS_PORT}:8443/udp
       - ${CALLS_PORT}:8443/tcp
+    networks:
+      - mattermost-network
+      - default
     security_opt:
       - no-new-privileges:true
     pids_limit: 200
@@ -80,4 +85,6 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: mattermost-network
     

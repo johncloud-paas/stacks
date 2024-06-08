@@ -1,14 +1,14 @@
 services:
   app:
     image: index.docker.io/appsmith/appsmith-ee
-    # ports:
-    #   - "80:80"
-    #   - "443:443"
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME:/appsmith-stacks
     restart: unless-stopped
     depends_on:
       - postgres
+    networks:
+      - backend
+      - default
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
@@ -24,6 +24,8 @@ services:
   postgres:
     image: postgres
     restart: unless-stopped
+    networks:
+      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres:/var/lib/postgresql/data
     healthcheck:
@@ -43,3 +45,5 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: appsmith-network

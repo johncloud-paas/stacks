@@ -4,6 +4,8 @@ services:
   keycloak_db:
     image: postgres:13.2
     restart: unless-stopped
+    networks:
+      - keycloak
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/keycloak_db:/var/lib/postgresql/data
     environment:
@@ -28,6 +30,9 @@ services:
       retries: 30
     # ports:
     #   - 17070:8080
+    networks:
+      - keycloak
+      - default
     environment:
       KC_PROXY_ADDRESS_FORWARDING: "true"
       KC_HEALTH_ENABLED: true
@@ -71,6 +76,9 @@ services:
       # - "6360:6360"
       # For the web front-end
       # - "17170:17170"
+    networks:
+      - keycloak
+      - default
     environment:
       - UID=$UID
       - GID=$GID
@@ -109,3 +117,5 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: keycloak-network

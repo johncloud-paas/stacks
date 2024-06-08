@@ -5,9 +5,12 @@ name: moodle
 services:
   app:
     image: docker.io/bitnami/moodle:4.1.4-debian-11-r43
-    ports:
-      - '8090:8080'
+    # ports:
+    #   - '8090:8080'
     restart: unless-stopped
+    networks:
+      - moodle-network
+      - default
     environment:
       - TZ=$TZ
       - MOODLE_DATABASE_HOST=$DB_HOST
@@ -25,11 +28,17 @@ services:
       - "traefik.http.routers.moodle.rule=Host(`$HOST`)"
       - "traefik.http.routers.moodle.entrypoints=websecure"
       - "traefik.http.routers.moodle.tls.certresolver=letsencrypt"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
 
   db:
     image: mariadb:lts
     restart: unless-stopped
-    container_name: moodle_db
+    networks:
+      - moodle-network
     environment:
       - TZ=$TZ
       - MARIADB_PASSWORD=$DB_PASSWORD
@@ -47,4 +56,6 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: moodle-network
     

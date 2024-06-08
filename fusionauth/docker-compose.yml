@@ -8,6 +8,8 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
@@ -27,6 +29,8 @@ services:
       discovery.type: single-node
       xpack.security.enabled: false
       ES_JAVA_OPTS: ${ES_JAVA_OPTS}
+    networks:
+      - backend
     healthcheck:
       test: [ "CMD", "curl",  "--fail" ,"--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://localhost:9200/" ]
       interval: 5s
@@ -50,6 +54,9 @@ services:
         condition: service_healthy
       search:
         condition: service_healthy
+    networks:
+      - backend
+      - default
     environment:
       DATABASE_URL: jdbc:postgresql://$COMPOSE_PROJECT_NAME-db-1:5432/fusionauth
       DATABASE_ROOT_USERNAME: postgres
@@ -78,3 +85,6 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: fusionauth-network
+    

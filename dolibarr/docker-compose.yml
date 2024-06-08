@@ -8,6 +8,8 @@ services:
       MARIADB_PASSWORD: $DOLI_DB_PASSWORD
       MARIADB_ROOT_PASSWORD: $DOLI_DB_ROOT_PASSWORD
       MARIADB_DATABASE: $DOLI_DB_NAME
+    networks:
+      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/mysql
     labels:
@@ -24,6 +26,9 @@ services:
       PHP_INI_DATE_TIMEZONE: '$TZ'
     depends_on:
       - mariadb
+    networks:
+      - backend
+      - default
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
@@ -39,4 +44,6 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: dolibarr-network
     

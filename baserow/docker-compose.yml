@@ -12,6 +12,8 @@ services:
       interval: 30s
       retries: 5
       timeout: 5s
+    networks:
+      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/database:/var/lib/postgresql/data
     environment:
@@ -27,6 +29,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - backend
+      - default
     healthcheck:
       test: ./baserow.sh backend-cmd backend-healthcheck
       interval: 60s
@@ -65,4 +70,7 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
+  backend:
+    name: baserow-network
+    
 
