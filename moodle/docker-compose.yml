@@ -13,7 +13,7 @@ services:
       - default
     environment:
       - TZ=$TZ
-      - MOODLE_DATABASE_HOST=$DB_HOST
+      - MOODLE_DATABASE_HOST=db
       - MOODLE_DATABASE_PORT_NUMBER=$DB_PORT_NUMBER
       - MOODLE_DATABASE_USER=$DB_USER
       - MOODLE_DATABASE_NAME=$DB_NAME

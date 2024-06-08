@@ -12,7 +12,7 @@ services:
     pids_limit: 100
     read_only: true
     networks:
-      - mattermost-network
+      - backend
     tmpfs:
       - /tmp
       - /var/run/postgresql
@@ -38,7 +38,7 @@ services:
       - ${CALLS_PORT}:8443/udp
       - ${CALLS_PORT}:8443/tcp
     networks:
-      - mattermost-network
+      - backend
       - default
     security_opt:
       - no-new-privileges:true

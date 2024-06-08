@@ -5,7 +5,7 @@ services:
     image: postgres:13.2
     restart: unless-stopped
     networks:
-      - keycloak
+      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/keycloak_db:/var/lib/postgresql/data
     environment:
@@ -31,7 +31,7 @@ services:
     # ports:
     #   - 17070:8080
     networks:
-      - keycloak
+      - backend
       - default
     environment:
       KC_PROXY_ADDRESS_FORWARDING: "true"
@@ -77,7 +77,7 @@ services:
       # For the web front-end
       # - "17170:17170"
     networks:
-      - keycloak
+      - backend
       - default
     environment:
       - UID=$UID
