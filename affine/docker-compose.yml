@@ -89,5 +89,5 @@ networks:
     external: true
     name: $TRAEFIK_NETWORK
   backend:
-    name: affine-network
+    driver: bridge
     

@@ -86,5 +86,5 @@ networks:
     external: true
     name: $TRAEFIK_NETWORK
   backend:
-    name: fusionauth-network
+    driver: bridge
     

@@ -45,5 +45,5 @@ networks:
     external: true
     name: $TRAEFIK_NETWORK
   backend:
-    name: dolibarr-network
+    driver: bridge
     

@@ -57,5 +57,5 @@ networks:
     external: true
     name: $TRAEFIK_NETWORK
   backend:
-    name: moodle-network
+    driver: bridge
     

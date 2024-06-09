@@ -118,4 +118,4 @@ networks:
     external: true
     name: $TRAEFIK_NETWORK
   backend:
-    name: keycloak-network
+    driver: bridge

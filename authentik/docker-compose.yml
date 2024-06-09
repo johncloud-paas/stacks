@@ -128,4 +128,4 @@ networks:
     external: true
     name: $TRAEFIK_NETWORK
   backend:
-    name: authentik-network
+    driver: bridge
