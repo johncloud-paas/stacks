@@ -71,3 +71,4 @@ networks:
     name: $TRAEFIK_NETWORK
   backend:
     driver: bridge
+    internal: true
