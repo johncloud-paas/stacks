@@ -1,5 +1,3 @@
-version: '3.1'
-
 services:
   app:
     image: lscr.io/linuxserver/jellyfin:latest
@@ -10,9 +8,9 @@ services:
       - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files/Vidéos/Shows:/shows
       - $JOHNCLOUD_ROOT/traefik/certs/$HOST/privatekey.pem:/config/key.pem
     restart: unless-stopped
-    ports:
-      - 8096:8096
-      - 8920:8920 #optional
+    # ports:
+    #   - 8096:8096
+    #   - 8920:8920 #optional
     environment:
       - PUID=$USERID
       - PGID=$GROUPID
