@@ -29,7 +29,7 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U affine']
+      test: ['CMD-SHELL', 'pg_isready -U $DB_USER']
       interval: 10s
       timeout: 5s
       retries: 5
