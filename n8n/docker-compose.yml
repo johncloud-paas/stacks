@@ -1,9 +1,7 @@
-version: '3.1'
-
 services:
   n8n:
     image: docker.n8n.io/n8nio/n8n
-    restart: always
+    restart: unless-stopped
     ports:
       - "127.0.0.1:5678:5678"
     labels:
@@ -20,12 +18,12 @@ services:
       - traefik.http.middlewares.n8n.headers.SSLHost=${DOMAIN_NAME}
       - traefik.http.middlewares.n8n.headers.STSIncludeSubdomains=true
       - traefik.http.middlewares.n8n.headers.STSPreload=true
-      - traefik.http.routers.n8n.middlewares=n8n@docker
+      # - traefik.http.routers.n8n.middlewares=n8n@docker
       - traefik.http.services.wordpress.loadbalancer.server.port=5678
       - homepage.group=$HOME_GROUP
       - homepage.name=$HOME_NAME
       - homepage.icon=$HOME_ICON
-      - homepage.href=https://$HOST
+      - homepage.href=https://${SUBDOMAIN}.${DOMAIN_NAME}
       - homepage.description=$HOME_DESCRIPTION
     environment:
       - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
