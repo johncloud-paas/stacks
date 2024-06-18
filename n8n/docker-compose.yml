@@ -22,6 +22,11 @@ services:
       - traefik.http.middlewares.n8n.headers.STSPreload=true
       - traefik.http.routers.n8n.middlewares=n8n@docker
       - traefik.http.services.wordpress.loadbalancer.server.port=5678
+      - homepage.group=$HOME_GROUP
+      - homepage.name=$HOME_NAME
+      - homepage.icon=$HOME_ICON
+      - homepage.href=https://$HOST
+      - homepage.description=$HOME_DESCRIPTION
     environment:
       - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
       - N8N_PORT=5678
