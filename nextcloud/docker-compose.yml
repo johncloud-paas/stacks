@@ -6,8 +6,6 @@ services:
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     volumes:
       - $JOHNCLOUD_ROOT/nextcloud/db:/var/lib/mysql
-    networks:
-      - backend
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -22,8 +20,6 @@ services:
   redis:
     image: redis:latest
     restart: unless-stopped
-    networks:
-      - backend
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -38,9 +34,6 @@ services:
     restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/nextcloud/data:/var/www/html
-    networks:
-      - backend
-      - default
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -58,7 +51,6 @@ services:
       - MAIL_FROM_ADDRESS=$MAIL_FROM_ADDRESS
       - TRUSTED_PROXIES=$TRUSTED_PROXIES
       - OVERWRITEHOST=$HOST
-      - OVERWRITEPROTOCOL=https
     depends_on:
       - db
       - redis
@@ -83,7 +75,4 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-  backend:
-    name: nextcloud-network
-
     
