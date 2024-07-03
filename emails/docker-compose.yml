@@ -1,5 +1,3 @@
-version: '3.0'
-
 services:
   # External dependencies
   redis:
@@ -68,10 +66,6 @@ services:
       - WELCOME=$WELCOME
       - WELCOME_BODY=$WELCOME_BODY
       - WELCOME_SUBJECT=$WELCOME_SUBJECT
-    logging:
-      driver: journald
-      options:
-        tag: mailu-front
     ports:
       - "$REAL_IP_FROM:25:25"
       - "$REAL_IP_FROM:465:465"
@@ -216,10 +210,6 @@ services:
       - WELCOME=$WELCOME
       - WELCOME_BODY=$WELCOME_BODY
       - WELCOME_SUBJECT=$WELCOME_SUBJECT
-    logging:
-      driver: journald
-      options:
-        tag: mailu-admin
     volumes:
       - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data"
       - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/dkim:/dkim"
@@ -284,10 +274,6 @@ services:
       - WELCOME=$WELCOME
       - WELCOME_BODY=$WELCOME_BODY
       - WELCOME_SUBJECT=$WELCOME_SUBJECT
-    logging:
-      driver: journald
-      options:
-        tag: mailu-imap
     volumes:
       - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mail:/mail"
       - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/overrides/dovecot:/overrides:ro"
@@ -352,10 +338,6 @@ services:
       - WELCOME=$WELCOME
       - WELCOME_BODY=$WELCOME_BODY
       - WELCOME_SUBJECT=$WELCOME_SUBJECT
-    logging:
-      driver: journald
-      options:
-        tag: mailu-smtp
     volumes:
       - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mailqueue:/queue"
       - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/overrides/postfix:/overrides:ro"
@@ -484,10 +466,6 @@ services:
       - WELCOME=$WELCOME
       - WELCOME_BODY=$WELCOME_BODY
       - WELCOME_SUBJECT=$WELCOME_SUBJECT
-    logging:
-      driver: journald
-      options:
-        tag: mailu-antispam
     networks:
       - default
       - noinet
