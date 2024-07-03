@@ -1,0 +1,65 @@
+services:
+  ldap:
+    image: bitnami/openldap:2.6
+    # env_file: .env
+    # networks:
+    #   - default
+    #   - proxy
+    # ports:
+    #     - 1389:1389
+      #  - 1636:1636
+    restart: unless-stopped
+    # healthcheck:
+    #   test: "ldapsearch -x -b dc=nichebuilt,dc=club cn > /dev/null"
+    #   interval: 30s
+    #   retries: 2
+    #   timeout: 2s
+    environment:
+      BITNAMI_DEBUG: 'false'
+      USE_TLS: 'true'
+      INSECURE_TLS: 'false'
+    #volumes:  ## will need to configure this if you want persistent storage for ldap
+    #  - ./openldap-data:/bitnami/openldap/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.ldap-srv.entrypoints=ldaps"
+      - "traefik.tcp.routers.ldap-srv.tls=true"
+      - "traefik.tcp.routers.ldap-srv.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.ldap-srv.rule=HostSNI(`${HOST}`)"
+      - "traefik.tcp.services.ldap-srv.loadbalancer.server.port=1636"
+      # - "traefik.docker.network=proxy"
+  
+  webgui:
+    image: dnknth/ldap-ui
+    restart: unless-stopped
+    # networks:
+    #   - default
+    #   - proxy
+    # ports:
+    #   - 5000:5000
+    environment:
+      LDAP_URL: 'ldap://$COMPOSE_PROJECT_NAME-ldap-1:1636/'
+      BASE_DN: ${BASE_DN}
+      BIND_PATTERN: cn=%s,${BASE_DN}
+    # healthcheck:
+    #   test: "wget -q -O /dev/null http://localhost:5000"
+    #   interval: 30s
+    #   retries: 2
+    #   timeout: 2s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ldap-web-https.entrypoints=websecure"
+      - "traefik.http.routers.ldap-web-https.tls=true"
+      - "traefik.http.routers.ldap-web-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ldap-web-https.rule=Host(`${HOST}`)"
+      - "traefik.http.services.ldap-web-https.loadbalancer.server.port=5000"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
