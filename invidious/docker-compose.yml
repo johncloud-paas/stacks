@@ -17,6 +17,8 @@ services:
           host: invidious-db
           port: 5432
         check_tables: true
+        region: FR
+        locale: fr
         # external_port:
         # domain:
         # https_only: false
