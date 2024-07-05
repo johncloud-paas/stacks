@@ -1,0 +1,17 @@
+kind: source
+spec:
+  name: <SOURCE_NAME>
+  registry: cloudquery
+  path: cloudquery/aws
+  version: "v27.5.0"
+  tables: ["aws_ec2_*"]
+  destinations: ["postgresql"]
+---
+kind: destination
+spec:
+  name: postgresql
+  path: cloudquery/postgresql
+  registry: cloudquery
+  version: "v8.2.4"
+  spec:
+    connection_string: "postgres://<DB_USER>:<DB_PASSWORD>@<COMPOSE_PROJECT_NAME>-postgres-1:5432/<DB_NAME>?sslmode=disable"

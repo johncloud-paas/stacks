@@ -1,5 +1,3 @@
-version: '3.2'
-
 services:
   affine:
     image: ghcr.io/toeverything/affine-graphql:stable
@@ -13,9 +11,6 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
-    networks:
-      - backend
-      - default
     volumes:
       # custom configurations
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/root/.affine/config
@@ -52,8 +47,6 @@ services:
   redis:
     image: redis
     restart: unless-stopped
-    networks:
-      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis:/data
     healthcheck:
@@ -67,12 +60,10 @@ services:
   postgres:
     image: postgres
     restart: unless-stopped
-    networks:
-      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U affine']
+      test: ['CMD-SHELL', 'pg_isready -U $DB_USER']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -88,6 +79,4 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-  backend:
-    driver: bridge
     
