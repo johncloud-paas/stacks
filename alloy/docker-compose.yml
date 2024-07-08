@@ -1,0 +1,25 @@
+services:
+  alloy:
+    image: grafana/alloy:latest
+    restart: unless-stopped
+    ports:
+      - 12345:12345
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config/config.alloy:/etc/alloy/config.alloy
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/lib/alloy/data
+      - /run/log:/run/log:ro
+      - /var/log:/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: ["run","--server.http.listen-addr=0.0.0.0:12345","--storage.path=/var/lib/alloy/data","/etc/alloy/config.alloy"]
+    # environment:
+    #   - NETDATA_CLAIM_TOKEN=$NETDATA_CLAIM_TOKEN
+    #   - NETDATA_CLAIM_URL=https://app.netdata.cloud
+    #   - NETDATA_CLAIM_ROOMS=$NETDATA_CLAIM_ROOMS
+    labels:
+      - "traefik.enable=false"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=$HOME_LINK"
+      - "homepage.description=$HOME_DESCRIPTION"
+      
