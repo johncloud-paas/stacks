@@ -22,4 +22,9 @@ services:
       - "homepage.icon=$HOME_ICON"
       - "homepage.href=$HOME_LINK"
       - "homepage.description=$HOME_DESCRIPTION"
-      
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
