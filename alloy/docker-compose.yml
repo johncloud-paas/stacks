@@ -11,10 +11,6 @@ services:
       - /var/log:/var/log:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: ["run","--server.http.listen-addr=0.0.0.0:12345","--storage.path=/var/lib/alloy/data","/etc/alloy/config.alloy"]
-    # environment:
-    #   - NETDATA_CLAIM_TOKEN=$NETDATA_CLAIM_TOKEN
-    #   - NETDATA_CLAIM_URL=https://app.netdata.cloud
-    #   - NETDATA_CLAIM_ROOMS=$NETDATA_CLAIM_ROOMS
     labels:
       - "traefik.enable=false"
       - "homepage.group=$HOME_GROUP"
