@@ -1,0 +1,29 @@
+services:
+  alloy:
+    image: couchbase:community
+    restart: unless-stopped
+    ports:
+      - 9123:9123
+      - 11207:11207
+      - 11210:11210
+      - 11280:11280
+      - 18091-18097:18091-18097
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/couchbase/var
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8091"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=$HOME_LINK"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
