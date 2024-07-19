@@ -1,0 +1,58 @@
+services:
+  server:
+    image: cortezaproject/corteza:2023.3
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - DOMAIN=$HOST
+      - DB_DSN=postgres://$DB_USER:$DB_PASSWORD@$COMPOSE_PROJECT_NAME-db-1:5432/corteza?sslmode=disable
+      - HTTP_WEBAPP_ENABLED=$HTTP_WEBAPP_ENABLED
+      - ACTIONLOG_ENABLED=$ACTIONLOG_ENABLED
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+      - TEMPLATE_RENDERER_GOTENBERG_ADDRESS=http://$COMPOSE_PROJECT_NAME-gotenberg-1:3000
+      - TEMPLATE_RENDERER_GOTENBERG_ENABLED=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      # - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=17745"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+  gotenberg:
+    image: thecodingmachine/gotenberg:6
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+
+  db:
+    # PostgreSQL Database
+    # See https://hub.docker.com/_/postgres for details
+    # Support for postgres 13, 14 and 15 is available in the latest version of Corteza
+    image: postgres:15
+    restart: unless-stopped
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U $DB_USER"], interval: 10s, timeout: 5s, retries: 5 }
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/dbdata:/var/lib/postgresql/data
+    environment:
+      # Warning: these are values that are only used on 1st start
+      #          if you want to change it later, you need to do that
+      #          manually inside db container
+      POSTGRES_USER:     $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB:       corteza
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
