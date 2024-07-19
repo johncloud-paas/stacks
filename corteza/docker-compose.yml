@@ -3,10 +3,13 @@ services:
     image: cortezaproject/corteza:2023.3
     restart: unless-stopped
     depends_on:
-      - db
+      gotenberg:
+        condition: service_started
+      cortezadb:
+        condition: service_healthy
     environment:
       - DOMAIN=$HOST
-      - DB_DSN=postgres://$DB_USER:$DB_PASSWORD@$COMPOSE_PROJECT_NAME-db-1:5432/corteza?sslmode=disable
+      - DB_DSN=postgres://$DB_USER:$DB_PASSWORD@$COMPOSE_PROJECT_NAME-cortezadb-1:5432/corteza?sslmode=disable
       - HTTP_WEBAPP_ENABLED=$HTTP_WEBAPP_ENABLED
       - ACTIONLOG_ENABLED=$ACTIONLOG_ENABLED
       - SMTP_HOST=${SMTP_HOST}
@@ -33,7 +36,7 @@ services:
     labels:
       - "traefik.enable=false"
 
-  db:
+  cortezadb:
     # PostgreSQL Database
     # See https://hub.docker.com/_/postgres for details
     # Support for postgres 13, 14 and 15 is available in the latest version of Corteza
