@@ -12,8 +12,6 @@ services:
       interval: 30s
       retries: 5
       timeout: 5s
-    networks:
-      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/database:/var/lib/postgresql/data
     environment:
@@ -33,8 +31,6 @@ services:
       interval: 30s
       retries: 5
       timeout: 3s
-    networks:
-      - backend
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis:/data
     labels:
@@ -67,9 +63,6 @@ services:
     depends_on:
       - postgresql
       - redis
-    networks:
-      - backend
-      - default
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authentik.rule=Host(`$HOST`)"
@@ -86,8 +79,6 @@ services:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2023.10.6}
     restart: unless-stopped
     command: worker
-    networks:
-      - backend
     environment:
       AUTHENTIK_REDIS__HOST: $COMPOSE_PROJECT_NAME-redis-1
       AUTHENTIK_POSTGRESQL__HOST: $COMPOSE_PROJECT_NAME-postgresql-1
@@ -127,5 +118,4 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-  backend:
-    driver: bridge
+    

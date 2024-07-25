@@ -70,10 +70,6 @@ services:
       - STRIPE_PRICE_ID_ULTIMATE_MONTHLY_OLD=$STRIPE_PRICE_ID_ULTIMATE_MONTHLY_OLD
       - STRIPE_PRICE_ID_ULTIMATE_YEARLY_OLD=$STRIPE_PRICE_ID_ULTIMATE_YEARLY_OLD
       - STRIPE_EXCLUDED_PLANS=$STRIPE_EXCLUDED_PLANS
-    # ports:
-    #   - "${APP_PORT:-8000}:80"
-    # expose:
-    #   - "${APP_PORT:-8000}"
     healthcheck:
       test: curl --fail http://127.0.0.1:80/api/health || exit 1
       interval: 5s

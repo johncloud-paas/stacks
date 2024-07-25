@@ -1,5 +1,5 @@
 services:
-  alloy:
+  couchbase:
     image: couchbase:community
     restart: unless-stopped
     ports:
