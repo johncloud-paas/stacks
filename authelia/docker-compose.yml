@@ -1,0 +1,32 @@
+services:
+  authelia:
+    image: 'authelia/authelia'
+    restart: 'unless-stopped'
+    # expose:
+    #   - 9091
+    volumes:
+      - '${JOHNCLOUD_ROOT}/config:/config'
+    environment:
+      TZ: "$TZ"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.rule=Host(`$HOST`)"
+      - "traefik.http.routers.authelia.entryPoints=websecure"
+      - "traefik.http.routers.authelia.tls.certresolver=letsencrypt"
+      - "traefik.http.services.authelia.loadbalancer.server.port=9091"
+      - "traefik.http.middlewares.authelia.forwardAuth.address=http://$COMPOSE_PROJECT_NAME-authelia-1:9091/api/authz/forward-auth"
+      ## The following commented line is for configuring the Authelia URL in the proxy. We strongly suggest this is
+      ## configured in the Session Cookies section of the Authelia configuration.
+      # - "traefik.http.middlewares.authelia.forwardAuth.address=http://$COMPOSE_PROJECT_NAME-authelia-1:9091/api/authz/forward-auth?authelia_url=https%3A%2F%2Fauth.example.com%2F"
+      - "traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Email,Remote-Name"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
