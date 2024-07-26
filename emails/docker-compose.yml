@@ -66,14 +66,14 @@ services:
       - WELCOME=$WELCOME
       - WELCOME_BODY=$WELCOME_BODY
       - WELCOME_SUBJECT=$WELCOME_SUBJECT
-    ports:
-      - "$REAL_IP_FROM:25:25"
-      - "$REAL_IP_FROM:465:465"
-      - "$REAL_IP_FROM:587:587"
-      - "$REAL_IP_FROM:110:110"
-      - "$REAL_IP_FROM:995:995"
-      - "$REAL_IP_FROM:143:143"
-      - "$REAL_IP_FROM:993:993"
+    # ports:
+      # - "$REAL_IP_FROM:25:25"
+      # - "$REAL_IP_FROM:465:465"
+      # - "$REAL_IP_FROM:587:587"
+      # - "$REAL_IP_FROM:110:110"
+      # - "$REAL_IP_FROM:995:995"
+      # - "$REAL_IP_FROM:143:143"
+      # - "$REAL_IP_FROM:993:993"
     networks:
       - default
     volumes:
@@ -86,12 +86,25 @@ services:
       - 192.168.203.254
     labels:
       - "traefik.enable=true"
+      # Web UI settings
       - "traefik.http.routers.front.rule=Host(`$TRAEFIK_DOMAIN`)"
       - "traefik.http.routers.front.entrypoints=websecure"
       - "traefik.http.routers.front.tls=true"
       - "traefik.http.routers.front.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.front.service=mailu-websecure-svc"
-      - "traefik.http.services.mailu-websecure-svc.loadbalancer.server.port=80"
+      - "traefik.http.services.front.loadbalancer.server.port=80"
+      # IMAP settings
+      - "traefik.tcp.routers.imap.rule=HostSNI(`$TRAEFIK_DOMAIN`)"
+      - "traefik.tcp.routers.imap.service=imap_service"
+      - "traefik.tcp.routers.imap.entrypoints=imap"
+      - "traefik.tcp.routers.imap.tls.certresolver=letsencrypt"
+      - "traefik.tcp.services.imap_service.loadbalancer.server.port=993"
+      # SMTP settings
+      - "traefik.tcp.routers.smtp.rule=HostSNI(`$TRAEFIK_DOMAIN`)"
+      - "traefik.tcp.routers.smtp.service=smtp_service"
+      - "traefik.tcp.routers.smtp.entrypoints=smtp"
+      - "traefik.tcp.routers.smtp.tls.certresolver=letsencrypt"
+      - "traefik.tcp.services.smtp_service.loadbalancer.server.port=587"
+      # Homepage settings
       - "homepage.group=Bureautique"
       - "homepage.name=Mailu"
       - "homepage.icon=mailu.png"
