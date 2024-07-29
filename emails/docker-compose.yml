@@ -98,15 +98,13 @@ services:
       - "traefik.tcp.routers.front_other.tls.passthrough=true"
       - "traefik.tcp.routers.front_other.service=front_other"
       - "traefik.tcp.services.front_other.loadbalancer.server.port=443"
-      - "traefik.tcp.services.front_other.loadbalancer.proxyProtocol.version=2"
+      # - "traefik.tcp.services.front_other.loadbalancer.proxyProtocol.version=2"
       # IMAP settings
       # - "traefik.tcp.routers.imap.rule=HostSNI(`$TRAEFIK_DOMAIN`)"
       - "traefik.tcp.routers.imap.rule=HostSNI(`*`)"
       - "traefik.tcp.routers.imap.service=imap_service"
       - "traefik.tcp.routers.imap.entrypoints=imaps"
       # - "traefik.tcp.services.imap_service.loadbalancer.proxyProtocol.version=2"
-      # - "traefik.tcp.routers.imap.tls.certresolver=letsencrypt"
-      # - "traefik.tcp.routers.imap.tls.passthrough=true"
       - "traefik.tcp.services.imap_service.loadbalancer.server.port=993"
       # SMTP settings
       # - "traefik.tcp.routers.smtp.rule=HostSNI(`$TRAEFIK_DOMAIN`)"
@@ -114,8 +112,6 @@ services:
       - "traefik.tcp.routers.smtp.service=smtp_service"
       - "traefik.tcp.routers.smtp.entrypoints=smtp"
       # - "traefik.tcp.services.smtp_service.loadbalancer.proxyProtocol.version=2"
-      # - "traefik.tcp.routers.smtp.tls.certresolver=letsencrypt"
-      # - "traefik.tcp.routers.smtp.tls.passthrough=true"
       - "traefik.tcp.services.smtp_service.loadbalancer.server.port=587"
       # Sieve settings
       # - "traefik.tcp.routers.sieve.rule=HostSNI(`$TRAEFIK_DOMAIN`)"
@@ -123,8 +119,6 @@ services:
       - "traefik.tcp.routers.sieve.service=sieve_service"
       - "traefik.tcp.routers.sieve.entrypoints=sieve"
       # - "traefik.tcp.services.sieve_service.loadbalancer.proxyProtocol.version=2"
-      # - "traefik.tcp.routers.sieve.tls.certresolver=letsencrypt"
-      # - "traefik.tcp.routers.sieve.tls.passthrough=true"
       - "traefik.tcp.services.sieve_service.loadbalancer.server.port=4190"
       # Submissions settings
       # - "traefik.tcp.routers.submissions.rule=HostSNI(`$TRAEFIK_DOMAIN`)"
@@ -132,8 +126,6 @@ services:
       - "traefik.tcp.routers.submissions.service=submissions_service"
       - "traefik.tcp.routers.submissions.entrypoints=submissions"
       # - "traefik.tcp.services.submissions_service.loadbalancer.proxyProtocol.version=2"
-      # - "traefik.tcp.routers.submissions.tls.certresolver=letsencrypt"
-      # - "traefik.tcp.routers.submissions.tls.passthrough=true"
       - "traefik.tcp.services.submissions_service.loadbalancer.server.port=465"
       # Homepage settings
       - "homepage.group=Bureautique"
