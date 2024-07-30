@@ -1,0 +1,20 @@
+services:
+  sumologic-collector:
+    image: sumologic/collector:latest
+    restart: unless-stopped
+    environment:
+      - SUMO_ACCESS_ID=$SUMO_ACCESS_ID
+      - SUMO_ACCESS_KEY=$SUMO_ACCESS_KEY
+      - SUMO_COLLECTOR_NAME=$SUMO_COLLECTOR_NAME
+    # volumes:
+      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config_etc:/etc/sumo
+      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config_opt:/opt/SumoCollector/config
+      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/log:/logs
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
