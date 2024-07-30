@@ -6,10 +6,9 @@ services:
       - SUMO_ACCESS_ID=$SUMO_ACCESS_ID
       - SUMO_ACCESS_KEY=$SUMO_ACCESS_KEY
       - SUMO_COLLECTOR_NAME=$SUMO_COLLECTOR_NAME
-    # volumes:
-      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config_etc:/etc/sumo
-      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config_opt:/opt/SumoCollector/config
-      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/log:/logs
+      - SUMO_CLOBBER=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=false"
 
