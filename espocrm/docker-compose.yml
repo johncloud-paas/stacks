@@ -1,0 +1,56 @@
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MYSQL_DATABASE: espocrm
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mysql:/var/lib/mysql
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=false"
+
+  espocrm:
+    image: espocrm/espocrm
+    environment:
+      ESPOCRM_DATABASE_PLATFORM: Mysql
+      ESPOCRM_DATABASE_HOST: $COMPOSE_PROJECT_NAME-mysql-1
+      ESPOCRM_DATABASE_USER: $DB_USER
+      ESPOCRM_DATABASE_PASSWORD: $DB_PASSWORD
+      ESPOCRM_ADMIN_USERNAME: $ESPOCRM_USER
+      ESPOCRM_ADMIN_PASSWORD: $ESPOCRM_PASSWORD
+      ESPOCRM_SITE_URL: "https://$HOST"
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/www/html
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+  espocrm-daemon:
+    image: espocrm/espocrm
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/daemon:/var/www/html
+    restart: unless-stopped
+    depends_on:
+      - espocrm
+    entrypoint: docker-daemon.sh
+    labels:
+      - "traefik.enable=false"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
