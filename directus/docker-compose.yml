@@ -44,6 +44,16 @@ services:
         condition: service_healthy
     environment:
       SECRET: "$SECRET"
+      AUTH_PROVIDERS: "google"
+      AUTH_GOOGLE_DRIVER: "openid"
+      AUTH_GOOGLE_CLIENT_ID: "$PROVIDERS_GOOGLE_CLIENT_ID" # Replace XXXX with the Client ID from Step 6
+      AUTH_GOOGLE_CLIENT_SECRET: "$PROVIDERS_GOOGLE_CLIENT_SECRET" # Replace XXXX with the Client Secret from Step 6
+      AUTH_GOOGLE_ISSUER_URL: "https://accounts.google.com"
+      AUTH_GOOGLE_IDENTIFIER_KEY: "email"
+      AUTH_GOOGLE_ICON: "google"
+      AUTH_GOOGLE_LABEL: "Google"
+      AUTH_GOOGLE_ALLOW_PUBLIC_REGISTRATION: "false"
+      EXTENSIONS_AUTO_RELOAD: "true"
       ADMIN_EMAIL: "$ADMIN_EMAIL"
       ADMIN_PASSWORD: "$ADMIN_PASSWORD"
       DB_CLIENT: "pg"
