@@ -36,16 +36,18 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/database:/directus/database
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/uploads:/directus/uploads
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/extensions:/directus/extensions
+    user: "0:0"
     depends_on:
-      - redis
-      - db
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     environment:
-      PUBLIC_URL: "$HOST"
       SECRET: "$SECRET"
       ADMIN_EMAIL: "$ADMIN_EMAIL"
       ADMIN_PASSWORD: "$ADMIN_PASSWORD"
       DB_CLIENT: "pg"
-      DB_PORT: "5432"
+      DB_PORT: 5432
       DB_HOST: "$COMPOSE_PROJECT_NAME-db-1"
       DB_DATABASE: "$DB_DATABASE"
       DB_USER: "$DB_USER"
@@ -55,7 +57,7 @@ services:
       EMAIL_FROM: "$ADMIN_EMAIL"
       EMAIL_TRANSPORT: "smtp"
       EMAIL_SMTP_HOST: "$EMAIL_SMTP_HOST"
-      EMAIL_SMTP_PORT: "$EMAIL_SMTP_PORT"
+      EMAIL_SMTP_PORT: $EMAIL_SMTP_PORT
       EMAIL_SMTP_USER: "$EMAIL_SMTP_USER"
       EMAIL_SMTP_PASSWORD: "$EMAIL_SMTP_PASSWORD"
       EMAIL_SMTP_SECURE: "true"
@@ -79,6 +81,8 @@ services:
   redis:
     image: redis:7.2.0
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
     environment:
       - TZ=$TZ
       - ENABLE_OVERCOMMIT_MEMORY=true
