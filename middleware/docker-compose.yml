@@ -1,0 +1,22 @@
+services:
+  agent:
+    image: "ghcr.io/middleware-labs/mw-host-agent:master"
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - /tmp:/tmp
+    environment:
+      - MW_API_KEY=$MW_API_KEY
+      - MW_TARGET=$MW_TARGET
+      - MW_API_URL_FOR_CONFIG_CHECK=$MW_API_URL_FOR_CONFIG_CHECK
+    labels:
+      - "traefik.enable=false"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=$HOME_LINK"
+      - "homepage.description=$HOME_DESCRIPTION"
+      
