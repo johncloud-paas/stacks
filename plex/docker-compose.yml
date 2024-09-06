@@ -2,8 +2,8 @@ services:
   plex:
     image: lscr.io/linuxserver/plex:latest
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=33
+      - PGID=33
       - TZ=$TZ
       - VERSION=docker
       - PLEX_CLAIM=$PLEX_CLAIM
