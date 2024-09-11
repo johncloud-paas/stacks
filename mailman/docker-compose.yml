@@ -34,6 +34,8 @@ services:
     ports:
       - "8001:8001" # API
       - "8024:8024" # LMTP - incoming emails
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/core:/opt/mailman/
     depends_on:
       database:
         condition: service_healthy
@@ -53,6 +55,7 @@ services:
       SMTP_HOST_USER: $SMTP_HOST_USER
       SMTP_HOST_PASSWORD: $SMTP_HOST_PASSWORD
       SMTP_USE_TLS: $SMTP_USE_TLS
+      UWSGI_STATIC_MAP: /static=/opt/mailman-web-data/static 
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/core-data:/opt/mailman-web-data
     depends_on:
