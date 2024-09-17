@@ -58,6 +58,8 @@ services:
       - "DATABASE_NAME=fief"
       - "EMAIL_PROVIDER=SMTP"
       - "EMAIL_PROVIDER_PARAMS=$EMAIL_PROVIDER_PARAMS"
+      - "DEFAULT_FROM_EMAIL=$DEFAULT_FROM_EMAIL"
+      - "DEFAULT_FROM_NAME=$DEFAULT_FROM_NAME"
     depends_on:
       postgres:
         condition: service_healthy
@@ -98,6 +100,8 @@ services:
       - "DATABASE_NAME=fief"
       - "EMAIL_PROVIDER=SMTP"
       - "EMAIL_PROVIDER_PARAMS=$EMAIL_PROVIDER_PARAMS"
+      - "DEFAULT_FROM_EMAIL=$DEFAULT_FROM_EMAIL"
+      - "DEFAULT_FROM_NAME=$DEFAULT_FROM_NAME"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
