@@ -3,8 +3,9 @@ services:
     image: ydethe/qrgen:latest
     restart: unless-stopped
     environment:
-      - SERVER_URL=https://$HOST
       - SECRET_KEY=$SECRET_KEY
+      - LOGFIRE_TOKEN=$LOGFIRE_TOKEN
+      - LOGLEVEL=$LOGLEVEL
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
