@@ -56,6 +56,8 @@ services:
       - "DATABASE_USERNAME=postgres"
       - "DATABASE_PASSWORD=$DATABASE_PASSWORD"
       - "DATABASE_NAME=fief"
+      - "EMAIL_PROVIDER=SMTP"
+      - "EMAIL_PROVIDER_PARAMS=$EMAIL_PROVIDER_PARAMS"
     depends_on:
       postgres:
         condition: service_healthy
@@ -94,6 +96,8 @@ services:
       - "DATABASE_USERNAME=postgres"
       - "DATABASE_PASSWORD=$DATABASE_PASSWORD"
       - "DATABASE_NAME=fief"
+      - "EMAIL_PROVIDER=SMTP"
+      - "EMAIL_PROVIDER_PARAMS=$EMAIL_PROVIDER_PARAMS"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
