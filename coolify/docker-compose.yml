@@ -2,12 +2,7 @@ services:
   coolify:
     image: "ghcr.io/coollabsio/coolify:${LATEST_IMAGE:-latest}"
     restart: unless-stopped
-    working_dir: /var/www/html
     volumes:
-      # - type: bind
-      #   source: $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/source/.env
-      #   target: /var/www/html/.env
-      #   read_only: true
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ssh:/data/coolify/ssh
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/applications:/data/coolify/applications
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/databases:/data/coolify/databases
@@ -22,13 +17,13 @@ services:
       - APP_NAME=$APP_NAME
       - APP_KEY=$APP_KEY
       - APP_URL=$HOST
-      - DB_HOST="${COMPOSE_PROJECT_NAME}-postgres-1"
+      - DB_HOST=coolify-db
       - DB_PORT=5432
       - DB_DATABASE=$DB_DATABASE
       - DB_USERNAME=$DB_USERNAME
       - DB_PASSWORD="${DB_PASSWORD}"
       - QUEUE_CONNECTION=$QUEUE_CONNECTION
-      - REDIS_HOST="${COMPOSE_PROJECT_NAME}-redis-1"
+      - REDIS_HOST=coolify-redis
       - REDIS_PASSWORD="${REDIS_PASSWORD}"
       - HORIZON_BALANCE=$HORIZON_BALANCE
       - HORIZON_MAX_PROCESSES=$HORIZON_MAX_PROCESSES
@@ -85,7 +80,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      # - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8000"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8000"
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
@@ -94,6 +89,7 @@ services:
 
   postgres:
     image: postgres:15-alpine
+    container_name: coolify-db
     restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/postgresql/data
@@ -117,6 +113,7 @@ services:
 
   redis:
     image: redis:alpine
+    container_name: coolify-redis
     restart: unless-stopped
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     environment:
@@ -133,6 +130,7 @@ services:
 
   soketi:
     image: 'quay.io/soketi/soketi:1.6-16-alpine'
+    container_name: coolify-realtime
     restart: unless-stopped
     ports:
       - "${SOKETI_PORT:-6001}:6001"
