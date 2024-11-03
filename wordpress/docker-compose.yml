@@ -27,7 +27,7 @@ services:
       - "homepage.description=$HOME_DESCRIPTION"
 
   mysql:
-    image: mysql:5.7
+    image: mysql
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: "${DB_NAME}"
