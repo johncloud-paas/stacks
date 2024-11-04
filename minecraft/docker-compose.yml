@@ -54,10 +54,10 @@ services:
     labels:
       - "lazymc.group=mc"
       - "traefik.enable=true"
-      - "traefik.tcp.routers.ping.rule=HostSNI(`$HOST`)"
-      - "traefik.tcp.routers.ping.service=mc_service"
-      - "traefik.tcp.routers.ping.entrypoints=mc"
-      - "traefik.tcp.routers.ping.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.rule=HostSNI(`$HOST`)"
+      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.service=mc_service"
+      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.entrypoints=mc"
+      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.tcp.services.mc_service.loadbalancer.server.port=25565"
       
 networks:
