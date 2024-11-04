@@ -25,6 +25,7 @@ services:
     restart: unless-stopped
     environment:
       - EULA=true
+      - MOTD=$MOTD
       - TZ=$TZ
       - LOG_TIMESTAMP=true
       - DIFFICULTY=$DIFFICULTY
@@ -43,7 +44,7 @@ services:
       - RESOURCE_PACK_SHA1=$RESOURCE_PACK_SHA1
       - RESOURCE_PACK_ENFORCE=$RESOURCE_PACK_ENFORCE
       - ALLOW_FLIGHT=$ALLOW_FLIGHT
-      - WHITELIST_FILE=/data/whitelist.json
+      - WHITELIST=$WHITELIST
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
     healthcheck:
@@ -51,17 +52,22 @@ services:
       start_period: 1m
       interval: 5s
       retries: 20
+    # ports:
+    #   - 25565:25565
     labels:
       - "lazymc.group=mc"
-      - "traefik.enable=true"
-      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.rule=HostSNI(`$HOST`)"
+      # - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.rule=HostSNI(`$HOST`)"
+      # - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.entrypoints=mc_tcp"
       - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.service=mc_service"
-      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.entrypoints=mc"
-      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.tcp.services.mc_service.loadbalancer.server.port=25565"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://mcsrvstat.us/server/$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
       
 networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-
