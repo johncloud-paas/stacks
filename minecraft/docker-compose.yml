@@ -1,0 +1,22 @@
+services:
+  # docker run -d -p 25565:25565 --name mc -v mc-data:/data itzg/minecraft-server
+  server:
+    image: itzg/minecraft-server
+    restart: unless-stopped
+    environment:
+      - EULA=TRUE=value
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.ping.rule=HostSNI(`$HOST`)"
+      - "traefik.tcp.routers.ping.service=mc_service"
+      - "traefik.tcp.routers.ping.entrypoints=mc"
+      - "traefik.tcp.routers.ping.tls.certresolver=letsencrypt"
+      - "traefik.tcp.services.mc_service.loadbalancer.server.port=25565"
+      
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+
