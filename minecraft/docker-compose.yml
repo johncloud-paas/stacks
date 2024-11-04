@@ -1,13 +1,58 @@
 services:
-  # docker run -d -p 25565:25565 --name mc -v mc-data:/data itzg/minecraft-server
+  # lazymc:
+  #   image: ghcr.io/joesturge/lazymc-docker-proxy:latest
+  #   environment:
+  #     # Point to the service name of the Minecraft server
+  #     SERVER_ADDRESS: $COMPOSE_PROJECT_NAME-server-1:25565
+  #     # Required to find the container to manage it
+  #     LAZYMC_GROUP: mc
+  #   restart: unless-stopped
+  #   volumes:
+  #     # you should mount the minecraft server dir under /server, using read only.
+  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/server:ro
+  #     # you need to supply the docker socket, so that the container can run docker command
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.tcp.routers.ping.rule=HostSNI(`$HOST`)"
+  #     - "traefik.tcp.routers.ping.service=mc_service"
+  #     - "traefik.tcp.routers.ping.entrypoints=mc"
+  #     - "traefik.tcp.routers.ping.tls.certresolver=letsencrypt"
+  #     - "traefik.tcp.services.mc_service.loadbalancer.server.port=25565"
+
   server:
     image: itzg/minecraft-server
     restart: unless-stopped
     environment:
-      - EULA=TRUE=value
+      - EULA=true
+      - TZ=$TZ
+      - LOG_TIMESTAMP=true
+      - DIFFICULTY=$DIFFICULTY
+      - ICON=$ICON
+      - ALLOW_NETHER=$ALLOW_NETHER
+      - GENERATE_STRUCTURES=$GENERATE_STRUCTURES
+      - SNOOPER_ENABLED=$SNOOPER_ENABLED
+      - SPAWN_ANIMALS=$SPAWN_ANIMALS
+      - SPAWN_MONSTERS=$SPAWN_MONSTERS
+      - SPAWN_NPCS=$SPAWN_NPCS
+      - SPAWN_PROTECTION=$SPAWN_PROTECTION
+      - SEED=$SEED
+      - MODE=$MODE
+      - PVP=$PVP
+      - RESOURCE_PACK=$RESOURCE_PACK
+      - RESOURCE_PACK_SHA1=$RESOURCE_PACK_SHA1
+      - RESOURCE_PACK_ENFORCE=$RESOURCE_PACK_ENFORCE
+      - ALLOW_FLIGHT=$ALLOW_FLIGHT
+      - WHITELIST_FILE=/data/white-list.txt
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
+    healthcheck:
+      test: mc-health
+      start_period: 1m
+      interval: 5s
+      retries: 20
     labels:
+      - "lazymc.group=mc"
       - "traefik.enable=true"
       - "traefik.tcp.routers.ping.rule=HostSNI(`$HOST`)"
       - "traefik.tcp.routers.ping.service=mc_service"
