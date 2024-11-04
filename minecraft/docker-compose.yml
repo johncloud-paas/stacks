@@ -43,7 +43,7 @@ services:
       - RESOURCE_PACK_SHA1=$RESOURCE_PACK_SHA1
       - RESOURCE_PACK_ENFORCE=$RESOURCE_PACK_ENFORCE
       - ALLOW_FLIGHT=$ALLOW_FLIGHT
-      - WHITELIST_FILE=/data/white-list.txt
+      - WHITELIST_FILE=/data/whitelist.json
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
     healthcheck:
