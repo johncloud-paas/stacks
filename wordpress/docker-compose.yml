@@ -24,7 +24,7 @@ services:
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
-      - "homepage.href=https://$HOST"
+      - "homepage.href=https://$HOST/wp-admin"
       - "homepage.description=$HOME_DESCRIPTION"
 
   mysql:
