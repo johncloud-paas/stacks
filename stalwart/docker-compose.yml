@@ -4,9 +4,6 @@ services:
     image: stalwartlabs/mail-server:latest
     restart: unless-stopped
     hostname: mail.$HOST
-    networks:
-      default:
-        ipv4_address: $IP_ADDRESS
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $JOHNCLOUD_ROOT/stalwart/data:/opt/stalwart-mail
