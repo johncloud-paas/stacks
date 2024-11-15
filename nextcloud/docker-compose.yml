@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
     volumes:
-      - $JOHNCLOUD_ROOT/nextcloud/db:/var/lib/mysql
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/mysql
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -25,7 +25,7 @@ services:
       - PUID=$PUID
       - PGID=$PGID
     volumes:
-      - $JOHNCLOUD_ROOT/nextcloud/redis:/data
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis:/data
     labels:
       - "traefik.enable=false"
 
@@ -33,7 +33,7 @@ services:
     image: nextcloud:latest
     restart: unless-stopped
     volumes:
-      - $JOHNCLOUD_ROOT/nextcloud/data:/var/www/html
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/www/html
     environment:
       - TZ=$TZ
       - PUID=$PUID
@@ -56,15 +56,13 @@ services:
       - redis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.permanent=true"
-      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.regex=https://(.*)/.well-known/(?:card|cal)dav"
-      - "traefik.http.middlewares.nextcloud_redirectregex.redirectregex.replacement=https://$${1}/remote.php/dav"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=nextcloud_redirectregex,default@file"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_redirectregex.redirectregex.permanent=true"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_redirectregex.redirectregex.regex=https://(.*)/.well-known/(?:card|cal)dav"
+      - "traefik.http.middlewares.${COMPOSE_PROJECT_NAME}_redirectregex.redirectregex.replacement=https://$${1}/remote.php/dav"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=${COMPOSE_PROJECT_NAME}_redirectregex"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      # - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.serverstransport=ignorecert"
-      # - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.scheme=https"
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
