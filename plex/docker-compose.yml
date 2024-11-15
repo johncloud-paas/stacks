@@ -15,7 +15,7 @@ services:
       - $SHOWS_PATH:/tv
     ports:
       - "32400:32400/tcp" # access to the Plex Media Server [required]
-      - "32469:32469/tcp" # Plex DLNA Server
+      # - "32469:32469/tcp" # Plex DLNA Server
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
