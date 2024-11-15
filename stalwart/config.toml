@@ -1,9 +1,9 @@
-certificate.default.cert = "%{file:/data/certs/mail.johntest.ovh/cert.pem}%"
+certificate.default.cert = "%{file:/data/certs/mail.domain.tld/cert.pem}%"
 certificate.default.default = true
-certificate.default.private-key = "%{file:/data/certs/mail.johntest.ovh/key.pem}%"
+certificate.default.private-key = "%{file:/data/certs/mail.domain.tld/key.pem}%"
 directory.internal.store = "rocksdb"
 directory.internal.type = "internal"
-lookup.default.hostname = "mail.johntest.ovh"
+lookup.default.hostname = "mail.domain.tld"
 server.listener.http.bind = "[::]:8080"
 server.listener.http.protocol = "http"
 server.listener.https.bind = "[::]:443"
