@@ -6,7 +6,7 @@ services:
     hostname: mail.$HOST
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - $JOHNCLOUD_ROOT/stalwart/data:/opt/stalwart-mail
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart-mail
       - $JOHNCLOUD_ROOT/traefik/certs/mail.$HOST:/data/certs/mail.$HOST:ro
     labels:
       - traefik.enable=true
