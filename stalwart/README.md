@@ -1,1 +1,1 @@
-stalwart-cli -u https://mail.$HOST import messages -f maildir foo@domain.tld bar
+stalwart-cli -u https://mail.domain.tld import messages -f mbox foo@domain.tld bar.mbox
