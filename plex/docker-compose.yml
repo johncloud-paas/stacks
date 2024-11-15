@@ -14,9 +14,9 @@ services:
       - $VIDEOS_PATH:/movies
       - $SHOWS_PATH:/tv
     # ports:
-    #   - "32400:32400/tcp" # access to the Plex Media Server [required]
+      - "32400:32400/tcp" # access to the Plex Media Server [required]
     #   - "3005:3005/tcp"
-      - "32469:32469/tcp"
+      # - "32469:32469/tcp"
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
