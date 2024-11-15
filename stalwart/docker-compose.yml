@@ -52,6 +52,12 @@ services:
       - traefik.tcp.services.imaps.loadbalancer.server.port=993
       - traefik.tcp.services.imaps.loadbalancer.proxyProtocol.version=2
 
+      - homepage.group=Bureautique
+      - homepage.name=Stalwart
+      - homepage.icon=mailu.png
+      - homepage.href=https://mail.$HOST
+      - homepage.description=Mail domain administration
+
 networks:
   default:
     external: true
