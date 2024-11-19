@@ -46,6 +46,7 @@ server.listener.submission.protocol = "smtp"
 server.listener.submission.proxy.override = true
 server.listener.submission.proxy.trusted-networks.0 = "192.168.203.0/16"
 server.listener.submission.proxy.trusted-networks.1 = "192.168.203.100"
+server.listener.submission.tls.implicit = true
 server.listener.submissions.bind = "[::]:465"
 server.listener.submissions.protocol = "smtp"
 server.listener.submissions.tls.implicit = true

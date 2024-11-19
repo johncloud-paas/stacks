@@ -11,7 +11,7 @@ services:
     labels:
       - traefik.enable=true
 
-      - traefik.http.routers.mailserver.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
+      - traefik.http.routers.mailserver.rule=Host(`stalwart.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
       - traefik.http.routers.mailserver.entrypoints=websecure
       - traefik.http.routers.mailserver.tls.certresolver=letsencrypt
       - traefik.http.routers.mailserver.service=mailserver
@@ -31,21 +31,21 @@ services:
       - traefik.tcp.services.smtp.loadbalancer.server.port=25
       - traefik.tcp.services.smtp.loadbalancer.proxyProtocol.version=2
 
-      - traefik.tcp.routers.submission.rule=HostSNI(`*`)
+      - traefik.tcp.routers.submission.rule=HostSNI(`mail.$HOST`)
       - traefik.tcp.routers.submission.tls.passthrough=true
       - traefik.tcp.routers.submission.entrypoints=submission
       - traefik.tcp.routers.submission.service=submission
       - traefik.tcp.services.submission.loadbalancer.server.port=587
       - traefik.tcp.services.submission.loadbalancer.proxyProtocol.version=2
 
-      - traefik.tcp.routers.submissions.rule=HostSNI(`*`)
+      - traefik.tcp.routers.submissions.rule=HostSNI(`mail.$HOST`)
       - traefik.tcp.routers.submissions.tls.passthrough=true
       - traefik.tcp.routers.submissions.entrypoints=submissions
       - traefik.tcp.routers.submissions.service=submissions
       - traefik.tcp.services.submissions.loadbalancer.server.port=465
       - traefik.tcp.services.submissions.loadbalancer.proxyProtocol.version=2
 
-      - traefik.tcp.routers.imaps.rule=HostSNI(`*`)
+      - traefik.tcp.routers.imaps.rule=HostSNI(`mail.$HOST`)
       - traefik.tcp.routers.imaps.tls.passthrough=true
       - traefik.tcp.routers.imaps.entrypoints=imaps
       - traefik.tcp.routers.imaps.service=imaps
@@ -55,7 +55,7 @@ services:
       - homepage.group=$HOME_GROUP
       - homepage.name=$HOME_NAME
       - homepage.icon=$HOME_ICON
-      - homepage.href=https://mail.$HOST
+      - homepage.href=https://stalwart.$HOST
       - homepage.description=$HOME_DESCRIPTION
 
 networks:
