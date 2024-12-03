@@ -1,5 +1,5 @@
 services:
-  douceville:
+  app:
     image: ydethe/douceville:latest
     restart: unless-stopped
     depends_on:
@@ -26,8 +26,8 @@ services:
       - MAIL_USERNAME=$MAIL_USERNAME
       - MAIL_PASSWORD=$MAIL_PASSWORD
       - MAIL_DEFAULT_SENDER=$MAIL_DEFAULT_SENDER
-      - ADDOK_HOST=$ADDOK_HOST
-      - POSTGRES_HOST=$POSTGRES_HOST
+      - ADDOK_HOST=$COMPOSE_PROJECT_NAME-addok-1
+      - POSTGRES_HOST=$COMPOSE_PROJECT_NAME-db-1
       - POSTGRES_DB=$POSTGRES_DB
       - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
