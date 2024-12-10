@@ -41,12 +41,12 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/code
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`) && PathPrefix(`/$API_PATH`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`) && PathPrefix(`$API_PATH`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=$COMPOSE_PROJECT_NAME-stripprefix@docker"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=3566"
-      - "traefik.http.middlewares.$COMPOSE_PROJECT_NAME-stripprefix.stripprefix.prefixes=/$API_PATH"
+      - "traefik.http.middlewares.$COMPOSE_PROJECT_NAME-stripprefix.stripprefix.prefixes=$API_PATH"
       - "traefik.http.middlewares.$COMPOSE_PROJECT_NAME-stripprefix.stripprefix.forceSlash=false"
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
