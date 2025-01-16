@@ -13,13 +13,16 @@ services:
       - globalSettings__mail__smtp__ssl=$globalSettings__mail__smtp__ssl
       - globalSettings__mail__smtp__username=$globalSettings__mail__smtp__username
       - globalSettings__mail__smtp__password=$globalSettings__mail__smtp__password
+      - globalSettings__hibpApiKey=$globalSettings__hibpApiKey
+      - BW_DOMAIN=$HOST
+      - BW_INSTALLATION_ID=00000000-0000-0000-0000-000000000000
+      - BW_INSTALLATION_KEY=xxxxxxxxxxxx
       - BW_ENABLE_SSL=false
       - BW_DB_PROVIDER=postgresql
       - BW_DB_SERVER=$COMPOSE_PROJECT_NAME-db-1
       - BW_DB_DATABASE=$DB_DATABASE
       - BW_DB_USERNAME=$DB_USERNAME
       - BW_DB_PASSWORD=$DB_PASSWORD
-      - globalSettings__hibpApiKey=$globalSettings__hibpApiKey
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc:/etc/bitwarden
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/logs:/var/log/bitwarden
