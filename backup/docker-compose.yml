@@ -29,11 +29,11 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=51515"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
-      - "homepage.group=Platform"
-      - "homepage.name=Kopia"
-      - "homepage.icon=kopia.svg"
-      - "homepage.href=https://$HOST"
-      - "homepage.description=Backup system"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://${HOST}"
+      - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
   default:
