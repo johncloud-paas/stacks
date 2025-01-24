@@ -1,14 +1,7 @@
-version: "3.8"
-
 services:
   app:
     image: kopia/kopia:latest
-    container_name: backup_app
-    hostname: backup_app
     restart: unless-stopped
-    # ports:
-    #     - 51515:51515
-    # Setup the server that provides the web gui
     command:
         - server
         - start
@@ -31,16 +24,15 @@ services:
     labels:
       # - "traefik.enable=false"
       - "traefik.enable=true"
-      - "traefik.http.routers.backup.rule=Host(`backup.$HOST`)"
-      - "traefik.http.routers.backup.entrypoints=websecure"
-      - "traefik.http.routers.backup.tls.certresolver=letsencrypt"
-      - "traefik.http.services.backup.loadbalancer.server.port=51515"
-      - "traefik.http.routers.backup.middlewares=forward-auth-verify"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=51515"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
       - "homepage.group=Platform"
       - "homepage.name=Kopia"
       - "homepage.icon=kopia.svg"
-      - "homepage.href=https://backup.$HOST"
-      # - "homepage.href=http://192.168.205.30:51515"
+      - "homepage.href=https://$HOST"
       - "homepage.description=Backup system"
 
 networks:
