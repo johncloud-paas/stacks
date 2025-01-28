@@ -1,0 +1,34 @@
+services:
+  app:
+    image: pihole/pihole:latest
+    restart: unless-stopped
+    # ports:
+      # - "8081:80/tcp" # Pi-hole web admin interface, proxied through Caddy (configure port in Caddyfile)
+      # # Following are NOT proxied through Caddy, bound to host net instead:
+      # - "53:53/udp"
+      # - "53:53/tcp"
+      # - "853:853/tcp" # DNS-over-TLS 
+    environment:
+      TZ: $TZ
+      WEBPASSWORD: $WEBPASSWORD # Only used on first boot, change with pihole cli then comment out here.
+    volumes:
+      - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc-pihole:/etc/pihole'
+      - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc-dnsmasq.d:/etc/dnsmasq.d'
+      - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc-lighttpd/external.conf:/etc/lighttpd/external.conf'  # Recommend leave as bind mount for easier editing.
+        # ref for why you may need to change this file: https://docs.pi-hole.net/guides/webserver/caddy/#modifying-lighttpd-configuration
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=80"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://${HOST}/admin"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
