@@ -1,0 +1,40 @@
+services: 
+  pomerium:
+    image: pomerium/pomerium:v0.28.0
+    restart: unless-stopped
+    environment:
+      POMERIUM_ZERO_TOKEN: $CLUSTER_TOKEN
+      XDG_CACHE_HOME: /var/cache
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cache:/var/cache
+    networks:
+      main:
+        aliases:
+        - verify.$CLUSTER_STARTER_SUBDOMAIN.pomerium.app
+    labels:
+      - "traefik.enable=true"
+
+      ### Web UI (HTTP/HTTPS)
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.$COMPOSE_PROJECT_NAME-ui.service=$COMPOSE_PROJECT_NAME-ui"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://${HOST}/"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+  verify:
+    image: cr.pomerium.com/pomerium/verify:latest
+    restart: unless-stopped
+    networks:
+      main:
+        aliases:
+        - verify
+
+networks:
+  main:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
