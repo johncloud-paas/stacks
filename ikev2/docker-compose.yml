@@ -1,0 +1,41 @@
+services:
+  server:
+    image: hwdsl2/ipsec-vpn-server
+    restart: unless-stopped
+    cap_add:
+    - NET_ADMIN
+    devices:
+      - "/dev/ppp:/dev/ppp"
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+      - net.ipv4.conf.all.rp_filter=0
+      - net.ipv4.conf.default.accept_redirects=0
+      - net.ipv4.conf.default.send_redirects=0
+      - net.ipv4.conf.default.rp_filter=0
+    ports:
+      - 500:500/udp
+      - 4500:4500/udp
+    environment:
+      - VPN_IPSEC_PSK=$VPN_IPSEC_PSK
+      - VPN_DNS_NAME=$HOST
+      - VPN_USER=$VPN_USER
+      - VPN_PASSWORD=$VPN_PASSWORD
+      - VPN_DNS_SRV1=$VPN_DNS_SRV1
+      - VPN_DNS_SRV2=$VPN_DNS_SRV2
+    volumes:
+    - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/etc/ipsec.d
+    - /lib/modules:/lib/modules:ro
+    # labels:
+    #   - "traefik.enable=true"
+    #   - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-prox.rule=HostSNI(`*`)
+    #   - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-prox.tls=false
+    #   - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-prox.entrypoints=proxy
+    #   - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-prox.service=$COMPOSE_PROJECT_NAME-prox
+    #   - traefik.tcp.services.$COMPOSE_PROJECT_NAME-prox.loadbalancer.server.port=3128
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
