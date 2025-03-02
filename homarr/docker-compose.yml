@@ -1,0 +1,28 @@
+services:
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/appdata:/appdata
+    environment:
+      - SECRET_ENCRYPTION_KEY=$SECRET_ENCRYPTION_KEY
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.service=$COMPOSE_PROJECT_NAME"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=7575"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://${HOST}/"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
