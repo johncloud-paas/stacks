@@ -7,7 +7,7 @@ services:
     environment:
       APP_URL: "https://$HOST"
       APP_SECRET: "$APP_SECRET"
-      DATABASE_URL: "postgresql://docmost:DB_PASSWORD@$COMPOSE_PROJECT_NAME-db-1:5432/docmost?schema=public"
+      DATABASE_URL: "postgresql://docmost:$DB_PASSWORD@$COMPOSE_PROJECT_NAME-db-1:5432/docmost?schema=public"
       REDIS_URL: "redis://$COMPOSE_PROJECT_NAME-redis-1:6379"
     restart: unless-stopped
     volumes:
