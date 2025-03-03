@@ -1,0 +1,40 @@
+services:
+  app:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - APP_KEY=$APP_KEY
+      - ADMIN_EMAIL=$ADMIN_EMAIL
+      - ADMIN_PASSWORD=$ADMIN_PASSWORD
+      - DB_CONNECTION=sqlite
+      - SPEEDTEST_SCHEDULE=
+      - SPEEDTEST_SERVERS=
+      - PRUNE_RESULTS_OLDER_THAN=
+      - CHART_DATETIME_FORMAT= 
+      - DATETIME_FORMAT=
+      - APP_TIMEZONE=$TZ
+      - DISPLAY_TIMEZONE=$TZ
+      - APP_URL=https://$HOST
+      - ASSET_URL=https://$HOST
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.speedtest-tracker.rule=Host(`speedtest.yourdomain.com`)"
+      - "traefik.http.routers.speedtest-tracker.entrypoints=websecure"
+      - "traefik.http.routers.speedtest-tracker.tls=true"
+      - "traefik.http.routers.speedtest-tracker.tls.certresolver=yourresolver"
+      - "traefik.http.services.speedtest-tracker.loadbalancer.server.port=80"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://${HOST}/"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
