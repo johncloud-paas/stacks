@@ -18,6 +18,7 @@ services:
       - DISPLAY_TIMEZONE=$TZ
       - APP_URL=https://$HOST
       - ASSET_URL=https://$HOST
+      - SPEEDTEST_SCHEDULE=$SPEEDTEST_SCHEDULE
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/config
     labels:
