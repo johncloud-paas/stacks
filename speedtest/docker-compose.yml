@@ -2,6 +2,12 @@ services:
   app:
     image: lscr.io/linuxserver/speedtest-tracker:latest
     restart: unless-stopped
+    healthcheck:
+      test: curl -fSs https://$HOST/api/healthcheck | jq -r .message || exit 1
+      interval: 10s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
     environment:
       - PUID=1000
       - PGID=1000
