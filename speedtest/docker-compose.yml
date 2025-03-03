@@ -22,17 +22,18 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/config
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.speedtest-tracker.rule=Host(`speedtest.yourdomain.com`)"
-      - "traefik.http.routers.speedtest-tracker.entrypoints=websecure"
-      - "traefik.http.routers.speedtest-tracker.tls=true"
-      - "traefik.http.routers.speedtest-tracker.tls.certresolver=yourresolver"
-      - "traefik.http.services.speedtest-tracker.loadbalancer.server.port=80"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=80"
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://${HOST}/"
       - "homepage.description=$HOME_DESCRIPTION"
-
+      - "homepage.widget.type=speedtest"
+      - "homepage.widget.url=https://${HOST}"
 
 networks:
   default:
