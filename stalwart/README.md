@@ -1,1 +1,1 @@
-stalwart-cli -u https://mail.domain.tld import messages -f mbox foo@domain.tld bar.mbox
+Copy config.toml to `$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data/etc`
