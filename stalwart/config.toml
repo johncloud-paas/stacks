@@ -68,19 +68,3 @@ tracer.log.level = "info"
 tracer.log.lossy = false
 tracer.log.multiline = false
 tracer.log.type = "stdout"
-[session.milter."rspamd"]
-enable = [ { if = "listener = 'smtp'", then = true }, 
-           { else = false } ]
-hostname = "127.0.0.1"
-port = 11332
-stages = ["connect", "ehlo", "mail", "rcpt", "data"]
-tls = false
-allow-invalid-certs = false
-
-[session.milter."clamav"]
-enable = [ { if = "listener = 'smtp'", then = true }, 
-           { else = false } ]
-hostname = "127.0.0.1"
-port = 15112
-tls = false
-allow-invalid-certs = false
