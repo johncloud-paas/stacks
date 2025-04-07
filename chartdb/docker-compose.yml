@@ -1,0 +1,25 @@
+# docker run -e OPENAI_API_KEY=<YOUR_OPEN_AI_KEY> -p 8080:80 ghcr.io/chartdb/chartdb:latest
+
+services:
+  app:
+    image: ghcr.io/chartdb/chartdb:latest
+    restart: unless-stopped
+    environment:
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=80"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
