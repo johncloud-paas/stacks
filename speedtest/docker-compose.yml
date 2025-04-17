@@ -21,6 +21,7 @@ services:
       - APP_URL=https://$HOST
       - ASSET_URL=https://$HOST
       - SPEEDTEST_SCHEDULE=$SPEEDTEST_SCHEDULE
+      - SPEEDTEST_SERVERS=$SPEEDTEST_SERVERS
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/config
     labels:
