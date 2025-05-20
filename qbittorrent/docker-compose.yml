@@ -31,7 +31,7 @@ services:
       - "homepage.widget.url=https://$HOST"
       - "homepage.widget.username=admin"
       - "homepage.widget.password=$ADMIN_PASSWORD"
-      - "homepage.widget.enableLeechProgress=true # optional, defaults to false
+      - "homepage.widget.enableLeechProgress=true"
 
 networks:
   default:
