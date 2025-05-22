@@ -4,11 +4,11 @@ services:
     image: stalwartlabs/mail-server:latest
     restart: unless-stopped
     hostname: mail.$HOST
-    ports:
-      - 25:25
-      - 587:587
-      - 465:465
-      - 993:993
+    # ports:
+    #   - 25:25
+    #   - 587:587
+    #   - 465:465
+    #   - 993:993
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart-mail
