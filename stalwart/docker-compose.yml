@@ -42,11 +42,11 @@ services:
       - traefik.tcp.services.smtp.loadbalancer.proxyProtocol.version=2
 
       - traefik.tcp.routers.submission.rule=HostSNI(`mail.$HOST`)
-      - traefik.tcp.routers.submission.tls.passthrough=true
+      - traefik.tcp.routers.submission.tls.passthrough=false
       - traefik.tcp.routers.submission.entrypoints=submission
       - traefik.tcp.routers.submission.service=submission
       - traefik.tcp.services.submission.loadbalancer.server.port=587
-      - traefik.tcp.services.submission.loadbalancer.proxyProtocol.version=2
+      # - traefik.tcp.services.submission.loadbalancer.proxyProtocol.version=2
 
       - traefik.tcp.routers.submissions.rule=HostSNI(`mail.$HOST`)
       - traefik.tcp.routers.submissions.tls.passthrough=true
