@@ -2,8 +2,6 @@ services:
   anythingllm:
     image: mintplexlabs/anythingllm:latest
     restart: unless-stopped
-    depends_on:
-      - weaviate
     cap_add:
       - SYS_ADMIN
     # user: 1000:1000
