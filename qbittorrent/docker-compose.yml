@@ -27,11 +27,11 @@ services:
       - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
-      - "homepage.widget.type=qbittorrent"
-      - "homepage.widget.url=https://$HOST"
-      - "homepage.widget.username=admin"
-      - "homepage.widget.password=$ADMIN_PASSWORD"
-      - "homepage.widget.enableLeechProgress=true"
+      # - "homepage.widget.type=qbittorrent"
+      # - "homepage.widget.url=https://$HOST"
+      # - "homepage.widget.username=admin"
+      # - "homepage.widget.password=$ADMIN_PASSWORD"
+      # - "homepage.widget.enableLeechProgress=true"
 
 networks:
   default:
