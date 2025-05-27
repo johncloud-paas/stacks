@@ -43,6 +43,7 @@ services:
     restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/www/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=$TZ
       - PUID=$PUID
