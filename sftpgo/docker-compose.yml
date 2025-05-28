@@ -12,22 +12,38 @@ services:
       - SFTPGO_DATA_PROVIDER__CREATE_DEFAULT_ADMIN=true
       - SFTPGO_DEFAULT_ADMIN_USERNAME=admin
       - SFTPGO_DEFAULT_ADMIN_PASSWORD=$SFTPGO_DEFAULT_ADMIN_PASSWORD
-      - SFTPGO_HTTPD__BIND_PORT=8080
-      - SFTPGO_WEBDAVD__BIND_PORT=8080
-      - SFTPGO_WEBDAVD__ENABLED=true
+      - SFTPGO_SFTPD__BINDINGS__0__PORT=0
+      - SFTPGO_FTPD__BINDINGS__0__PORT=0
+      - SFTPGO_HTTPD__BINDINGS__0__PORT=8080
+      - SFTPGO_HTTPD__BINDINGS__0__PROXY_ALLOWED=192.168.203.0/24
+      - SFTPGO_HTTPD__BINDINGS__0__ENABLE_REST_API=false
+      - SFTPGO_HTTPD__BINDINGS__0__RENDER_OPENAPI=false
+      - SFTPGO_WEBDAVD__BINDINGS__0__PORT=8081
+      # - SFTPGO_WEBDAVD__BINDINGS__0__PROXY_ALLOWED=192.168.203.0/24
+      # - SFTPGO_WEBDAVD__BINDINGS__0__PREFIX=/dav
+      - SFTPGO_COMMON__UPLOAD_MODE=1
       - SFTPGO_COMMON__DEFENDER__ENABLED=true
       - SFTPGO_COMMON__DEFENDER__BAN_TIME=30
       - SFTPGO_COMMON__DEFENDER__THRESHOLD=10
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.service=$COMPOSE_PROJECT_NAME-webdav"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME-webdav.loadbalancer.server.port=8081"
+
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`ui.$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.service=$COMPOSE_PROJECT_NAME"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8080"
+
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
-      - "homepage.href=https://$HOST/web/admin"
+      - "homepage.href=https://ui.$HOST/web/admin"
       - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
