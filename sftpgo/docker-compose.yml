@@ -32,6 +32,7 @@ services:
       - SFTPGO_COMMON__DEFENDER__ENABLED=true
       - SFTPGO_COMMON__DEFENDER__BAN_TIME=30
       - SFTPGO_COMMON__DEFENDER__THRESHOLD=10
+      - SFTPGO_COMMON__PROXY_PROTOCOL=2
     labels:
       - "traefik.enable=true"
 
