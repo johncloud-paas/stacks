@@ -6,13 +6,18 @@ services:
     restart: unless-stopped
     user: $UID:$GID
     volumes:
-      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/downloads
-      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cookies:/cookies
-      - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files:/srv/sftpgo:ro
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/srv/sftpgo/data
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/home:/var/lib/sftpgo
-    # environment:
-    #   - PUBLIC_HOST_URL=$HOST
-    #   - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
+    environment:
+      - SFTPGO_DATA_PROVIDER__CREATE_DEFAULT_ADMIN=true
+      - SFTPGO_DEFAULT_ADMIN_USERNAME=admin
+      - SFTPGO_DEFAULT_ADMIN_PASSWORD=$SFTPGO_DEFAULT_ADMIN_PASSWORD
+      - SFTPGO_HTTPD__BIND_PORT=8080
+      - SFTPGO_WEBDAVD__BIND_PORT=8080
+      - SFTPGO_WEBDAVD__ENABLED=true
+      - SFTPGO_COMMON__DEFENDER__ENABLED=true
+      - SFTPGO_COMMON__DEFENDER__BAN_TIME=30
+      - SFTPGO_COMMON__DEFENDER__THRESHOLD=10
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
