@@ -1,0 +1,8 @@
+watchdog
+openai
+qdrant-client
+PyMuPDF
+python-docx
+openpyxl
+pytesseract
+Pillow
