@@ -11,7 +11,7 @@ services:
     #   - 993:993
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart-mail
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart
       - $JOHNCLOUD_ROOT/traefik/certs/mail.$HOST:/data/certs/mail.$HOST:ro
     labels:
       - "bunkerweb.SERVER_NAME=stalwart.$HOST"
