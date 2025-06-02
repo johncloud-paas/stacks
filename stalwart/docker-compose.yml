@@ -1,7 +1,7 @@
 services:
   mailserver:
     # swaks --to test-xxxxxxx@srv1.mail-tester.com --from admin@$HOST --server mail.$HOST --auth-user admin --protocol SSMTP --port 465 --auth-password xxx
-    image: stalwartlabs/mail-server:latest
+    image: stalwartlabs/stalwart:latest
     restart: unless-stopped
     hostname: mail.$HOST
     # ports:
