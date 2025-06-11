@@ -2,8 +2,6 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     restart: unless-stopped
-    # ports:
-    #   - 6333:6333
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/qdrant_data:/qdrant/storage
     environment:
@@ -35,6 +33,7 @@ services:
     environment:
       - LOGLEVEL=$LOGLEVEL
       - QDRANT_HOST=$COMPOSE_PROJECT_NAME-qdrant-1
+      - QDRANT_HTTPS=false
       - QDRANT_PORT=6333
       - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
       - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
@@ -59,6 +58,7 @@ services:
     environment:
       - LOGLEVEL=$LOGLEVEL
       - QDRANT_HOST=$COMPOSE_PROJECT_NAME-qdrant-1
+      - QDRANT_HTTPS=false
       - QDRANT_PORT=6333
       - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
       - QDRANT_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
