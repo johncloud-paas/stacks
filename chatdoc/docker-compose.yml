@@ -2,15 +2,19 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     restart: unless-stopped
+    # ports:
+    #   - 6333:6333
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__API_KEY=$QDRANT__SERVICE__API_KEY
+      - QDRANT__SERVICE__READ_ONLY_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
     labels:
       - "traefik.enable=true"
 
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-qdrant.rule=Host(`qdrant.$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-qdrant.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-qdrant.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-qdrant.middlewares=forward-auth-verify"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-qdrant.service=$COMPOSE_PROJECT_NAME-qdrant"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME-qdrant.loadbalancer.server.port=6333"
 
@@ -33,6 +37,7 @@ services:
       - QDRANT_HOST=$COMPOSE_PROJECT_NAME-qdrant-1
       - QDRANT_PORT=6333
       - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
+      - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - DOCS_PATH=/docs
       - STATE_DB_PATH=/code/index_state.db
@@ -56,6 +61,7 @@ services:
       - QDRANT_HOST=$COMPOSE_PROJECT_NAME-qdrant-1
       - QDRANT_PORT=6333
       - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
+      - QDRANT_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - COLLECTION_NAME=$COLLECTION_NAME
       - DAV_ROOT=$DAV_ROOT
