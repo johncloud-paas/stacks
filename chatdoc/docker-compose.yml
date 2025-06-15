@@ -50,6 +50,27 @@ services:
       - OCR_LANG=$OCR_LANG
       - TORCH_NUM_THREADS=$TORCH_NUM_THREADS
 
+  imapsync:
+    image: ydethe/imapsync:latest
+    restart: unless-stopped
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails
+    environment:
+      - LOGLEVEL=$LOGLEVEL
+      - SYNC_PERIOD=$SYNC_PERIOD
+      - IMAP_LIST__0__LABEL=$IMAP_LIST__0__LABEL
+      - IMAP_LIST__0__IMAP_SERVER=$IMAP_LIST__0__IMAP_SERVER
+      - IMAP_LIST__0__IMAP_PORT=$IMAP_LIST__0__IMAP_PORT
+      - IMAP_LIST__0__USERNAME=$IMAP_LIST__0__USERNAME
+      - IMAP_LIST__0__PASSWORD=$IMAP_LIST__0__PASSWORD
+      - IMAP_LIST__0__MAILBOX=$IMAP_LIST__0__MAILBOX
+      - IMAP_LIST__1__LABEL=$IMAP_LIST__1__LABEL
+      - IMAP_LIST__1__IMAP_SERVER=$IMAP_LIST__1__IMAP_SERVER
+      - IMAP_LIST__1__IMAP_PORT=$IMAP_LIST__1__IMAP_PORT
+      - IMAP_LIST__1__USERNAME=$IMAP_LIST__1__USERNAME
+      - IMAP_LIST__1__PASSWORD=$IMAP_LIST__1__PASSWORD
+      - IMAP_LIST__1__MAILBOX=$IMAP_LIST__1__MAILBOX
+
   ragwebui:
     image: ydethe/ragwebui:latest
     restart: unless-stopped
