@@ -29,6 +29,7 @@ services:
       - qdrant
     volumes:
       - $DOCUMENTS_ROOT_FOLDER:/docs:ro
+      - $EMAILS_ROOT_FOLDER:/emails:ro
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ragindexer:/code
     environment:
       - LOGLEVEL=$LOGLEVEL
@@ -39,6 +40,7 @@ services:
       - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - DOCS_PATH=/docs
+      - EMAILS_PATH=/emails
       - STATE_DB_PATH=/code/index_state.db
       - COLLECTION_NAME=$COLLECTION_NAME
       - DAV_ROOT=$DAV_ROOT
