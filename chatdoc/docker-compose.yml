@@ -28,8 +28,8 @@ services:
     depends_on:
       - qdrant
     volumes:
-      - $DOCUMENTS_ROOT_FOLDER:/docs:ro
-      - $EMAILS_ROOT_FOLDER:/emails:ro
+      - $DOCUMENTS_ROOT_FOLDER:/docs
+      - $EMAILS_ROOT_FOLDER:/emails
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ragindexer:/code
     environment:
       - LOGLEVEL=$LOGLEVEL
