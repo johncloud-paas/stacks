@@ -33,10 +33,10 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ragindexer:/code
     environment:
       - LOGLEVEL=$LOGLEVEL
-      # - QDRANT_HOST=$COMPOSE_PROJECT_NAME-qdrant-1
-      # - QDRANT_HTTPS=false
-      - QDRANT_HOST=qdrant.$HOST
-      - QDRANT_HTTPS=true
+      - QDRANT_HOST=qdrant
+      - QDRANT_HTTPS=false
+      # - QDRANT_HOST=qdrant.$HOST
+      # - QDRANT_HTTPS=true
       - QDRANT_PORT=6333
       - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
       - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
@@ -82,7 +82,7 @@ services:
       - qdrant
     environment:
       - LOGLEVEL=$LOGLEVEL
-      - QDRANT_HOST=$COMPOSE_PROJECT_NAME-qdrant-1
+      - QDRANT_HOST=qdrant
       - QDRANT_HTTPS=false
       - QDRANT_PORT=6333
       - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
