@@ -58,12 +58,12 @@ services:
       - PUID=$PUID
       - PGID=$PGID
       # Redis settings
-      - REDIS_HOST=$COMPOSE_PROJECT_NAME-redis-1
+      - REDIS_HOST=redis
       # Database settings (PostGreSQL)
       - POSTGRES_DB=$NEXTCLOUD_MYSQL_DATABASE
       - POSTGRES_USER=$NEXTCLOUD_MYSQL_USER
       - POSTGRES_PASSWORD=$NEXTCLOUD_MYSQL_PASSWORD
-      - POSTGRES_HOST=$COMPOSE_PROJECT_NAME-db-1
+      - POSTGRES_HOST=db
       # Mailing settings
       - SMTP_HOST=$SMTP_HOST
       - SMTP_SECURE=$SMTP_SECURE

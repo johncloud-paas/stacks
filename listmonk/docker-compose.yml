@@ -24,7 +24,7 @@ services:
       - LISTMONK_app__address=0.0.0.0:9000
       - LISTMONK_app__admin_username=admin
       - LISTMONK_app__admin_password=$ADMIN_PASSWORD
-      - LISTMONK_db__host=$COMPOSE_PROJECT_NAME-db-1
+      - LISTMONK_db__host=db
       - LISTMONK_db__port=5432
       - LISTMONK_db__user=listmonk
       - LISTMONK_db__password=$POSTGRES_PASSWORD

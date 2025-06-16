@@ -15,7 +15,7 @@ services:
       - NODE_ENV=production
       - BASE_URL=https://${HOST}
       - PORT=1234
-      - REDIS_HOST=$COMPOSE_PROJECT_NAME-redis-1
+      - REDIS_HOST=redis
       # For local uploads storage
       - FILE_DIR=/uploads
     labels:
