@@ -33,7 +33,7 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ragindexer:/code
     environment:
       - LOGLEVEL=$LOGLEVEL
-      - QDRANT_URL=qdrant:6333
+      - QDRANT_URL=http://qdrant:6333
       - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
       - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
       - OPENAI_API_KEY=$OPENAI_API_KEY
