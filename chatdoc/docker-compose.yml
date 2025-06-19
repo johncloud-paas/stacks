@@ -79,9 +79,7 @@ services:
       - qdrant
     environment:
       - LOGLEVEL=$LOGLEVEL
-      - QDRANT_HOST=qdrant
-      - QDRANT_HTTPS=false
-      - QDRANT_PORT=6333
+      - QDRANT_URL=http://qdrant:6333
       - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
       - QDRANT_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
       - OPENAI_API_KEY=$OPENAI_API_KEY
