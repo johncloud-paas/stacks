@@ -34,12 +34,12 @@ services:
       # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-jmap.loadbalancer.server.port=443
       # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-jmap.loadbalancer.proxyProtocol.version=2
 
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.rule=HostSNI(`*`)
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.tls=false
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.entrypoints=smtp
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.service=$COMPOSE_PROJECT_NAME-smtp
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-smtp.loadbalancer.server.port=25
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-smtp.loadbalancer.proxyProtocol.version=2
+      - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.rule=HostSNI(`*`)
+      - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.tls=false
+      - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.entrypoints=smtp
+      - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.service=$COMPOSE_PROJECT_NAME-smtp
+      - traefik.tcp.services.$COMPOSE_PROJECT_NAME-smtp.loadbalancer.server.port=25
+      - traefik.tcp.services.$COMPOSE_PROJECT_NAME-smtp.loadbalancer.proxyProtocol.version=2
 
       # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submission.rule=HostSNI(`mail.$HOST`)
       # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submission.tls.passthrough=true
