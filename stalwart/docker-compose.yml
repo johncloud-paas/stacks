@@ -4,21 +4,11 @@ services:
     image: stalwartlabs/stalwart:latest
     restart: unless-stopped
     hostname: mail.$HOST
-    # ports:
-    #   - 25:25
-    #   - 587:587
-    #   - 465:465
-    #   - 993:993
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart
       - $JOHNCLOUD_ROOT/traefik/certs/mail.$HOST:/data/certs/mail.$HOST:ro
     labels:
-      - "bunkerweb.SERVER_NAME=stalwart.$HOST"
-      - "bunkerweb.USE_REVERSE_PROXY=yes"
-      - "bunkerweb.REVERSE_PROXY_URL=/"
-      - "bunkerweb.REVERSE_PROXY_HOST=http://mailserver:8080"
-      
       - traefik.enable=true
 
       - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.rule=Host(`stalwart.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
