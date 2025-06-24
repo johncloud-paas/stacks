@@ -47,7 +47,7 @@ services:
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME - Neo4J"
       - "homepage.icon=neo4j.svg"
-      - "homepage.href=https://neo4j.$HOST/dashboard"
+      - "homepage.href=https://neo4j.$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
 
   ragindexer:
