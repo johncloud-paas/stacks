@@ -38,18 +38,17 @@ services:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4jui.rule=Host(`neo4j.$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4jui.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4jui.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4jui.service=$COMPOSE_PROJECT_NAME-neo4jui"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME-neo4jui.loadbalancer.server.port=7474"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.rule=Host(`neo4j.$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.service=$COMPOSE_PROJECT_NAME-neo4j"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME-neo4j.loadbalancer.server.port=7474"
 
-      - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-neo4j.rule=HostSNI(`*`)
-      - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-neo4j.tls=false
-      - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-neo4j.entrypoints=neo4j
-      - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-neo4j.service=$COMPOSE_PROJECT_NAME-neo4j
-      - traefik.tcp.services.$COMPOSE_PROJECT_NAME-neo4j.loadbalancer.server.port=7687
-      - traefik.tcp.services.$COMPOSE_PROJECT_NAME-neo4j.loadbalancer.proxyProtocol.version=2
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.rule=Host(`neo4j.$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.entrypoints=bolt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.service=$COMPOSE_PROJECT_NAME-bolt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME-bolt.loadbalancer.server.port=7687"
 
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME - Neo4J"
