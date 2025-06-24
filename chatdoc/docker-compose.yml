@@ -32,9 +32,9 @@ services:
         - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/plugins:/plugins
     environment:
         - NEO4J_AUTH=neo4j/$NEO4J_PASSWORD
-    # ports:
-    #   - "7474:7474"
-    #   - "7687:7687"
+    ports:
+      # - "7474:7474"
+      - "7687:7687"
     labels:
       - "traefik.enable=true"
 
