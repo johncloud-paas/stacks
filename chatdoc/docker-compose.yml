@@ -22,39 +22,53 @@ services:
       - "homepage.href=https://qdrant.$HOST/dashboard"
       - "homepage.description=$HOME_DESCRIPTION"
 
-  neo4j:
-    image: neo4j:latest
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:server
     restart: unless-stopped
     volumes:
-        - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/logs:/logs
-        - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/config:/config
-        - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/data:/data
-        - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/plugins:/plugins
-    environment:
-        - NEO4J_AUTH=neo4j/$NEO4J_PASSWORD
-    # ports:
-    #   - "7474:7474"
-    #   - "7687:7687"
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/models:/models
+    command: >
+      --model /models/llama-7b.gguf
+      --port 8000
+      --host 0.0.0.0
+      # --n-gpu-layers 35
+      # --n-threads 8
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=false"
 
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.rule=Host(`neo4j.$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.service=$COMPOSE_PROJECT_NAME-neo4j"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME-neo4j.loadbalancer.server.port=7474"
+  # neo4j:
+  #   image: neo4j:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/logs:/logs
+  #       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/config:/config
+  #       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/data:/data
+  #       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/plugins:/plugins
+  #   environment:
+  #       - NEO4J_AUTH=neo4j/$NEO4J_PASSWORD
+  #   # ports:
+  #   #   - "7474:7474"
+  #   #   - "7687:7687"
+  #   labels:
+  #     - "traefik.enable=true"
 
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.rule=Host(`neo4j.$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.entrypoints=bolt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.service=$COMPOSE_PROJECT_NAME-bolt"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME-bolt.loadbalancer.server.port=7687"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.rule=Host(`neo4j.$HOST`)"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.entrypoints=websecure"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.tls.certresolver=letsencrypt"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.service=$COMPOSE_PROJECT_NAME-neo4j"
+  #     - "traefik.http.services.$COMPOSE_PROJECT_NAME-neo4j.loadbalancer.server.port=7474"
 
-      - "homepage.group=$HOME_GROUP"
-      - "homepage.name=$HOME_NAME - Neo4J"
-      - "homepage.icon=neo4j.svg"
-      - "homepage.href=https://neo4j.$HOST"
-      - "homepage.description=$HOME_DESCRIPTION"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.rule=Host(`neo4j.$HOST`)"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.entrypoints=bolt"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.tls.certresolver=letsencrypt"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.service=$COMPOSE_PROJECT_NAME-bolt"
+  #     - "traefik.http.services.$COMPOSE_PROJECT_NAME-bolt.loadbalancer.server.port=7687"
+
+  #     - "homepage.group=$HOME_GROUP"
+  #     - "homepage.name=$HOME_NAME - Neo4J"
+  #     - "homepage.icon=neo4j.svg"
+  #     - "homepage.href=https://neo4j.$HOST"
+  #     - "homepage.description=$HOME_DESCRIPTION"
 
   ragindexer:
     image: ydethe/ragindexer:latest
