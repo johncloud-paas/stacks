@@ -40,9 +40,15 @@ services:
       retries: 5
       start_period: 10s
     labels:
-      # --n-gpu-layers 35
-      # --n-threads 8
-      - "traefik.enable=false"
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.rule=Host(`llama.$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.service=$COMPOSE_PROJECT_NAME-llama"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME-llama.loadbalancer.server.port=8000"
+      - "traefik.http.middlewares.llama-auth.basicauth.users=$LLAMA_SERVER_AUTH"
+      - "traefik.http.routers..$COMPOSE_PROJECT_NAME-llama.middlewares=llama-auth@docker"
 
   # neo4j:
   #   image: neo4j:latest
