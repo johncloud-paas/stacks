@@ -48,7 +48,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.service=$COMPOSE_PROJECT_NAME-llama"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME-llama.loadbalancer.server.port=8000"
       - "traefik.http.middlewares.llama-auth.basicauth.users=$LLAMA_SERVER_AUTH"
-      - "traefik.http.routers..$COMPOSE_PROJECT_NAME-llama.middlewares=llama-auth@docker"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.middlewares=llama-auth@docker"
 
   # neo4j:
   #   image: neo4j:latest
