@@ -30,9 +30,8 @@ services:
     command: >
       --port 8000
       --host 0.0.0.0
-      --hf-repo bkz11/gpt2-Q8_0-GGUF
-      --model gpt2.Q8_0.gguf
-      -c 2048
+      --hf-repo JulianChang/SmolLM2-1.7B-Instruct-Q8_0-GGUF
+      --hf-file smollm2-1.7b-instruct-q8_0.gguf
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s
