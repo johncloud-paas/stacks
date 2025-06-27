@@ -25,14 +25,20 @@ services:
   llama-server:
     image: ghcr.io/ggml-org/llama.cpp:server
     restart: unless-stopped
-    volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/models:/models
+    # volumes:
+    #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/models:/models
     command: >
       --port 8000
       --host 0.0.0.0
       --hf-repo bkz11/gpt2-Q8_0-GGUF
       --model gpt2.Q8_0.gguf
       -c 2048
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     labels:
       # --n-gpu-layers 35
       # --n-threads 8
