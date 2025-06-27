@@ -30,8 +30,7 @@ services:
     command: >
       --port 8000
       --host 0.0.0.0
-      --hf-repo $LLAMA_MODEL_PROVIDER
-      --hf-file $LLAMA_MODEL_NAME
+      --hf $LLAMA_MODEL_PROVIDER
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s
