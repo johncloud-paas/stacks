@@ -28,9 +28,11 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/models:/models
     command: >
-      --model /models/llama-7b.gguf
       --port 8000
       --host 0.0.0.0
+      --hf-repo bkz11/gpt2-Q8_0-GGUF
+      --model gpt2.Q8_0.gguf
+      -c 2048
     labels:
       # --n-gpu-layers 35
       # --n-threads 8
