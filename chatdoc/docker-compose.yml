@@ -31,6 +31,7 @@ services:
       --port 8000
       --host 0.0.0.0
       -hf $LLAMA_MODEL_PROVIDER
+      --hf-token $HF_TOKEN
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s
