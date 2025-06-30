@@ -52,6 +52,7 @@ services:
       - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.bearerHeader=true"
       - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.bearerHeaderName=Authorization"
       - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.tokens=$LLAMA_SERVER_APIKEY"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.middlewares=api-token"
 
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME - LLaMa"
