@@ -49,6 +49,12 @@ services:
       - "traefik.http.middlewares.llama-auth.basicauth.users=$LLAMA_SERVER_AUTH"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.middlewares=llama-auth@docker"
 
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME - LLaMa"
+      - "homepage.icon=neo4j.svg"
+      - "homepage.href=https://llama.$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
   # neo4j:
   #   image: neo4j:latest
   #   restart: unless-stopped
