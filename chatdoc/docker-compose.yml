@@ -51,7 +51,7 @@ services:
       # - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.middlewares=llama-auth@docker"
       - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.bearerHeader=true"
       - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.bearerHeaderName=Authorization"
-      - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.tokens=089c0f3d838432318d56c5846ebbbf0fe9ef75fcb26d9105be5eeb2c448e34bef47e6b6ef97768c0e5aecdc7880994299fc7cb4ff73dbb84a48dfb191e8fe63b"
+      - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.tokens=$LLAMA_SERVER_APIKEY"
 
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME - LLaMa"
