@@ -51,7 +51,7 @@ services:
       - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.tokens=$LLAMA_SERVER_APIKEY"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.middlewares=api-token"
 
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.rule=Host(`llama.$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.rule=Host(`llamaui.$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.tls.certresolver=letsencrypt"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.service=$COMPOSE_PROJECT_NAME-llama2"
