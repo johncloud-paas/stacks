@@ -45,6 +45,7 @@ services:
 
   shlink_db:
     image: mysql:8.1.0
+    restart: unless-stopped
     environment:
       TZ: $TZ
       MYSQL_DATABASE: $DB_NAME
