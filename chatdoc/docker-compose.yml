@@ -25,6 +25,7 @@ services:
   llama-server:
     image: ghcr.io/ggml-org/llama.cpp:server
     restart: unless-stopped
+    cpus: $LLAMA_CPU_LIMIT
     # volumes:
     #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/models:/models
     command: >
