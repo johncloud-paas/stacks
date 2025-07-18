@@ -1,8 +1,0 @@
-repos:
-- hooks:
-  - id: check-changelog
-    args: [--version-regex, '<a href="[^"]+">(?P<version>[^<]+)', --bump=auto, -t, keepachangelog]
-  - id: extract-todo
-    args: [--ignore, __pypackages__, .venv]
-  repo: https://github.com/ydethe/pdm_template.git
-  rev: v0.1.9
