@@ -1,0 +1,45 @@
+services:
+  app:
+    image: kopia/kopia:latest
+    restart: unless-stopped
+    command:
+        - server
+        - start
+        - --disable-csrf-token-checks
+        - --insecure
+        - --address=0.0.0.0:51515
+        - --without-password
+    environment:
+        # Set repository password
+        KOPIA_PASSWORD: $KOPIA_PASSWORD
+        USER: $KOPIA_USER
+    networks:
+      default:
+        ipv4_address: ${CONTAINER_IP}
+    volumes:
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+        # Mount local folders needed by kopia
+        - $BACKUP_ROOT/backup/config:/app/config
+        - $BACKUP_ROOT/backup/cache:/app/cache
+        - $BACKUP_ROOT/backup/logs:/app/logs
+        - $JOHNCLOUD_ROOT:/source
+    labels:
+      # - "traefik.enable=true"
+      # - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      # - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      # - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      # - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=51515"
+      # - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=http://${CONTAINER_IP}:51515"
+      # - "homepage.href=https://${HOST}"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: traefik-proxy
+    

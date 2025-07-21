@@ -6,10 +6,17 @@ services:
       DOMAIN: https://$HOST
       TZ: $TZ
       ADMIN_TOKEN_FILE: /run/secrets/vaultwarden_admin_token
+      SMTP_HOST: $SMTP_HOST
+      SMTP_FROM: $SMTP_FROM
+      SMTP_PORT: $SMTP_PORT
+      SMTP_SECURITY: $SMTP_SECURITY
+      SMTP_USERNAME: $SMTP_USERNAME
+      SMTP_PASSWORD_FILE: /run/secrets/vaultwarden_smtp_passsword
     volumes:
       - vaultwarden:/data/
     secrets:
       - vaultwarden_admin_token
+      - vaultwarden_smtp_passsword
     deploy:
       replicas: 1
       labels:
@@ -29,6 +36,8 @@ volumes:
 
 secrets:
   vaultwarden_admin_token:
+    external: true
+  vaultwarden_smtp_passsword:
     external: true
     
 networks:
