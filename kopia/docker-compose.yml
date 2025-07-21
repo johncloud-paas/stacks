@@ -45,5 +45,5 @@ volumes:
 networks:
   default:
     external: true
-    name: traefik-proxy
+    name: $TRAEFIK_NETWORK
     
