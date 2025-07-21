@@ -25,11 +25,11 @@ services:
       labels:
         - "traefik.enable=true"
 
-        # - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.rule=Host(`$HOST`)"
-        # - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.entrypoints=websecure"
-        # - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.tls.certresolver=letsencrypt"
-        # - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.service=$COMPOSE_PROJECT_NAME-webdav"
-        # - "traefik.http.services.$COMPOSE_PROJECT_NAME-webdav.loadbalancer.server.port=8081"
+        - "traefik.http.routers.$COMPOSE_PROJECT_NAME2.rule=Host(`$HOST`)"
+        - "traefik.http.routers.$COMPOSE_PROJECT_NAME2.entrypoints=websecure"
+        - "traefik.http.routers.$COMPOSE_PROJECT_NAME2.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.$COMPOSE_PROJECT_NAME2.service=$COMPOSE_PROJECT_NAME2"
+        - "traefik.http.services.$COMPOSE_PROJECT_NAME2.loadbalancer.server.port=8081"
 
         - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`ui.$HOST`)"
         - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
