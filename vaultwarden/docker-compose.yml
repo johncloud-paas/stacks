@@ -5,6 +5,7 @@ services:
     environment:
       DOMAIN: https://$HOST
       TZ: $TZ
+      SIGNUPS_ALLOWED: $SIGNUPS_ALLOWED
       ADMIN_TOKEN_FILE: /run/secrets/vaultwarden_admin_token
       SMTP_HOST: $SMTP_HOST
       SMTP_FROM: $SMTP_FROM
