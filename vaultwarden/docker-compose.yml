@@ -5,8 +5,11 @@ services:
     environment:
       DOMAIN: https://$HOST
       TZ: $TZ
+      ADMIN_TOKEN_FILE: /run/secrets/vaultwarden_admin_token
     volumes:
       - vaultwarden:/data/
+    secrets:
+      - vaultwarden_admin_token
     deploy:
       replicas: 1
       labels:
@@ -24,6 +27,10 @@ services:
 volumes:
   vaultwarden:
 
+secrets:
+  vaultwarden_admin_token:
+    external: true
+    
 networks:
   default:
     external: true
