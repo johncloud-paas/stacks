@@ -1,0 +1,44 @@
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:1.41.6
+    environment:
+      - TZ=$TZ
+      - VERSION=docker
+      - PLEX_CLAIM=$PLEX_CLAIM
+      - ADVERTISE_IP="http://$SERVER_IP:32400/"
+    volumes:
+      - plex-config:/config
+      - sftpgo_documents:/documents
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`$HOST`)"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt"
+        - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=32400"
+
+        - "traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_tcp.rule=HostSNI(`*`)"
+        - "traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_tcp.tls.passthrough=true"
+        - "traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_tcp.entrypoints=plex"
+        - "traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_tcp.service=${COMPOSE_PROJECT_NAME}_tcp"
+        - "traefik.tcp.services.${COMPOSE_PROJECT_NAME}_tcp.loadbalancer.server.port=32400"
+        - "traefik.tcp.services.${COMPOSE_PROJECT_NAME}_tcp.loadbalancer.proxyProtocol.version=2"
+
+        - "homepage.group=$HOME_GROUP"
+        - "homepage.name=$HOME_NAME"
+        - "homepage.icon=$HOME_ICON"
+        - "homepage.href=https://${HOST}/web/index.html"
+        - "homepage.description=$HOME_DESCRIPTION"
+
+volumes:
+  plex-config:
+  sftpgo_documents:
+    external: true
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
