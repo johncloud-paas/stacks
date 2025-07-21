@@ -5,9 +5,7 @@ services:
       - documents:/srv/sftpgo/data
       - sftpgo:/var/lib/sftpgo
     environment:
-      - SFTPGO_DATA_PROVIDER__CREATE_DEFAULT_ADMIN=true
-      - SFTPGO_DEFAULT_ADMIN_USERNAME=admin
-      # - SFTPGO_DEFAULT_ADMIN_PASSWORD=$SFTPGO_DEFAULT_ADMIN_PASSWORD
+      - SFTPGO_DATA_PROVIDER__CREATE_DEFAULT_ADMIN=false
       - SFTPGO_SFTPD__BINDINGS__0__PORT=0
       - SFTPGO_FTPD__BINDINGS__0__PORT=0
       - SFTPGO_HTTPD__WEB_ROOT=/
