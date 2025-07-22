@@ -25,11 +25,13 @@ services:
 
   ollama-server:
     image: ollama/ollama
-    cpus: $LLAMA_CPU_LIMIT
     volumes:
       - ollama:/root/.ollama
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '$LLAMA_CPU_LIMIT'
       labels:
         - "traefik.enable=true"
 
