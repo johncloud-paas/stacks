@@ -47,6 +47,21 @@ services:
         - "homepage.href=https://ollama.$HOST"
         - "homepage.description=$HOME_DESCRIPTION"
 
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    volumes:
+      - open-webui:/app/backend/data
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-openwebui.rule=Host(`ui.ollama.$HOST`)"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-openwebui.entrypoints=websecure"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-openwebui.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-openwebui.service=${COMPOSE_PROJECT_NAME}-openwebui"
+        - "traefik.http.services.${COMPOSE_PROJECT_NAME}-openwebui.loadbalancer.server.port=8080"
+
   ragindexer:
     image: ydethe/ragindexer:latest
     depends_on:
@@ -77,27 +92,27 @@ services:
     deploy:
       replicas: 1
 
-  imapsync:
-    image: ydethe/imapsync:latest
-    volumes:
-      - ragindexer_emails:/emails
-    environment:
-      - LOGLEVEL=$LOGLEVEL
-      - SYNC_PERIOD=$SYNC_PERIOD
-      - IMAP_LIST__0__LABEL=$IMAP_LIST__0__LABEL
-      - IMAP_LIST__0__IMAP_SERVER=$IMAP_LIST__0__IMAP_SERVER
-      - IMAP_LIST__0__IMAP_PORT=$IMAP_LIST__0__IMAP_PORT
-      - IMAP_LIST__0__USERNAME=$IMAP_LIST__0__USERNAME
-      - IMAP_LIST__0__PASSWORD=$IMAP_LIST__0__PASSWORD
-      - IMAP_LIST__0__MAILBOX=$IMAP_LIST__0__MAILBOX
-      - IMAP_LIST__1__LABEL=$IMAP_LIST__1__LABEL
-      - IMAP_LIST__1__IMAP_SERVER=$IMAP_LIST__1__IMAP_SERVER
-      - IMAP_LIST__1__IMAP_PORT=$IMAP_LIST__1__IMAP_PORT
-      - IMAP_LIST__1__USERNAME=$IMAP_LIST__1__USERNAME
-      - IMAP_LIST__1__PASSWORD=$IMAP_LIST__1__PASSWORD
-      - IMAP_LIST__1__MAILBOX=$IMAP_LIST__1__MAILBOX
-    deploy:
-      replicas: 1
+  # imapsync:
+  #   image: ydethe/imapsync:latest
+  #   volumes:
+  #     - ragindexer_emails:/emails
+  #   environment:
+  #     - LOGLEVEL=$LOGLEVEL
+  #     - SYNC_PERIOD=$SYNC_PERIOD
+  #     - IMAP_LIST__0__LABEL=$IMAP_LIST__0__LABEL
+  #     - IMAP_LIST__0__IMAP_SERVER=$IMAP_LIST__0__IMAP_SERVER
+  #     - IMAP_LIST__0__IMAP_PORT=$IMAP_LIST__0__IMAP_PORT
+  #     - IMAP_LIST__0__USERNAME=$IMAP_LIST__0__USERNAME
+  #     - IMAP_LIST__0__PASSWORD=$IMAP_LIST__0__PASSWORD
+  #     - IMAP_LIST__0__MAILBOX=$IMAP_LIST__0__MAILBOX
+  #     - IMAP_LIST__1__LABEL=$IMAP_LIST__1__LABEL
+  #     - IMAP_LIST__1__IMAP_SERVER=$IMAP_LIST__1__IMAP_SERVER
+  #     - IMAP_LIST__1__IMAP_PORT=$IMAP_LIST__1__IMAP_PORT
+  #     - IMAP_LIST__1__USERNAME=$IMAP_LIST__1__USERNAME
+  #     - IMAP_LIST__1__PASSWORD=$IMAP_LIST__1__PASSWORD
+  #     - IMAP_LIST__1__MAILBOX=$IMAP_LIST__1__MAILBOX
+  #   deploy:
+  #     replicas: 1
 
   ragwebui:
     image: ydethe/ragwebui:latest
@@ -139,6 +154,7 @@ services:
 volumes:
   qdrant:
   ollama:
+  open-webui:
   sftpgo_documents:
     external: true
   ragindexer:
