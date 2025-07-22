@@ -44,7 +44,7 @@ services:
         - "homepage.group=$HOME_GROUP"
         - "homepage.name=$HOME_NAME - LLaMa"
         - "homepage.icon=https://raw.githubusercontent.com/johncloud-paas/stacks/main/chatdoc/llama0-logo.png"
-        - "homepage.href=https://llamaui.$HOST"
+        - "homepage.href=https://ollama.$HOST"
         - "homepage.description=$HOME_DESCRIPTION"
 
   ragindexer:
