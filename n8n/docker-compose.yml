@@ -1,0 +1,48 @@
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    secrets:
+      - vaultwarden_smtp_passsword
+    environment:
+      - N8N_HOST=${HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - WEBHOOK_URL=https://${HOST}/
+      - GENERIC_TIMEZONE=${TZ}
+      - N8N_EMAIL_MODE=$N8N_EMAIL_MODE
+      - N8N_SMTP_HOST=$N8N_SMTP_HOST
+      - N8N_SMTP_PORT=$N8N_SMTP_PORT
+      - N8N_SMTP_USER=$N8N_SMTP_USER
+      - N8N_SMTP_PASS_FILE=/run/secrets/vaultwarden_smtp_passsword
+      - N8N_SMTP_SENDER=$N8N_SMTP_SENDER
+      - N8N_SMTP_SSL=$N8N_SMTP_SSL
+    volumes:
+      - n8n:/home/node/.n8n
+    deploy:
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`${HOST}`)
+        - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls=true
+        - traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure
+        - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt
+        - traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=5678
+        - homepage.group=$HOME_GROUP
+        - homepage.name=$HOME_NAME
+        - homepage.icon=$HOME_ICON
+        - homepage.href=https://${HOST}
+        - homepage.description=$HOME_DESCRIPTION
+
+volumes:
+  n8n:
+
+secrets:
+  vaultwarden_smtp_passsword:
+    external: true
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
