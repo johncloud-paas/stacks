@@ -23,33 +23,34 @@ services:
         - "homepage.href=https://qdrant.$HOST/dashboard"
         - "homepage.description=$HOME_DESCRIPTION"
 
-  ollama-server:
-    image: ollama/ollama
-    volumes:
-      - ollama:/root/.ollama
-    deploy:
-      replicas: 1
-      resources:
-        limits:
-          cpus: '$LLAMA_CPU_LIMIT'
-      labels:
-        - "traefik.enable=true"
+  # ollama-server:
+  #   image: ollama/ollama
+  #   volumes:
+  #     - ollama:/root/.ollama
+  #   deploy:
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         cpus: '$LLAMA_CPU_LIMIT'
+  #     labels:
+  #       - "traefik.enable=true"
 
-        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.rule=Host(`ollama.$HOST`)"
-        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.entrypoints=websecure"
-        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.tls.certresolver=letsencrypt"
-        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.service=${COMPOSE_PROJECT_NAME}-ollama"
-        - "traefik.http.services.${COMPOSE_PROJECT_NAME}-ollama.loadbalancer.server.port=11434"
+  #       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.rule=Host(`ollama.$HOST`)"
+  #       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.entrypoints=websecure"
+  #       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.tls.certresolver=letsencrypt"
+  #       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.service=${COMPOSE_PROJECT_NAME}-ollama"
+  #       - "traefik.http.services.${COMPOSE_PROJECT_NAME}-ollama.loadbalancer.server.port=11434"
 
-        - "homepage.group=$HOME_GROUP"
-        - "homepage.name=$HOME_NAME - LLaMa"
-        - "homepage.icon=https://raw.githubusercontent.com/johncloud-paas/stacks/main/chatdoc/llama0-logo.png"
-        - "homepage.href=https://ollama.$HOST"
-        - "homepage.description=$HOME_DESCRIPTION"
+  #       - "homepage.group=$HOME_GROUP"
+  #       - "homepage.name=$HOME_NAME - LLaMa"
+  #       - "homepage.icon=https://raw.githubusercontent.com/johncloud-paas/stacks/main/chatdoc/llama0-logo.png"
+  #       - "homepage.href=https://ollama.$HOST"
+  #       - "homepage.description=$HOME_DESCRIPTION"
 
   openwebui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:ollama
     volumes:
+      - ollama:/root/.ollama
       - open-webui:/app/backend/data
     deploy:
       replicas: 1
