@@ -1,0 +1,148 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    volumes:
+      - qdrant:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__API_KEY=$QDRANT__SERVICE__API_KEY
+      - QDRANT__SERVICE__READ_ONLY_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-qdrant.rule=Host(`qdrant.$HOST`)"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-qdrant.entrypoints=websecure"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-qdrant.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-qdrant.service=${COMPOSE_PROJECT_NAME}-qdrant"
+        - "traefik.http.services.${COMPOSE_PROJECT_NAME}-qdrant.loadbalancer.server.port=6333"
+
+        - "homepage.group=$HOME_GROUP"
+        - "homepage.name=$HOME_NAME - Qdrant"
+        - "homepage.icon=https://avatars.githubusercontent.com/u/73504361"
+        - "homepage.href=https://qdrant.$HOST/dashboard"
+        - "homepage.description=$HOME_DESCRIPTION"
+
+  ollama-server:
+    image: ollama/ollama
+    cpus: $LLAMA_CPU_LIMIT
+    volumes:
+      - ollama:/root/.ollama
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.rule=Host(`ollama.$HOST`)"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.entrypoints=websecure"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}-ollama.service=${COMPOSE_PROJECT_NAME}-ollama"
+        - "traefik.http.services.${COMPOSE_PROJECT_NAME}-ollama.loadbalancer.server.port=11434"
+
+        - "homepage.group=$HOME_GROUP"
+        - "homepage.name=$HOME_NAME - LLaMa"
+        - "homepage.icon=https://raw.githubusercontent.com/johncloud-paas/stacks/main/chatdoc/llama0-logo.png"
+        - "homepage.href=https://llamaui.$HOST"
+        - "homepage.description=$HOME_DESCRIPTION"
+
+  ragindexer:
+    image: ydethe/ragindexer:latest
+    depends_on:
+      - qdrant
+    volumes:
+      - sftpgo_documents:/docs:ro
+      - ragindexer_emails:/emails:ro
+      - ragindexer:/code
+    environment:
+      - LOGLEVEL=$LOGLEVEL
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
+      - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+      - DOCS_PATH=/docs
+      - EMAILS_PATH=/emails
+      - STATE_DB_PATH=/code/index_state.db
+      - COLLECTION_NAME=$COLLECTION_NAME
+      - DAV_ROOT=$DAV_ROOT
+      - EMBEDDING_MODEL=$EMBEDDING_MODEL
+      - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
+      - MIN_EXPECTED_CHAR=$MIN_EXPECTED_CHAR
+      - OPEN_MODEL_PREF=$OPEN_MODEL_PREF
+      - CHUNK_SIZE=$CHUNK_SIZE
+      - CHUNK_OVERLAP=$CHUNK_OVERLAP
+      - OCR_LANG=$OCR_LANG
+      - TORCH_NUM_THREADS=$TORCH_NUM_THREADS
+    deploy:
+      replicas: 1
+
+  imapsync:
+    image: ydethe/imapsync:latest
+    volumes:
+      - ragindexer_emails:/emails
+    environment:
+      - LOGLEVEL=$LOGLEVEL
+      - SYNC_PERIOD=$SYNC_PERIOD
+      - IMAP_LIST__0__LABEL=$IMAP_LIST__0__LABEL
+      - IMAP_LIST__0__IMAP_SERVER=$IMAP_LIST__0__IMAP_SERVER
+      - IMAP_LIST__0__IMAP_PORT=$IMAP_LIST__0__IMAP_PORT
+      - IMAP_LIST__0__USERNAME=$IMAP_LIST__0__USERNAME
+      - IMAP_LIST__0__PASSWORD=$IMAP_LIST__0__PASSWORD
+      - IMAP_LIST__0__MAILBOX=$IMAP_LIST__0__MAILBOX
+      - IMAP_LIST__1__LABEL=$IMAP_LIST__1__LABEL
+      - IMAP_LIST__1__IMAP_SERVER=$IMAP_LIST__1__IMAP_SERVER
+      - IMAP_LIST__1__IMAP_PORT=$IMAP_LIST__1__IMAP_PORT
+      - IMAP_LIST__1__USERNAME=$IMAP_LIST__1__USERNAME
+      - IMAP_LIST__1__PASSWORD=$IMAP_LIST__1__PASSWORD
+      - IMAP_LIST__1__MAILBOX=$IMAP_LIST__1__MAILBOX
+    deploy:
+      replicas: 1
+
+  ragwebui:
+    image: ydethe/ragwebui:latest
+    depends_on:
+      - qdrant
+    environment:
+      - LOGLEVEL=$LOGLEVEL
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
+      - QDRANT_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+      - COLLECTION_NAME=$COLLECTION_NAME
+      - DAV_ROOT=$DAV_ROOT
+      - EMBEDDING_MODEL=$EMBEDDING_MODEL
+      - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
+      - OPEN_MODEL_PREF=$OPEN_MODEL_PREF
+      - TORCH_NUM_THREADS=$TORCH_NUM_THREADS
+      - CHUNK_SIZE=$CHUNK_SIZE
+      - CHUNK_OVERLAP=$CHUNK_OVERLAP
+      - RAG_AUGMENTATION=$RAG_AUGMENTATION
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`$HOST`)"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.service=${COMPOSE_PROJECT_NAME}"
+        - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=7860"
+        - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=forward-auth-verify"
+
+        - "homepage.group=$HOME_GROUP"
+        - "homepage.name=$HOME_NAME"
+        - "homepage.icon=$HOME_ICON"
+        - "homepage.href=https://$HOST"
+        - "homepage.description=$HOME_DESCRIPTION"
+
+volumes:
+  qdrant:
+  ollama:
+  sftpgo_documents:
+    external: true
+  ragindexer:
+  ragindexer_emails:
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
