@@ -1,0 +1,30 @@
+services:
+  app:
+    image: lscr.io/linuxserver/heimdall:latest
+    environment:
+      - TZ=$TZ
+    volumes:
+      - heimdall-config:/config
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+        - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+        - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+        - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=80"
+        - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
+        - "homepage.group=$HOME_GROUP"
+        - "homepage.name=$HOME_NAME"
+        - "homepage.icon=$HOME_ICON"
+        - "homepage.href=https://${HOST}"
+        - "homepage.description=$HOME_DESCRIPTION"
+
+volumes:
+  heimdall-config:
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
