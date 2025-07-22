@@ -11,32 +11,32 @@ services:
       labels:
         - traefik.enable=true
 
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME)_ui.rule=Host(`stalwart.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME)_ui.entrypoints=websecure
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME)_ui.tls.certresolver=letsencrypt
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME)_ui.service=${COMPOSE_PROJECT_NAME)_ui
-        - traefik.http.services.${COMPOSE_PROJECT_NAME)_ui.loadbalancer.server.port=8080
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.rule=Host(`stalwart.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.entrypoints=websecure
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.tls.certresolver=letsencrypt
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.service=${COMPOSE_PROJECT_NAME}_ui
+        - traefik.http.services.${COMPOSE_PROJECT_NAME}_ui.loadbalancer.server.port=8080
         
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_smtp.rule=HostSNI(`*`)
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_smtp.tls=false
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_smtp.entrypoints=smtp
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_smtp.service=${COMPOSE_PROJECT_NAME)_smtp
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)_smtp.loadbalancer.server.port=25
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)_smtp.loadbalancer.proxyProtocol.version=2
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_smtp.rule=HostSNI(`*`)
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_smtp.tls=false
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_smtp.entrypoints=smtp
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_smtp.service=${COMPOSE_PROJECT_NAME}_smtp
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_smtp.loadbalancer.server.port=25
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_smtp.loadbalancer.proxyProtocol.version=2
 
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_submissions.rule=HostSNI(`*`)
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_submissions.tls.passthrough=true
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_submissions.entrypoints=submissions
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_submissions.service=${COMPOSE_PROJECT_NAME)_submissions
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)_submissions.loadbalancer.server.port=465
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)_submissions.loadbalancer.proxyProtocol.version=2
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_submissions.rule=HostSNI(`*`)
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_submissions.tls.passthrough=true
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_submissions.entrypoints=submissions
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_submissions.service=${COMPOSE_PROJECT_NAME}_submissions
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_submissions.loadbalancer.server.port=465
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_submissions.loadbalancer.proxyProtocol.version=2
 
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_imaps.rule=HostSNI(`*`)
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_imaps.tls.passthrough=true
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_imaps.entrypoints=imaps
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)_imaps.service=${COMPOSE_PROJECT_NAME)_imaps
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)_imaps.loadbalancer.server.port=993
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)_imaps.loadbalancer.proxyProtocol.version=2
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_imaps.rule=HostSNI(`*`)
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_imaps.tls.passthrough=true
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_imaps.entrypoints=imaps
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_imaps.service=${COMPOSE_PROJECT_NAME}_imaps
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_imaps.loadbalancer.server.port=993
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_imaps.loadbalancer.proxyProtocol.version=2
 
         - homepage.group=$HOME_GROUP
         - homepage.name=$HOME_NAME
