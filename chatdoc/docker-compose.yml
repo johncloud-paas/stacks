@@ -54,6 +54,9 @@ services:
       - open-webui:/app/backend/data
     deploy:
       replicas: 1
+      resources:
+        limits:
+          cpus: '$LLAMA_CPU_LIMIT'
       labels:
         - "traefik.enable=true"
 
