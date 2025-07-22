@@ -1,0 +1,56 @@
+services:
+  mailserver:
+    # swaks --to test-xxxxxxx@srv1.mail-tester.com --from admin@$HOST --server mail.$HOST --auth-user admin --protocol SSMTP --port 465 --auth-password xxx
+    image: stalwartlabs/stalwart:latest
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - stalwart:/opt/stalwart
+      - traefik-certs:/data/certs:ro
+    deploy:
+      replicas: 1
+      labels:
+        - traefik.enable=true
+
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME)-ui.rule=Host(`stalwart.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME)-ui.entrypoints=websecure
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME)-ui.tls.certresolver=letsencrypt
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME)-ui.service=${COMPOSE_PROJECT_NAME)-ui
+        - traefik.http.services.${COMPOSE_PROJECT_NAME)-ui.loadbalancer.server.port=8080
+        
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-smtp.rule=HostSNI(`*`)
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-smtp.tls=false
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-smtp.entrypoints=smtp
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-smtp.service=${COMPOSE_PROJECT_NAME)-smtp
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)-smtp.loadbalancer.server.port=25
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)-smtp.loadbalancer.proxyProtocol.version=2
+
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-submissions.rule=HostSNI(`*`)
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-submissions.tls.passthrough=true
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-submissions.entrypoints=submissions
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-submissions.service=${COMPOSE_PROJECT_NAME)-submissions
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)-submissions.loadbalancer.server.port=465
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)-submissions.loadbalancer.proxyProtocol.version=2
+
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-imaps.rule=HostSNI(`*`)
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-imaps.tls.passthrough=true
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-imaps.entrypoints=imaps
+        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME)-imaps.service=${COMPOSE_PROJECT_NAME)-imaps
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)-imaps.loadbalancer.server.port=993
+        - traefik.tcp.services.${COMPOSE_PROJECT_NAME)-imaps.loadbalancer.proxyProtocol.version=2
+
+        - homepage.group=$HOME_GROUP
+        - homepage.name=$HOME_NAME
+        - homepage.icon=$HOME_ICON
+        - homepage.href=https://stalwart.$HOST
+        - homepage.description=$HOME_DESCRIPTION
+
+volumes:
+  stalwart:
+  traefik-certs:
+    external: true
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
