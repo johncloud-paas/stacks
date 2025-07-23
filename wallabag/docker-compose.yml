@@ -6,7 +6,8 @@ services:
       - SYMFONY__ENV__DOMAIN_NAME=https://$HOST
       - SYMFONY__ENV__SERVER_NAME="Johncloud wallabag"
     volumes:
-      - wallabag:/var/www/wallabag
+      - wallabag_images:/var/www/wallabag/web/assets/images
+      - wallabag_db:/var/www/wallabag/data
     depends_on:
       - redis
     deploy:
@@ -29,7 +30,8 @@ services:
       replicas: 1
 
 volumes:
-  wallabag:
+  wallabag_images:
+  wallabag_db:
 
 networks:
   default:
