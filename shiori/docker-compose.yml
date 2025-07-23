@@ -3,6 +3,8 @@ services:
     image: radhifadlillah/shiori
     command:
       - "server"
+      - "--log-level"
+      - "debug"
     volumes:
       - "shiori:/srv/shiori"
       # - "go-mod-cache:/go/pkg/mod"
