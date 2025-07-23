@@ -5,7 +5,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - stalwart:/opt/stalwart
-      - traefik-certs:/data/certs:ro
+      - traefik-dump-certs:/data/certs:ro
     deploy:
       replicas: 1
       labels:
@@ -46,7 +46,7 @@ services:
 
 volumes:
   stalwart:
-  traefik-certs:
+  traefik-dump-certs:
     external: true
 
 networks:
