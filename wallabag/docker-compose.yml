@@ -2,22 +2,12 @@ services:
   wallabag:
     image: wallabag/wallabag
     environment:
-      - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
-      - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
-      - SYMFONY__ENV__DATABASE_HOST=db
-      - SYMFONY__ENV__DATABASE_PORT=3306
       - SYMFONY__ENV__SECRET=$SECRET
-      - SYMFONY__ENV__DATABASE_NAME=wallabag
-      - SYMFONY__ENV__DATABASE_USER=wallabag
-      - SYMFONY__ENV__DATABASE_PASSWORD=$DB_PASSWORD
-      - SYMFONY__ENV__DATABASE_CHARSET=utf8mb4
-      - SYMFONY__ENV__DATABASE_TABLE_PREFIX="wallabag_"
       - SYMFONY__ENV__DOMAIN_NAME=https://$HOST
       - SYMFONY__ENV__SERVER_NAME="Johncloud wallabag"
     volumes:
-      - wallabag:/var/www/wallabag/web/assets/images
+      - wallabag:/var/www/wallabag
     depends_on:
-      - db
       - redis
     deploy:
       replicas: 1
@@ -29,20 +19,6 @@ services:
         - traefik.http.routers.${COMPOSE_PROJECT_NAME}.service=${COMPOSE_PROJECT_NAME}
         - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=80
 
-  db:
-    image: docker.io/library/mariadb:11.5
-    command: mariadbd --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
-    environment:
-      - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
-    volumes:
-      - wallabag_db:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "/usr/local/bin/healthcheck.sh", "--innodb_initialized"]
-      interval: 20s
-      timeout: 3s
-    deploy:
-      replicas: 1
-
   redis:
     image: redis:alpine
     healthcheck:
@@ -53,7 +29,6 @@ services:
       replicas: 1
 
 volumes:
-  wallabag_db:
   wallabag:
 
 networks:
