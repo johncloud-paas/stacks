@@ -61,11 +61,7 @@ services:
       replicas: 1
 
 volumes:
-  kopia_config:
-  kopia_cache:
-  kopia_logs:
-  sftpgo_documents:
-    external: true
+  linkace_db:
 
 networks:
   default:
