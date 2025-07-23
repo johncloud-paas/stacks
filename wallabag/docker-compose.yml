@@ -30,7 +30,8 @@ services:
         - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=80
 
   db:
-    image: mariadb
+    image: docker.io/library/mariadb:11.5
+    command: mariadbd --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
     environment:
       - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
     volumes:
