@@ -11,7 +11,7 @@ services:
       labels:
         - traefik.enable=true
 
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.rule=Host(`stalwart.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
         - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.entrypoints=websecure
         - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.tls.certresolver=letsencrypt
         - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.service=${COMPOSE_PROJECT_NAME}_ui
@@ -41,7 +41,7 @@ services:
         - homepage.group=$HOME_GROUP
         - homepage.name=$HOME_NAME
         - homepage.icon=$HOME_ICON
-        - homepage.href=https://stalwart.$HOST
+        - homepage.href=https://mail.$HOST
         - homepage.description=$HOME_DESCRIPTION
 
 volumes:

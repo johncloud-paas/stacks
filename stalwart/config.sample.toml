@@ -1,6 +1,6 @@
-certificate.default.cert = "%{file:/data/certs/mail.domain.tld/cert.pem}%"
+certificate.default.cert = "%{file:/data/certs/stalwart.domain.tld/cert.pem}%"
 certificate.default.default = true
-certificate.default.private-key = "%{file:/data/certs/mail.domain.tld/key.pem}%"
+certificate.default.private-key = "%{file:/data/certs/stalwart.domain.tld/key.pem}%"
 directory.internal.store = "rocksdb"
 directory.internal.type = "internal"
 lookup.default.hostname = "mail.domain.tld"
@@ -59,7 +59,7 @@ storage.directory = "internal"
 storage.fts = "rocksdb"
 storage.lookup = "rocksdb"
 store.rocksdb.compression = "lz4"
-store.rocksdb.path = "/opt/stalwart-mail/data"
+store.rocksdb.path = "/opt/stalwart/data"
 store.rocksdb.type = "rocksdb"
 tracer.log.ansi = false
 tracer.log.buffered = true
