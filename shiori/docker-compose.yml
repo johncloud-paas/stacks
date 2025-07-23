@@ -5,7 +5,7 @@ services:
       - "server"
     volumes:
       - "shiori:/srv/shiori"
-      - "go-mod-cache:/go/pkg/mod"
+      # - "go-mod-cache:/go/pkg/mod"
     environment:
       SHIORI_DIR: /srv/shiori
       SHIORI_DATABASE_URL: postgres://shiori:$DB_PASSWORD@postgres/shiori?sslmode=disable
