@@ -1,0 +1,40 @@
+services:
+  shiori:
+    image: radhifadlillah/shiori
+    command:
+      - "server"
+    volumes:
+      - "shiori:/srv/shiori"
+      - "go-mod-cache:/go/pkg/mod"
+    environment:
+      SHIORI_DIR: /srv/shiori
+      SHIORI_DATABASE_URL: postgres://shiori:$DB_PASSWORD@postgres/shiori?sslmode=disable
+    deploy:
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`$HOST`)
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}.service=${COMPOSE_PROJECT_NAME}
+        - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8080
+
+  postgres:
+    image: postgres:13.18
+    volumes:
+      - shiori_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: shiori
+      POSTGRES_USER: $DB_PASSWORD
+    deploy:
+      replicas: 1
+
+volumes:
+  shiori:
+  shiori_db:
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
