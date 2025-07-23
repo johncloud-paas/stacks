@@ -26,8 +26,8 @@ services:
     volumes:
       - shiori_db:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: shiori
-      POSTGRES_USER: $DB_PASSWORD
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_USER: shiori
     deploy:
       replicas: 1
 
