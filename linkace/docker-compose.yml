@@ -5,6 +5,7 @@ services:
       - db
       - redis
     environment:
+      - LINKACE_DOMAIN=$HOST
       - APP_KEY=$APP_KEY
       ## Configuration of the database connection
       # Set the database driver (mysql, pgsql, sqlsrv, sqlite)

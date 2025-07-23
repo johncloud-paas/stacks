@@ -1,0 +1,62 @@
+services:
+  wallabag:
+    image: wallabag/wallabag
+    environment:
+      - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
+      - SYMFONY__ENV__DATABASE_DRIVER=pdo_mysql
+      - SYMFONY__ENV__DATABASE_HOST=db
+      - SYMFONY__ENV__DATABASE_PORT=3306
+      - SYMFONY__ENV__SECRET=$SECRET
+      - SYMFONY__ENV__DATABASE_NAME=wallabag
+      - SYMFONY__ENV__DATABASE_USER=wallabag
+      - SYMFONY__ENV__DATABASE_PASSWORD=$DB_PASSWORD
+      - SYMFONY__ENV__DATABASE_CHARSET=utf8mb4
+      - SYMFONY__ENV__DATABASE_TABLE_PREFIX="wallabag_"
+      - SYMFONY__ENV__DOMAIN_NAME=https://$HOST
+      - SYMFONY__ENV__SERVER_NAME="Johncloud wallabag"
+    volumes:
+      - wallabag:/var/www/wallabag/web/assets/images
+    depends_on:
+      - db
+      - redis
+    deploy:
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`$HOST`)
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt
+        - traefik.http.routers.${COMPOSE_PROJECT_NAME}.service=${COMPOSE_PROJECT_NAME}
+        - traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=80
+
+  db:
+    image: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
+    volumes:
+      - wallabag_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh", "--innodb_initialized"]
+      interval: 20s
+      timeout: 3s
+    deploy:
+      replicas: 1
+
+  redis:
+    image: redis:alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 20s
+      timeout: 3s
+    deploy:
+      replicas: 1
+
+volumes:
+  wallabag_db:
+  wallabag:
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
