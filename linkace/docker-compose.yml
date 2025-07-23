@@ -45,9 +45,9 @@ services:
     command: mariadbd --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_USER=linkace
       - MYSQL_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_DATABASE=linkace
     volumes:
       - linkace_db:/var/lib/mysql
     deploy:
