@@ -2,7 +2,7 @@ services:
   sftpgo:
     image: drakkan/sftpgo:latest
     volumes:
-      - $SFTPGO_DOCS_ROOT:/srv/sftpgo/data
+      - ${SFTPGO_DOCS_ROOT}:/srv/sftpgo/data
       - sftpgo-data:/var/lib/sftpgo
     environment:
       - SERVICE_FQDN_SFTPGO
