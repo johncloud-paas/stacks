@@ -8,8 +8,7 @@ services:
   pydio:
     image: lscr.io/linuxserver/pydio-cells:latest
     volumes:
-      - cellsdir:/var/cells
-      - data:/var/cells/data
+      - cellsdir:/config
     environment:
       - SERVICE_URL_PYDIO
       - PUID=1000
@@ -30,7 +29,6 @@ services:
       - mysqldir:/var/lib/mysql
 
 volumes:
-  data: {}
   cellsdir: {}
   mysqldir: {}
   
