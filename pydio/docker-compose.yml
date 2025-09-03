@@ -6,13 +6,16 @@
 
 services:
   pydio:
-    image: pydio/cells:latest
+    image: lscr.io/linuxserver/pydio-cells:latest
     volumes:
       - cellsdir:/var/cells
       - data:/var/cells/data
     environment:
       - SERVICE_URL_PYDIO
-      - CELLS_SITE_EXTERNAL=${SERVICE_URL_PYDIO}
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ:-Europe/Paris}
+      - EXTERNALURL=${SERVICE_URL_PYDIO}
   
   mysql:
     image: mysql:8
