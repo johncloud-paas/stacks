@@ -1,0 +1,33 @@
+# documentation: https://docs.pydio.com/cells-v4/admin-guide/quick-start/cells-installation/docker/#run-with-docker-compose
+# slogan: The Secure Enterprise Content Management Platform
+# tags: tag1,tag2,tag3
+# logo: svgs/pydio.svg
+# port: 8080
+
+services:
+  pydio:
+    image: pydio/cells:latest
+    volumes:
+      - cellsdir:/var/cells
+      - data:/var/cells/data
+    environment:
+      - SERVICE_URL_PYDIO
+      - CELLS_SITE_EXTERNAL=${SERVICE_URL_PYDIO}
+  
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SERVICE_PASSWORD_PYDIODB}
+      MYSQL_DATABASE: cells
+      MYSQL_USER: pydio
+      MYSQL_PASSWORD: ${SERVICE_PASSWORD_PYDIODB}
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
+    volumes:
+      - mysqldir:/var/lib/mysql
+
+volumes:
+  data: {}
+  cellsdir: {}
+  mysqldir: {}
+  

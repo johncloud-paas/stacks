@@ -1,56 +1,129 @@
+# documentation: https://stalw.art/docs/install/get-started/
+# slogan: An open-source mail and collaboration server designed for the modern internet
+# tags: email
+# logo: svgs/homepage.png
+# port: 8080
+
+# https://www.aldertvaandering.com/blog/setting-up-stalwart-on-coolify/
+# https://hasto.pl/securing-coolify-with-crowdsec-a-complete-guide/
+
 services:
-  mailserver:
-    # swaks --to test-xxxxxxx@srv1.mail-tester.com --from admin@$HOST --server mail.$HOST --auth-user admin --protocol SSMTP --port 465 --auth-password xxx
-    image: stalwartlabs/stalwart:latest
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - stalwart:/opt/stalwart
-      - traefik-dump-certs:/data/certs:ro
-    deploy:
-      replicas: 1
-      labels:
-        - traefik.enable=true
-
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.entrypoints=websecure
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.tls.certresolver=letsencrypt
-        - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.service=${COMPOSE_PROJECT_NAME}_ui
-        - traefik.http.services.${COMPOSE_PROJECT_NAME}_ui.loadbalancer.server.port=8080
-        
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_smtp.rule=HostSNI(`*`)
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_smtp.tls=false
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_smtp.entrypoints=smtp
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_smtp.service=${COMPOSE_PROJECT_NAME}_smtp
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_smtp.loadbalancer.server.port=25
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_smtp.loadbalancer.proxyProtocol.version=2
-
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_submissions.rule=HostSNI(`*`)
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_submissions.tls.passthrough=true
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_submissions.entrypoints=submissions
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_submissions.service=${COMPOSE_PROJECT_NAME}_submissions
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_submissions.loadbalancer.server.port=465
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_submissions.loadbalancer.proxyProtocol.version=2
-
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_imaps.rule=HostSNI(`*`)
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_imaps.tls.passthrough=true
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_imaps.entrypoints=imaps
-        - traefik.tcp.routers.${COMPOSE_PROJECT_NAME}_imaps.service=${COMPOSE_PROJECT_NAME}_imaps
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_imaps.loadbalancer.server.port=993
-        - traefik.tcp.services.${COMPOSE_PROJECT_NAME}_imaps.loadbalancer.proxyProtocol.version=2
-
-        - homepage.group=$HOME_GROUP
-        - homepage.name=$HOME_NAME
-        - homepage.icon=$HOME_ICON
-        - homepage.href=https://mail.$HOST
-        - homepage.description=$HOME_DESCRIPTION
-
-volumes:
   stalwart:
-  traefik-dump-certs:
-    external: true
+    image: 'stalwartlabs/stalwart:latest'
+    container_name: stalwart
+    networks:
+      - coolify
+    ports:
+      - '25:25'
+      - '587:587'
+      - '465:465'
+      - '143:143'
+      - '993:993'
+      - '4190:4190'
+      - '110:110'
+      - '995:995'
+    environment:
+      - SERVICE_FQDN_STALWART_8080
+    volumes:
+      - './data:/opt/stalwart/data'
+      - '/etc/localtime:/etc/localtime:ro'
+      - '/data/coolify/certs:/data/certs:ro'
+      - type: bind
+        source: ./etc/config.toml
+        target: /opt/stalwart/etc/config.toml
+        content: |
+          # authentication.fallback-admin.secret = 
+          authentication.fallback-admin.user = "admin"
+          certificate.default.cert = "%{file:/data/certs/mail.${MAIL_DOMAIN}/cert.pem}%"
+          certificate.default.default = true
+          certificate.default.private-key = "%{file:/data/certs/mail.${MAIL_DOMAIN}/key.pem}%"
+          directory.internal.store = "sqlite"
+          directory.internal.type = "internal"
+          server.hostname = "mail.${MAIL_DOMAIN}"
+          server.listener.jmap.bind = "[::]:443"
+          server.listener.jmap.protocol = "http"
+          server.listener.jmap.tls.implicit = true
+          server.listener.http.bind = "[::]:8080"
+          server.listener.http.protocol = "http"
+          server.listener.https.bind = "[::]:443"
+          server.listener.https.protocol = "http"
+          server.listener.https.tls.implicit = true
+          server.listener.imap.bind = "[::]:143"
+          server.listener.imap.protocol = "imap"
+          server.listener.imaptls.bind = "[::]:993"
+          server.listener.imaptls.protocol = "imap"
+          server.listener.imaptls.tls.implicit = true
+          server.listener.pop3.bind = "[::]:110"
+          server.listener.pop3.protocol = "pop3"
+          server.listener.pop3s.bind = "[::]:995"
+          server.listener.pop3s.protocol = "pop3"
+          server.listener.pop3s.tls.implicit = true
+          server.listener.sieve.bind = "[::]:4190"
+          server.listener.sieve.protocol = "managesieve"
+          server.listener.smtp.bind = "[::]:25"
+          server.listener.smtp.protocol = "smtp"
+          server.listener.submission.bind = "[::]:587"
+          server.listener.submission.protocol = "smtp"
+          server.listener.submissions.bind = "[::]:465"
+          server.listener.submissions.protocol = "smtp"
+          server.listener.submissions.tls.implicit = true
+          storage.blob = "sqlite"
+          storage.data = "sqlite"
+          storage.directory = "internal"
+          storage.fts = "sqlite"
+          storage.lookup = "sqlite"
+          store.sqlite.compression = "lz4"
+          store.sqlite.path = "/opt/stalwart/data/data.db"
+          store.sqlite.pool.max-connections = 10
+          store.sqlite.purge.frequency = "0 3 *"
+          store.sqlite.read-from-replicas = true
+          store.sqlite.type = "sqlite"
+          tracer.log.ansi = false
+          tracer.log.buffered = true
+          tracer.log.enable = true
+          tracer.log.level = "info"
+          tracer.log.lossy = false
+          tracer.log.multiline = false
+          tracer.log.type = "stdout"
 
+    labels:
+      - traefik.enable=true
+      - 'traefik.http.routers.mailserver.rule=Host(`mail.${MAIL_DOMAIN}`) || Host(`autodiscover.${MAIL_DOMAIN}`) || Host(`autoconfig.${MAIL_DOMAIN}`) || Host(`mta-sts.${MAIL_DOMAIN}`) || Host(`mx.${MAIL_DOMAIN}`) || Host(`smtp.${MAIL_DOMAIN}`) || Host(`pop.${MAIL_DOMAIN}`) || Host(`imap.${MAIL_DOMAIN}`)'
+      - traefik.http.routers.mailserver.entrypoints=http
+      - traefik.http.routers.mailserver.service=mailserver
+      - traefik.http.services.mailserver.loadbalancer.server.port=8080
+      - traefik.http.routers.mailserver.tls.certresolver=letsencrypt
+      - traefik.http.routers.mailserver.tls=true
+      - 'traefik.http.routers.mailserver.tls.domains[0].main=mail.${MAIL_DOMAIN}'
+      - 'traefik.http.routers.mailserver.tls.domains[0].sans=autodiscover.${MAIL_DOMAIN},autoconfig.${MAIL_DOMAIN},mta-sts.${MAIL_DOMAIN},mx.${MAIL_DOMAIN},smtp.${MAIL_DOMAIN},pop.${MAIL_DOMAIN},imap.${MAIL_DOMAIN},jmap.${MAIL_DOMAIN}'
+      - 'traefik.tcp.routers.smtp.rule=HostSNI(`*`)'
+      - traefik.tcp.routers.smtp.entrypoints=smtp
+      - traefik.tcp.routers.smtp.service=smtp
+      - traefik.tcp.services.smtp.loadbalancer.server.port=25
+      - traefik.tcp.services.smtp.loadbalancer.proxyProtocol.version=2
+      - 'traefik.tcp.routers.jmap.rule=HostSNI(`*`)'
+      - traefik.tcp.routers.jmap.tls.passthrough=true
+      - traefik.tcp.routers.jmap.entrypoints=https
+      - traefik.tcp.routers.jmap.service=jmap
+      - traefik.tcp.services.jmap.loadbalancer.server.port=443
+      - traefik.tcp.services.jmap.loadbalancer.proxyProtocol.version=2
+      - 'traefik.tcp.routers.smtps.rule=HostSNI(`*`)'
+      - traefik.tcp.routers.smtps.tls.passthrough=true
+      - traefik.tcp.routers.smtps.entrypoints=smtps
+      - traefik.tcp.routers.smtps.service=smtps
+      - traefik.tcp.services.smtps.loadbalancer.server.port=465
+      - traefik.tcp.services.smtps.loadbalancer.proxyProtocol.version=2
+      - 'traefik.tcp.routers.imaps.rule=HostSNI(`*`)'
+      - traefik.tcp.routers.imaps.tls.passthrough=true
+      - traefik.tcp.routers.imaps.entrypoints=imaps
+      - traefik.tcp.routers.imaps.service=imaps
+      - traefik.tcp.services.imaps.loadbalancer.server.port=993
+      - traefik.tcp.services.imaps.loadbalancer.proxyProtocol.version=2
+    tty: true
+    stdin_open: true
+    restart: always
+volumes:
+  data: null
 networks:
-  default:
+  coolify:
     external: true
-    name: $TRAEFIK_NETWORK
-    
