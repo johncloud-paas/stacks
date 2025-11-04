@@ -10,7 +10,6 @@ services:
       - 'DUPLICATI__WEBSERVICE_PASSWORD=${SERVICE_PASSWORD_WEB}'
     volumes:
       - '$JOHNCLOUD_ROOT/config:/config'
-      - '$JOHNCLOUD_ROOT/backups:/backups'
       - '/var/johncloud:/source:ro'
     healthcheck:
       test:
