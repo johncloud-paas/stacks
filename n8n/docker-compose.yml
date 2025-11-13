@@ -6,7 +6,7 @@ services:
     #   - "127.0.0.1:5678:5678"
     labels:
       - traefik.enable=true
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`${SUBDOMAIN}.${DOMAIN_NAME}`)
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`${HOST}`)
       - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls=true
       - traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure
       - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt
@@ -22,14 +22,14 @@ services:
       - homepage.group=$HOME_GROUP
       - homepage.name=$HOME_NAME
       - homepage.icon=$HOME_ICON
-      - homepage.href=https://${SUBDOMAIN}.${DOMAIN_NAME}
+      - homepage.href=https://${HOST}
       - homepage.description=$HOME_DESCRIPTION
     environment:
-      - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
+      - N8N_HOST=${HOST}
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - NODE_ENV=production
-      - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
+      - WEBHOOK_URL=https://${HOST}/
       - GENERIC_TIMEZONE=${TZ}
       - N8N_EMAIL_MODE=$N8N_EMAIL_MODE
       - N8N_SMTP_HOST=$N8N_SMTP_HOST
