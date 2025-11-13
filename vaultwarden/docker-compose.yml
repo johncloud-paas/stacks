@@ -5,6 +5,8 @@ services:
     environment:
       DOMAIN: https://$HOST
       TZ: $TZ
+      SIGNUPS_ALLOWED: $SIGNUPS_ALLOWED
+      ADMIN_TOKEN: $ADMIN_TOKEN
       SMTP_HOST: $SMTP_HOST
       SMTP_FROM: $SMTP_FROM
       SMTP_PORT: $SMTP_PORT
@@ -12,20 +14,20 @@ services:
       SMTP_USERNAME: $SMTP_USERNAME
       SMTP_PASSWORD: $SMTP_PASSWORD
     volumes:
-      - $JOHNCLOUD_ROOT/vaultwarden/data:/data/
+      - $JOHNCLOUD_ROOT/vaultwarden:/data/
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.vaultwarden.rule=Host(`$HOST`)"
-      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
-      - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
-      - "homepage.group=Bureautique"
-      - "homepage.name=Vaultwarden"
-      - "homepage.icon=vaultwarden.svg"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=80"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://$HOST"
-      - "homepage.description=Password manager"
-
+      - "homepage.description=$HOME_DESCRIPTION"
+    
 networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-    

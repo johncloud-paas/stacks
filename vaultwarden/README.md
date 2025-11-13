@@ -1,12 +1,7 @@
-# Bitwarden stack for [Johncloud PaaS](https://github.com/johncloud-paas)
+# Admin page
 
-Website: https://bitwarden.com/help/install-and-deploy-unified-beta/
-Container: https://bitwarden.com/help/install-and-deploy-unified-beta/
+https://github.com/dani-garcia/vaultwarden/wiki/Enabling-admin-page
 
-## Installation
+    echo "my_very_strong_password_1" | sudo docker secret create vaultwarden_admin_token -
+    echo "my_very_strong_password_2" | sudo docker secret create vaultwarden_smtp_passsword -
 
-First, prepare the DNS. You shall add a CNAME or A record for `bitwarden.domain.tld`
-
-Second, have your environment variables written in a file. Take sample.env in this repository as an example.
-
-Finally, follow the guide here to deploy the stack: https://docs.portainer.io/user/docker/stacks/add#option-3-git-repository
