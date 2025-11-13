@@ -13,8 +13,8 @@ services:
       - $MUSIC_PATH:/music
       - $VIDEOS_PATH:/movies
       - $SHOWS_PATH:/tv
-    # ports:
-    #   - "32400:32400/tcp" # access to the Plex Media Server [required]
+    ports:
+      - "32400:32400/tcp" # access to the Plex Media Server [required]
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -23,13 +23,6 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=32400"
-
-      - "traefik.tcp.routers.plex.rule=HostSNI(`*`)"
-      - "traefik.tcp.routers.plex.tls.passthrough=true"
-      - "traefik.tcp.routers.plex.entrypoints=plex"
-      - "traefik.tcp.routers.plex.service=plex"
-      - "traefik.tcp.services.plex.loadbalancer.server.port=32400"
-      - "traefik.tcp.services.plex.loadbalancer.proxyProtocol.version=2"
 
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
