@@ -40,8 +40,7 @@ services:
       - N8N_RUNNERS_AUTH_TOKEN=${RUNNERS_AUTH_TOKEN}
       - N8N_NATIVE_PYTHON_RUNNER=true
     volumes:
-      # - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/data:/home/node/.n8n
-      - ./n8n/data:/home/node/.n8n
+      - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/data:/home/node/.n8n
 
   task-runners:
     image: n8nio/runners:1.111.0
