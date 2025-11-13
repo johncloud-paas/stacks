@@ -25,7 +25,6 @@ services:
       - traefik.enable=true
 
       - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`) || Host(`mx.$HOST`) || Host(`smtp.$HOST`) || Host(`pop.$HOST`) || Host(`imap.$HOST`) || Host(`jmap.$HOST`)'
-      - traefik.http.routers.mailserver.entrypoints=https
       - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.entrypoints=websecure
       - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.tls.certresolver=letsencrypt
       - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.service=$COMPOSE_PROJECT_NAME-ui
