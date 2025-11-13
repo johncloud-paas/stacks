@@ -24,6 +24,7 @@ services:
       - homepage.href=https://${HOST}
       - homepage.description=$HOME_DESCRIPTION
     environment:
+      - EXPRESS_TRUST_PROXY=true
       - N8N_HOST=${HOST}
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
