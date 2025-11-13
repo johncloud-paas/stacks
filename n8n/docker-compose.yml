@@ -2,7 +2,7 @@ services:
   n8n:
     image: n8nio/n8n:latest
     restart: unless-stopped
-    user: "0:0"
+    user: "1000:1000"
     labels:
       - traefik.enable=true
       - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`${HOST}`)
@@ -16,7 +16,6 @@ services:
       - homepage.href=https://${HOST}
       - homepage.description=$HOME_DESCRIPTION
     environment:
-      - EXPRESS_TRUST_PROXY=true
       - N8N_HOST=${HOST}
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
@@ -24,6 +23,10 @@ services:
       - WEBHOOK_URL=https://${HOST}/
       - N8N_PROXY_HOPS=1
       - GENERIC_TIMEZONE=${TZ}
+      - DB_TYPE=sqlite
+      - DB_SQLITE_POOL_SIZE=4
+      - N8N_GIT_NODE_DISABLE_BARE_REPOS=true
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=true
       - N8N_EMAIL_MODE=$N8N_EMAIL_MODE
       - N8N_SMTP_HOST=$N8N_SMTP_HOST
       - N8N_SMTP_PORT=$N8N_SMTP_PORT
@@ -37,7 +40,8 @@ services:
       - N8N_RUNNERS_AUTH_TOKEN=${RUNNERS_AUTH_TOKEN}
       - N8N_NATIVE_PYTHON_RUNNER=true
     volumes:
-      - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/data:/home/node/.n8n
+      # - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/data:/home/node/.n8n
+      - ./n8n/data:/home/node/.n8n
 
   task-runners:
     image: n8nio/runners:1.111.0
