@@ -23,13 +23,11 @@ services:
       - $JOHNCLOUD_ROOT/traefik/certs/mail.$HOST:/data/certs/mail.$HOST:ro
     labels:
       - traefik.enable=true
-
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`) || Host(`mx.$HOST`) || Host(`smtp.$HOST`) || Host(`pop.$HOST`) || Host(`imap.$HOST`) || Host(`jmap.$HOST`)'
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.entrypoints=websecure
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.tls.certresolver=letsencrypt
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.service=$COMPOSE_PROJECT_NAME-ui
-      - traefik.http.services.$COMPOSE_PROJECT_NAME-ui.loadbalancer.server.port=8080
-
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`) || Host(`mx.$HOST`) || Host(`smtp.$HOST`) || Host(`pop.$HOST`) || Host(`imap.$HOST`) || Host(`jmap.$HOST`)'
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls=true
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt
+      - traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8080
       - homepage.group=$HOME_GROUP
       - homepage.name=$HOME_NAME
       - homepage.icon=$HOME_ICON
