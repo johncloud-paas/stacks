@@ -2,8 +2,7 @@ services:
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
     restart: unless-stopped
-    # ports:
-    #   - "127.0.0.1:5678:5678"
+    user: "0:0"
     labels:
       - traefik.enable=true
       - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`${HOST}`)
