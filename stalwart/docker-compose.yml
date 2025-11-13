@@ -5,10 +5,14 @@ services:
     restart: unless-stopped
     hostname: mail.$HOST
     ports:
-      - 25:25
-      - 465:465
-      - 993:993
-      - 587:587
+      - '25:25'
+      - '587:587'
+      - '465:465'
+      - '143:143'
+      - '993:993'
+      - '4190:4190'
+      - '110:110'
+      - '995:995'
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart
@@ -16,46 +20,12 @@ services:
     labels:
       - traefik.enable=true
 
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`)
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`) || Host(`mx.$HOST`) || Host(`smtp.$HOST`) || Host(`pop.$HOST`) || Host(`imap.$HOST`) || Host(`jmap.$HOST`)'
+      - traefik.http.routers.mailserver.entrypoints=https
       - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.entrypoints=websecure
       - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.tls.certresolver=letsencrypt
       - traefik.http.routers.$COMPOSE_PROJECT_NAME-ui.service=$COMPOSE_PROJECT_NAME-ui
       - traefik.http.services.$COMPOSE_PROJECT_NAME-ui.loadbalancer.server.port=8080
-      
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-jmap.rule=HostSNI(`*`)
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-jmap.tls.passthrough=true
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-jmap.entrypoints=websecure
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-jmap.service=$COMPOSE_PROJECT_NAME-jmap
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-jmap.loadbalancer.server.port=443
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-jmap.loadbalancer.proxyProtocol.version=2
-
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.rule=HostSNI(`*`)
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.tls=false
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.entrypoints=smtp
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-smtp.service=$COMPOSE_PROJECT_NAME-smtp
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-smtp.loadbalancer.server.port=25
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-smtp.loadbalancer.proxyProtocol.version=2
-
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submission.rule=HostSNI(`mail.$HOST`)
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submission.tls.passthrough=true
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submission.entrypoints=submission
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submission.service=$COMPOSE_PROJECT_NAME-submission
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-submission.loadbalancer.server.port=587
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-submission.loadbalancer.proxyProtocol.version=2
-
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submissions.rule=HostSNI(`*`)
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submissions.tls.passthrough=true
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submissions.entrypoints=submissions
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-submissions.service=$COMPOSE_PROJECT_NAME-submissions
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-submissions.loadbalancer.server.port=465
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-submissions.loadbalancer.proxyProtocol.version=2
-
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-imaps.rule=HostSNI(`*`)
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-imaps.tls.passthrough=true
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-imaps.entrypoints=imaps
-      # - traefik.tcp.routers.$COMPOSE_PROJECT_NAME-imaps.service=$COMPOSE_PROJECT_NAME-imaps
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-imaps.loadbalancer.server.port=993
-      # - traefik.tcp.services.$COMPOSE_PROJECT_NAME-imaps.loadbalancer.proxyProtocol.version=2
 
       - homepage.group=$HOME_GROUP
       - homepage.name=$HOME_NAME
