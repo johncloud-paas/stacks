@@ -14,7 +14,7 @@ services:
       - "traefik.http.routers.shlink_ui.rule=Host(`shlink.$BASE_HOST`)"
       - "traefik.http.routers.shlink_ui.entrypoints=websecure"
       - "traefik.http.routers.shlink_ui.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.shlink_ui.middlewares=forward-auth-verify"
+      - "traefik.http.routers.shlink_ui.middlewares=authentik@file"
       - "homepage.group=Bureautique"
       - "homepage.name=Shlink"
       - "homepage.icon=shlink.svg"

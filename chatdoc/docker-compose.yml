@@ -57,7 +57,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.tls.certresolver=letsencrypt"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.service=$COMPOSE_PROJECT_NAME-llama2"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME-llama2.loadbalancer.server.port=8000"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.middlewares=forward-auth-verify"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.middlewares=authentik@file"
 
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME - LLaMa"
@@ -177,7 +177,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.service=$COMPOSE_PROJECT_NAME"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=7860"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik@file"
 
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"

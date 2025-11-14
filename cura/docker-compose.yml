@@ -16,7 +16,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
       - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=3000"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=forward-auth-verify"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik@file"
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
