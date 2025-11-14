@@ -26,10 +26,8 @@ services:
       - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/media:/media'
       - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/custom-templates:/templates'
     depends_on:
-      postgresql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgresql
+      - redis
     labels:
       - traefik.enable=true
       - traefik.http.routers.$COMPOSE_PROJECT_NAME.entryPoints=websecure
@@ -73,27 +71,25 @@ services:
       - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/certs:/certs'
       - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/custom-templates:/templates'
     depends_on:
-      postgresql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgresql
+      - redis
     
   postgresql:
     image: 'postgres:16-alpine'
     restart: unless-stopped
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - 'pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}'
-      interval: 2s
-      timeout: 10s
-      retries: 15
+    # healthcheck:
+    #   test:
+    #     - CMD-SHELL
+    #     - 'pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}'
+    #   interval: 2s
+    #   timeout: 10s
+    #   retries: 15
     volumes:
       - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/postgresql/data'
     environment:
       POSTGRES_PASSWORD: '${SERVICE_PASSWORD_POSTGRESQL}'
       POSTGRES_USER: '${SERVICE_USER_POSTGRESQL}'
-      POSTGRES_DB: authentik
+      POSTGRES_DB: $POSTGRES_DB
       SERVICE_PASSWORD_POSTGRESQL: '${SERVICE_PASSWORD_POSTGRESQL}'
       SERVICE_USER_POSTGRESQL: '${SERVICE_USER_POSTGRESQL}'
       
