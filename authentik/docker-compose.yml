@@ -1,5 +1,5 @@
 services:
-  authentik-server:
+  server:
     image: 'ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2025.6.4}'
     restart: unless-stopped
     command: server
@@ -41,7 +41,7 @@ services:
       - "homepage.href=https://$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
       
-  authentik-worker:
+  worker:
     image: 'ghcr.io/goauthentik/server:${AUTHENTIK_TAG:-2025.6.4}'
     restart: unless-stopped
     command: worker
