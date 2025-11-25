@@ -1,6 +1,7 @@
 services:
   duplicati:
     image: 'lscr.io/linuxserver/duplicati:latest'
+    restart: unless-stopped
     environment:
       - PUID=0
       - PGID=0

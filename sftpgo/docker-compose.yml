@@ -5,7 +5,6 @@ services:
     user: $UID:$GID
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/srv/sftpgo/data
-      # - $JOHNCLOUD_ROOT/nextcloud/data/data/ydethe/files:/srv/sftpgo/data
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/home:/var/lib/sftpgo
     environment:
       - SFTPGO_DATA_PROVIDER__CREATE_DEFAULT_ADMIN=true
