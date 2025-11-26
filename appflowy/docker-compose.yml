@@ -1,0 +1,296 @@
+services:
+  # You do not need this if you have configured to use your own s3 file storage
+  minio:
+    restart: unless-stopped
+    image: minio/minio
+    environment:
+      - MINIO_BROWSER_REDIRECT_URL=https://${HOST}/minio
+      - MINIO_ROOT_USER=${AWS_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${AWS_SECRET}
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/minio:/data
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.entryPoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.rule=Host(`$HOST`) && PathPrefix(`/minio`)
+      - traefik.http.middlewares.minio-strip-prefix.replacepathregex.regex=^/minio(/.*)$
+      - traefik.http.middlewares.minio-strip-prefix.replacepathregex.replacement=$1
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.middlewares=minio-strip-prefix
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.tls=true
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_minio.loadbalancer.server.port=9001
+
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio_api.entryPoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio_api.rule=Host(`$HOST`) && PathPrefix(`/minio-api`)
+      - traefik.http.middlewares.minioapi-strip-prefix.replacepathregex.regex=^/minio-api(/.*)$
+      - traefik.http.middlewares.minioapi-strip-prefix.replacepathregex.replacement=$1
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio_api.middlewares=minioapi-strip-prefix
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio_api.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio_api.tls=true
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_minio_api.loadbalancer.server.port=9000
+
+  postgres:
+    restart: unless-stopped
+    image: pgvector/pgvector:pg16
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=postgres
+      - PGPORT=5432
+    command: ["postgres", "-c", "port=5432"]
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres", "-d", "postgres", "-p", "5432" ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres:/var/lib/postgresql/data
+
+  redis:
+    restart: unless-stopped
+    image: redis
+
+  gotrue:
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail http://127.0.0.1:9999/health || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    image: appflowyinc/gotrue:${GOTRUE_VERSION:-latest}
+    environment:
+      # There are a lot of options to configure GoTrue. You can reference the example config:
+      # https://github.com/supabase/auth/blob/master/example.env
+      # The initial GoTrue Admin user to create, if not already exists.
+      - GOTRUE_ADMIN_EMAIL=${SMTP_ADMIN_EMAIL}
+      # The initial GoTrue Admin user password to create, if not already exists.
+      # If the user already exists, the update will be skipped.
+      - GOTRUE_ADMIN_PASSWORD=${GOTRUE_ADMIN_PASSWORD}
+      - GOTRUE_DISABLE_SIGNUP=${GOTRUE_DISABLE_SIGNUP:-false}
+      - GOTRUE_SITE_URL=appflowy-flutter://                           # redirected to AppFlowy application
+      - GOTRUE_URI_ALLOW_LIST=** # adjust restrict if necessary
+      - GOTRUE_JWT_SECRET=${GOTRUE_JWT_SECRET}                        # authentication secret
+      - GOTRUE_JWT_EXP=${GOTRUE_JWT_EXP}
+      # Without this environment variable, the createuser command will create an admin
+      # with the `admin` role as opposed to `supabase_admin`
+      - GOTRUE_JWT_ADMIN_GROUP_NAME=supabase_admin
+      - GOTRUE_DB_DRIVER=postgres
+      - API_EXTERNAL_URL=https://${HOST}/gotrue
+      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@$COMPOSE_PROJECT_NAME-postgres-1:5432/postgres?search_path=auth
+      - PORT=9999
+      - GOTRUE_SMTP_HOST=${SMTP_HOST}
+      - GOTRUE_SMTP_PORT=${SMTP_PORT}
+      - GOTRUE_SMTP_USER=${SMTP_USER}
+      - GOTRUE_SMTP_PASS=${SMTP_PASS}
+      - GOTRUE_MAILER_URLPATHS_CONFIRMATION=/gotrue/verify
+      - GOTRUE_MAILER_URLPATHS_INVITE=/gotrue/verify
+      - GOTRUE_MAILER_URLPATHS_RECOVERY=/gotrue/verify
+      - GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE=/gotrue/verify
+      - GOTRUE_MAILER_TEMPLATES_MAGIC_LINK=${GOTRUE_MAILER_TEMPLATES_MAGIC_LINK}
+      - GOTRUE_SMTP_ADMIN_EMAIL=${SMTP_ADMIN_EMAIL}                # email with admin privileges e.g. internal@appflowy.io
+      - GOTRUE_SMTP_MAX_FREQUENCY=1ns
+      - GOTRUE_RATE_LIMIT_EMAIL_SENT=${GOTRUE_RATE_LIMIT_EMAIL_SENT} # number of email sendable per minute
+      - GOTRUE_MAILER_AUTOCONFIRM=${GOTRUE_MAILER_AUTOCONFIRM}
+      # Google OAuth config
+      - GOTRUE_EXTERNAL_GOOGLE_ENABLED=${GOTRUE_EXTERNAL_GOOGLE_ENABLED}
+      - GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID=${GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID}
+      - GOTRUE_EXTERNAL_GOOGLE_SECRET=${GOTRUE_EXTERNAL_GOOGLE_SECRET}
+      - GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI=https://${HOST}/gotrue/callback
+      # GITHUB OAuth config
+      - GOTRUE_EXTERNAL_GITHUB_ENABLED=${GOTRUE_EXTERNAL_GITHUB_ENABLED}
+      - GOTRUE_EXTERNAL_GITHUB_CLIENT_ID=${GOTRUE_EXTERNAL_GITHUB_CLIENT_ID}
+      - GOTRUE_EXTERNAL_GITHUB_SECRET=${GOTRUE_EXTERNAL_GITHUB_SECRET}
+      - GOTRUE_EXTERNAL_GITHUB_REDIRECT_URI=https://${HOST}/gotrue/callback
+      # Discord OAuth config
+      - GOTRUE_EXTERNAL_DISCORD_ENABLED=${GOTRUE_EXTERNAL_DISCORD_ENABLED}
+      - GOTRUE_EXTERNAL_DISCORD_CLIENT_ID=${GOTRUE_EXTERNAL_DISCORD_CLIENT_ID}
+      - GOTRUE_EXTERNAL_DISCORD_SECRET=${GOTRUE_EXTERNAL_DISCORD_SECRET}
+      - GOTRUE_EXTERNAL_DISCORD_REDIRECT_URI=https://${HOST}/gotrue/callback
+      # SAML 2.0 OAuth config
+      - GOTRUE_SAML_ENABLED=${GOTRUE_SAML_ENABLED}
+      - GOTRUE_SAML_PRIVATE_KEY=${GOTRUE_SAML_PRIVATE_KEY}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_gotrue.entryPoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_gotrue.rule=Host(`$HOST`) && PathPrefix(`/gotrue`)
+      - traefik.http.middlewares.gotrue-strip-prefix.replacepathregex.regex=^/gotrue(/.*)$
+      - traefik.http.middlewares.gotrue-strip-prefix.replacepathregex.replacement=$1
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_gotrue.middlewares=gotrue-strip-prefix
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_gotrue.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_gotrue.tls=true
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_gotrue.loadbalancer.server.port=9999
+
+  appflowy_cloud:
+    restart: unless-stopped
+    environment:
+      - RUST_LOG=${RUST_LOG:-info}
+      - APPFLOWY_ENVIRONMENT=production
+      - APPFLOWY_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@$COMPOSE_PROJECT_NAME-postgres-1:5432/postgres
+      - APPFLOWY_REDIS_URI=redis://$COMPOSE_PROJECT_NAME-redis-1:6379
+      - APPFLOWY_GOTRUE_JWT_SECRET=${GOTRUE_JWT_SECRET}
+      - APPFLOWY_GOTRUE_BASE_URL=http://$COMPOSE_PROJECT_NAME-gotrue-1:9999
+      - APPFLOWY_S3_CREATE_BUCKET=${APPFLOWY_S3_CREATE_BUCKET}
+      - APPFLOWY_S3_USE_MINIO=${APPFLOWY_S3_USE_MINIO}
+      - APPFLOWY_S3_MINIO_URL=http://$COMPOSE_PROJECT_NAME-minio-1:9000
+      - APPFLOWY_S3_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - APPFLOWY_S3_SECRET_KEY=${AWS_SECRET}
+      - APPFLOWY_S3_BUCKET=${APPFLOWY_S3_BUCKET}
+      - APPFLOWY_S3_REGION=${APPFLOWY_S3_REGION}
+      - APPFLOWY_S3_PRESIGNED_URL_ENDPOINT=${APPFLOWY_S3_PRESIGNED_URL_ENDPOINT}
+      - APPFLOWY_MAILER_SMTP_HOST=${SMTP_HOST}
+      - APPFLOWY_MAILER_SMTP_PORT=${SMTP_PORT}
+      - APPFLOWY_MAILER_SMTP_USERNAME=${SMTP_USERNAME}
+      - APPFLOWY_MAILER_SMTP_EMAIL=${SMTP_ADMIN_EMAIL}
+      - APPFLOWY_MAILER_SMTP_PASSWORD=${SMTP_PASS}
+      - APPFLOWY_MAILER_SMTP_TLS_KIND=${SMTP_TLS_KIND}
+      - APPFLOWY_ACCESS_CONTROL=${APPFLOWY_ACCESS_CONTROL}
+      - APPFLOWY_DATABASE_MAX_CONNECTIONS=${APPFLOWY_DATABASE_MAX_CONNECTIONS}
+      - AI_SERVER_HOST=${AI_SERVER_HOST}
+      - AI_SERVER_PORT=${AI_SERVER_PORT}
+      - AI_OPENAI_API_KEY=${AI_OPENAI_API_KEY}
+      - APPFLOWY_WEB_URL=https://${HOST}
+      - APPFLOWY_BASE_URL=https://${HOST}
+    image: appflowyinc/appflowy_cloud:${APPFLOWY_CLOUD_VERSION:-latest}
+    healthcheck:
+      test: "curl --fail http://127.0.0.1:8000/api/health || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    depends_on:
+      gotrue:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ws.entryPoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ws.rule=Host(`$HOST`) && PathPrefix(`/ws`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ws.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_ws.tls=true
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_ws.loadbalancer.server.port=8000
+      
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_cloud.entryPoints=websecure
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME}_cloud.rule=Host(`$HOST`) && PathPrefix(`/api`)'
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_cloud.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_cloud.tls=true
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_cloud.loadbalancer.server.port=8000
+
+  admin_frontend:
+    restart: unless-stopped
+    image: appflowyinc/admin_frontend:${APPFLOWY_ADMIN_FRONTEND_VERSION:-latest}
+    environment:
+      - APPFLOWY_GOTRUE_BASE_URL=https://${HOST}/gotrue
+      - APPFLOWY_BASE_URL=https://${HOST}
+
+    depends_on:
+      gotrue:
+        condition: service_healthy
+      appflowy_cloud:
+        condition: service_healthy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.entryPoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.rule=Host(`$HOST`) && PathPrefix(`/console`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.tls=true
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_admin.loadbalancer.server.port=3000
+
+  ai:
+    restart: unless-stopped
+    image: appflowyinc/appflowy_ai:${APPFLOWY_AI_VERSION:-latest}
+    environment:
+      - AI_SERVER_PORT=${AI_SERVER_PORT}
+      - OPENAI_API_KEY=${AI_OPENAI_API_KEY}
+      - DEFAULT_AI_MODEL=gpt-4.1-mini # Make sure the model is available in your OpenAI account
+      - DEFAULT_AI_COMPLETION_MODEL=gpt-4.1-mini # Make sure the model is available in your OpenAI account
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION}
+      - APPFLOWY_S3_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - APPFLOWY_S3_SECRET_KEY=${AWS_SECRET}
+      - APPFLOWY_S3_BUCKET=${APPFLOWY_S3_BUCKET}
+      - APPFLOWY_S3_REGION=${APPFLOWY_S3_REGION}
+      - AI_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@$COMPOSE_PROJECT_NAME-postgres-1:5432/postgres
+      - AI_REDIS_URL=redis://$COMPOSE_PROJECT_NAME-redis-1:6379
+      - AI_USE_MINIO=${APPFLOWY_S3_USE_MINIO}
+      - AI_MINIO_URL=http://$COMPOSE_PROJECT_NAME-minio-1:9000
+      - AI_APPFLOWY_HOST=https://${HOST}
+      - APPFLOWY_GOTRUE_JWT_SECRET=${GOTRUE_JWT_SECRET}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5001/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      appflowy_cloud:
+        condition: service_healthy
+
+  appflowy_worker:
+    restart: unless-stopped
+    image: appflowyinc/appflowy_worker:${APPFLOWY_WORKER_VERSION:-latest}
+    environment:
+      - RUST_LOG=${RUST_LOG:-info}
+      - APPFLOWY_ENVIRONMENT=production
+      - APPFLOWY_WORKER_REDIS_URL=redis://$COMPOSE_PROJECT_NAME-redis-1:6379
+      - APPFLOWY_WORKER_ENVIRONMENT=production
+      - APPFLOWY_WORKER_DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@$COMPOSE_PROJECT_NAME-postgres-1:5432/postgres
+      - APPFLOWY_WORKER_DATABASE_NAME=postgres
+      - APPFLOWY_WORKER_IMPORT_TICK_INTERVAL=30
+      - APPFLOWY_S3_USE_MINIO=${APPFLOWY_S3_USE_MINIO}
+      - APPFLOWY_S3_MINIO_URL=http://$COMPOSE_PROJECT_NAME-minio-1:9000
+      - APPFLOWY_S3_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - APPFLOWY_S3_SECRET_KEY=${AWS_SECRET}
+      - APPFLOWY_S3_BUCKET=${APPFLOWY_S3_BUCKET}
+      - APPFLOWY_S3_REGION=${APPFLOWY_S3_REGION}
+      - APPFLOWY_MAILER_SMTP_HOST=${SMTP_HOST}
+      - APPFLOWY_MAILER_SMTP_PORT=${SMTP_PORT}
+      - APPFLOWY_MAILER_SMTP_USERNAME=${SMTP_USERNAME}
+      - APPFLOWY_MAILER_SMTP_EMAIL=${SMTP_ADMIN_EMAIL}
+      - APPFLOWY_MAILER_SMTP_PASSWORD=${SMTP_PASS}
+      - APPFLOWY_MAILER_SMTP_TLS_KIND=${SMTP_TLS_KIND}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      appflowy_cloud:
+        condition: service_healthy
+
+  appflowy_web:
+    restart: unless-stopped
+    image: appflowyinc/appflowy_web:${APPFLOWY_WEB_VERSION:-latest}
+    depends_on:
+      appflowy_cloud:
+        condition: service_healthy
+    environment:
+      - APPFLOWY_BASE_URL=https://${HOST}
+      - APPFLOWY_GOTRUE_BASE_URL=https://${HOST}/gotrue
+      - APPFLOWY_WS_BASE_URL=wss://${HOST}/ws/v2
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.entryPoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.rule=Host(`$HOST`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_web.tls=true
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_web.loadbalancer.server.port=80
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST/"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
