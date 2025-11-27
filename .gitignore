@@ -1,3 +1,4 @@
 .env
 *.ovpn
 *.mp3
+authentik/*.jpg
