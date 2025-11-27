@@ -1,0 +1,43 @@
+services:
+  app:
+    image: stickerdaniel/linkedin-mcp-server:latest
+    restart: unless-stopped
+    environment:
+      - LINKEDIN_COOKIE="li_at=$LINKEDIN_COOKIE"
+    command: ["--transport", "streamable-http", "--host", "0.0.0.0", "--port", "8080", "--path", "/mcp"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8080"
+
+  inspector:
+    image: ghcr.io/modelcontextprotocol/inspector:latest
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - 6277:6277
+    environment:
+      - HOST=0.0.0.0
+      - DANGEROUSLY_OMIT_AUTH=true
+      - MCP_AUTO_OPEN_ENABLED=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_inspector.rule=Host(`inspector.$HOST`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_inspector.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_inspector.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}_inspector.loadbalancer.server.port=6274"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_inspector.middlewares=authentik@file"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://inspector.$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
