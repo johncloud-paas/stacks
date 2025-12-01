@@ -10,7 +10,7 @@ services:
       - 'DUPLICATI__WEBSERVICE_PASSWORD=${SERVICE_PASSWORD_WEB}'
     volumes:
       - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/config'
-      - '$JOHNCLOUD_ROOT:/source:ro'
+      - '$JOHNCLOUD_ROOT:/source'
     healthcheck:
       test:
         - CMD
