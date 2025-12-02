@@ -1,0 +1,72 @@
+services:
+  backend:
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    image: infisical/infisical:latest-postgres
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - ENCRYPTION_KEY=$ENCRYPTION_KEY
+      - AUTH_SECRET=$AUTH_SECRET
+      - DB_CONNECTION_URI=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@$COMPOSE_PROJECT_NAME-db-1:5432/${POSTGRES_DB}
+      - REDIS_URL=redis://$COMPOSE_PROJECT_NAME-redis-1:6379
+      - SITE_URL=https://$HOST
+      - SMTP_HOST=$SMTP_HOST
+      - SMTP_PORT=$SMTP_PORT
+      - SMTP_FROM_ADDRESS=$SMTP_FROM_ADDRESS
+      - SMTP_FROM_NAME=$SMTP_FROM_NAME
+      - SMTP_USERNAME=$SMTP_USERNAME
+      - SMTP_PASSWORD=$SMTP_PASSWORD
+      - CAPTCHA_SECRET=$CAPTCHA_SECRET
+      - NEXT_PUBLIC_CAPTCHA_SITE_KEY=$NEXT_PUBLIC_CAPTCHA_SITE_KEY
+      - PLAIN_API_KEY=$PLAIN_API_KEY
+      - PLAIN_WISH_LABEL_IDS=$PLAIN_WISH_LABEL_IDS
+      - SSL_CLIENT_CERTIFICATE_HEADER_KEY=$SSL_CLIENT_CERTIFICATE_HEADER_KEY
+      - ENABLE_MSSQL_SECRET_ROTATION_ENCRYPT=true
+      - SHOULD_USE_DATADOG_TRACER=false
+      - KUBERNETES_AUTO_FETCH_SERVICE_ACCOUNT_TOKEN=false
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.entryPoints=websecure
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls=true
+      - traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8080
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+  redis:
+    image: redis
+    restart: unless-stopped
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis_data:/data
+
+  db:
+    image: postgres:14-alpine
+    restart: unless-stopped
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/pg_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_DB=$POSTGRES_DB
+    healthcheck:
+      test: "pg_isready --username=${POSTGRES_USER} && psql --username=${POSTGRES_USER} --list"
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
