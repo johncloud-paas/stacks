@@ -2,7 +2,13 @@
 
 set -a; source .env; set +a
 
-sudo rm -rf $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME
+read -p "Erase $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME ? " -n 1 -r
+exit
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    sudo rm -rf $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME
+fi
 
 sudo mkdir -p $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/api_configuration
 sudo mkdir -p $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc
