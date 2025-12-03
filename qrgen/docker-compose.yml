@@ -1,6 +1,6 @@
 services:
   web:
-    image: ydethe/qrgen:latest
+    image: ydethe/qrgen:${QRGEN_TAG}
     restart: unless-stopped
     environment:
       - SECRET_KEY=$SECRET_KEY

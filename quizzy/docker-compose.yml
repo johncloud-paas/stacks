@@ -1,6 +1,6 @@
 services:
   app:
-    image: ydethe/quizzy
+    image: ydethe/quizzy:$QUIZZY_TAG
     restart: unless-stopped
     user: 1000:1000
     healthcheck:
