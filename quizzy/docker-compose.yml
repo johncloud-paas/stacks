@@ -3,19 +3,19 @@ services:
     image: ydethe/quizzy:$QUIZZY_TAG
     restart: unless-stopped
     user: 1000:1000
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:$PORT/health"]
+    #   interval: 30s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 10s
     environment:
       AES_SECRET: ${AES_SECRET}
       JWT_SECRET: ${JWT_SECRET}
       CLIENT_ID: ${CLIENT_ID}
       CLIENT_SECRET:  ${CLIENT_SECRET}
       COOKIE_SECRET: ${COOKIE_SECRET}
-      REDIRECT_URI: http://localhost:8000/auth/callback
+      REDIRECT_URI: http://localhost:$PORT/auth/callback
       OPENID_CONFIG_URL: ${OPENID_CONFIG_URL}
       LOGLEVEL: $LOGLEVEL
     volumes:
@@ -25,7 +25,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8000"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=$PORT"
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
