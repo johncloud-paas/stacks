@@ -17,13 +17,13 @@ auth:
   keyboardInteractive:
     method: oauth2
     oauth2:
-      clientId: "4lCqA9wDsGMoRizgsBVCKzG30lrhVUWF75VeD5Yt"                 # ← change
-      clientSecret: "HxcqYeXQxQyr9NY9jemNFtZibMRDPeaB7Rug1xpZIM9x4TCcwju0naSqCjzEq3AAFG7SMYZeO8704xK8UWcvAPd61MxmMlMTsrdRiaG1IUVzHASNbnZQSRUYkZ4DxlrM"             # ← change
+      clientId: ""     # ← change
+      clientSecret: "" # ← change
       provider: oidc
       oidc:
-        url: "https://authentik.johncloud.fr/application/o/container-ssh/"
+        url: "https://authentik.domain.tld/application/o/container-ssh/"
         usernameField: "email"
-        redirectURI: "https://ssh.johncloud.fr/oauth2/callback"
+        redirectURI: "https://ssh.domain.tld/oauth2/callback"
       deviceFlow: true
       authorizationCodeFlow: true
 
