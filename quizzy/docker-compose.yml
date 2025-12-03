@@ -17,6 +17,7 @@ services:
       COOKIE_SECRET: ${COOKIE_SECRET}
       REDIRECT_URI: http://localhost:8000/auth/callback
       OPENID_CONFIG_URL: ${OPENID_CONFIG_URL}
+      LOGLEVEL: $LOGLEVEL
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/quizzes:/app/quizzes
     labels:
