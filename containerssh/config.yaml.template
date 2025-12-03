@@ -1,0 +1,40 @@
+# containerssh-config.yaml
+log:
+  level: info
+
+ssh:
+  listen: 0.0.0.0:2222  # Internal port (Traefik forwards to this)
+  hostKeys:
+    - /etc/containerssh/keys/host_ed25519.key
+
+# === FORCE OIDC ONLY ===
+auth:
+  password:
+    method: deny
+  publicKey:
+    method: deny
+
+  keyboardInteractive:
+    method: oauth2
+    oauth2:
+      clientId: "4lCqA9wDsGMoRizgsBVCKzG30lrhVUWF75VeD5Yt"                 # ← change
+      clientSecret: "HxcqYeXQxQyr9NY9jemNFtZibMRDPeaB7Rug1xpZIM9x4TCcwju0naSqCjzEq3AAFG7SMYZeO8704xK8UWcvAPd61MxmMlMTsrdRiaG1IUVzHASNbnZQSRUYkZ4DxlrM"             # ← change
+      provider: oidc
+      oidc:
+        url: "https://authentik.johncloud.fr/application/o/container-ssh/"
+        usernameField: "email"
+        redirectURI: "https://ssh.johncloud.fr/oauth2/callback"
+      deviceFlow: true
+      authorizationCodeFlow: true
+
+# === Proxy to backend SSH server ===
+backend:
+  type: ssh
+  ssh:
+    address: "backend-ssh:2222"        # container name + SSH port
+    user: "{oidc_preferred_username}" # or "{oidc_email}" etc.
+    # Optional: forward the ID token to the backend
+    environment:
+      OIDC_ID_TOKEN: "{oidc_id_token}"
+      OIDC_EMAIL: "{oidc_email}"
+      
