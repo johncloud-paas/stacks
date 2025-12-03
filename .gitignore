@@ -3,3 +3,4 @@
 *.mp3
 authentik/*.jpg
 containerssh/config.yaml
+teleport/teleport.yaml

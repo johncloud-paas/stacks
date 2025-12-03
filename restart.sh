@@ -1,14 +1,16 @@
 #!/bin/bash
 
-( cd $1 &&
+SERVICE_DIR=`readlink -f $1`
+
+( cd $SERVICE_DIR &&
 sudo docker compose down &&
 (if test -f setup_before_up.sh; then
-  sudo ./setup_before_up.sh
+  sudo bash ./setup_before_up.sh $SERVICE_DIR
 fi) &&
 sudo docker compose pull &&
 sudo docker compose up -d --remove-orphans &&
 (if test -f setup_after_up.sh; then
-  sudo ./setup_after_up.sh
+  sudo bash ./setup_after_up.sh $SERVICE_DIR
 fi) &&
 sudo docker compose logs -f
 )
