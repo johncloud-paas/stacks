@@ -1,0 +1,109 @@
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: $MYSQL_DBNAME
+      MYSQL_USER: rag_flow
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis_data:/data
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 128mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g
+      - cluster.routing.allocation.disk.threshold_enabled=false
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/es_data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://localhost:9200"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: $MINIO_ROOT_USER
+      MINIO_ROOT_PASSWORD: $MINIO_ROOT_PASSWORD
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/minio_data:/data
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+
+  tei:
+    image: ${TEI_IMAGE}
+    ports:
+      - ${TEI_PORT-6380}:80
+    command: ["--model-id", "/data/${TEI_MODEL}", "--auto-truncate"]
+    restart: on-failure
+
+  ragflow:
+    image: infiniflow/ragflow:v0.22.1
+    environment:
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=rag_flow
+      - MYSQL_DB=$MYSQL_DBNAME
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=$REDIS_PASSWORD
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - MINIO_HOST=minio
+      - MINIO_PORT=9000
+      - MINIO_USER=$MINIO_ROOT_USER
+      - MINIO_PASSWORD=$MINIO_ROOT_PASSWORD
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/service_conf.yaml.template:/ragflow/conf/service_conf.yaml.template
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/entrypoint.sh:/ragflow/entrypoint.sh
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+      - elasticsearch
+      - minio
+      - tei
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.rule=Host(`$HOST`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}_ui.loadbalancer.server.port=9380"
+
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.rule=Host(`admin.$HOST`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.tls.certresolver=letsencrypt"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}_admin.loadbalancer.server.port=9381"
+
+      # - "traefik.docker.network=traefik_net"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST/"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    

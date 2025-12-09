@@ -1,0 +1,90 @@
+ragflow:
+  host: 0.0.0.0
+  http_port: 9380
+admin:
+  host: 0.0.0.0
+  http_port: 9381
+mysql:
+  name: '${MYSQL_DB:-rag_flow}'
+  user: '${MYSQL_USER:-rag_flow}'
+  password: '${MYSQL_PASSWORD:-infini_rag_flow}'
+  host: '${MYSQL_HOST:-mysql}'
+  port: 3306
+  max_connections: 900
+  stale_timeout: 300
+  max_allowed_packet: ${MYSQL_MAX_PACKET:-1073741824}
+minio:
+  user: '${MINIO_USER:-rag_flow}'
+  password: '${MINIO_PASSWORD:-infini_rag_flow}'
+  host: '${MINIO_HOST:-minio}:${MINIO_PORT:-9000}'
+es:
+  hosts: 'http://${ES_HOST:-opensearch}:${ES_PORT:-9200}'
+#   username: '${ES_USER:-elastic}'
+#   password: '${ELASTIC_PASSWORD:-infini_rag_flow}'
+# os:
+#   hosts: 'http://${OS_HOST:-opensearch01}:9201'
+#   username: '${OS_USER:-admin}'
+#   password: '${OPENSEARCH_PASSWORD:-infini_rag_flow_OS_01}'
+# infinity:
+#   uri: '${INFINITY_HOST:-infinity}:23817'
+#   db_name: 'default_db'
+redis:
+  db: 1
+  password: '${REDIS_PASSWORD:-infini_rag_flow}'
+  host: '${REDIS_HOST:-redis}:${REDIS_PORT:-6379}'
+user_default_llm:
+  default_models:
+    embedding_model:
+      api_key: 'xxx'
+      base_url: 'http://${TEI_HOST:-tei}:80'
+# oauth:
+#   oauth2:
+#     display_name: "OAuth2"
+#     client_id: "your_client_id"
+#     client_secret: "your_client_secret"
+#     authorization_url: "https://your-oauth-provider.com/oauth/authorize"
+#     token_url: "https://your-oauth-provider.com/oauth/token"
+#     userinfo_url: "https://your-oauth-provider.com/oauth/userinfo"
+#     redirect_uri: "https://your-app.com/v1/user/oauth/callback/oauth2"
+#   oidc:
+#     display_name: "OIDC"
+#     client_id: "your_client_id"
+#     client_secret: "your_client_secret"
+#     issuer: "https://your-oauth-provider.com/oidc"
+#     scope: "openid email profile"
+#     redirect_uri: "https://your-app.com/v1/user/oauth/callback/oidc"
+#   github:
+#     type: "github"
+#     icon: "github"
+#     display_name: "Github"
+#     client_id: "your_client_id"
+#     client_secret: "your_client_secret"
+#     redirect_uri: "https://your-app.com/v1/user/oauth/callback/github"
+# authentication:
+#   client:
+#     switch: false
+#     http_app_key:
+#     http_secret_key:
+#   site:
+#     switch: false
+# permission:
+#   switch: false
+#   component: false
+#   dataset: false
+# smtp:
+#   mail_server: ""
+#   mail_port: 465
+#   mail_use_ssl: true
+#   mail_use_tls: false
+#   mail_username: ""
+#   mail_password: ""
+#   mail_default_sender:
+#     - "RAGFlow" # display name
+#     - "" # sender email address
+#   mail_frontend_url: "https://your-frontend.example.com"
+# tcadp_config:
+#   secret_id: '${TENCENT_SECRET_ID}'
+#   secret_key: '${TENCENT_SECRET_KEY}'
+#   region: '${TENCENT_REGION}'
+#   table_result_type: '1'
+#   markdown_image_response_type: '1'
