@@ -12,6 +12,29 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added containerssh ([8676af4](https://github.com/johncloud-paas/stacks/commit/8676af45543f8ed5cfed88c8c7f1db5047009544) by Yann de The).
+- Added tags for quizzy and qrgen ([441ee77](https://github.com/johncloud-paas/stacks/commit/441ee77b82acd7d162cfc0e018e70b916be6d5ff) by Yann de The).
+- Added infisical ([2b2f1df](https://github.com/johncloud-paas/stacks/commit/2b2f1df8bd11874d7f690c17be8096442e857393) by Yann de The).
+- Added linkedin_mcp ([9c3ab5d](https://github.com/johncloud-paas/stacks/commit/9c3ab5d29deaebf944cb44484689df02d64b9e1a) by Yann de The).
+- Added restart to duplicati ([8dd6a2a](https://github.com/johncloud-paas/stacks/commit/8dd6a2aad5dc83853726759d26bd67839dd15777) by Yann de The).
+- Adding SSO to sgtpgo ([326ee2e](https://github.com/johncloud-paas/stacks/commit/326ee2eea11480aab5849c0f0b3af4c6e9873e8c) by Yann de The).
+- Added quizzy ([257945a](https://github.com/johncloud-paas/stacks/commit/257945a7c98c4963c6537de9a9f7e162fb953240) by Yann de The).
+- Added authentik ([5cc0da7](https://github.com/johncloud-paas/stacks/commit/5cc0da74c351b5d762ad8b016815f3035c4494a8) by Yann de The).
+- Added duplicati ([de3fadd](https://github.com/johncloud-paas/stacks/commit/de3fadd51bb155fa3e7fa2f402a1d21e2280572c) by Yann de Thé).
+- Added 2 auth to llama server ([4d8e69e](https://github.com/johncloud-paas/stacks/commit/4d8e69e55725d77bc0735787406440868dad45fb) by Yann de The).
+- Added n8n readme ([0d6bccb](https://github.com/johncloud-paas/stacks/commit/0d6bccb151f0fe617f5b2e0b9dda2c64185a6007) by Yann de The).
+- Added api key middleware ([aa0538b](https://github.com/johncloud-paas/stacks/commit/aa0538b1c10f296d259b8fe1fd4d6cbb9ce67dd3) by Yann de The).
+- Added api key to llama server ([c8e5467](https://github.com/johncloud-paas/stacks/commit/c8e54672995cd199634ffa9c51a9d651479b4973) by Yann de The).
+- Added homepage entry for llama.cpp ([0b47f5e](https://github.com/johncloud-paas/stacks/commit/0b47f5e1092b0cdcf46ee07be98ad65a3bda6fdf) by Yann de The).
+- Added lama server ([da65375](https://github.com/johncloud-paas/stacks/commit/da6537505cc9acba4b016d178164e67a2d5b4eca) by Yann de The).
+- Added neo4j ([9487aef](https://github.com/johncloud-paas/stacks/commit/9487aef65ccafa21c682ccea7ec6a399fc1da441) by Yann de The).
+- Added MIN_EXPECTED_CHAR env var ([20174d6](https://github.com/johncloud-paas/stacks/commit/20174d6f71a48ac097b474b024ef09e383154c51) by Yann de The).
+- Added emails watcher ([d6eae18](https://github.com/johncloud-paas/stacks/commit/d6eae18808187b36372e81198e569ce067e5bd74) by Yann de The).
+- Added imapsync ([b42b949](https://github.com/johncloud-paas/stacks/commit/b42b949fee2972b7aecc7da9b4793077581dab78) by Yann de The).
+- Added RAG augmentation ([1ae4212](https://github.com/johncloud-paas/stacks/commit/1ae4212e97e3ada869047d8b9561b35a59b5c49d) by Yann de The).
+- Added env variable QDRANT_HTTPS ([855563d](https://github.com/johncloud-paas/stacks/commit/855563dd84acf29f4cc31773161ec2be64375e72) by Yann de The).
+- Added qdrant api keys ([a3f96d4](https://github.com/johncloud-paas/stacks/commit/a3f96d41506332b07058fac1fcde1978e80d4715) by Yann de The).
+- Added chatdoc ([6a44c66](https://github.com/johncloud-paas/stacks/commit/6a44c660aabfbaef01d5aab5c4669acc2146ad84) by Yann de The).
 - Added OIDC to SFTPGo (wip) ([fae092e](https://github.com/johncloud-paas/stacks/commit/fae092ee8e31f07dcdcd3d27418a07ecd9726f71) by Yann de The).
 - Added SFTPGo (wip) ([8e76127](https://github.com/johncloud-paas/stacks/commit/8e76127f90ffdeaa5b79d2273443230f01e01b4b) by Yann de The).
 - Added Nextcloud AppAPI Docker Socket Proxy ([4c984b6](https://github.com/johncloud-paas/stacks/commit/4c984b6a089e0c1d6c3e05741bb0335b20b4f89b) by Yann de The).
@@ -87,7 +110,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added send service ([927b818](https://github.com/johncloud-paas/stacks/commit/927b81894439c6c60df9e68f8a5ec5f5703f7f6a) by Yann de The).
 - Added netdata ([6266494](https://github.com/johncloud-paas/stacks/commit/6266494630c674b3ec6b7130bd6b2d51e980e48c) by Yann de The).
 - Added webmail ([ee0a9eb](https://github.com/johncloud-paas/stacks/commit/ee0a9ebc872a020a947aad4a7e0db1d9b33d7c2d) by Yann de The).
-- Added authentik ([0cf0e2c](https://github.com/johncloud-paas/stacks/commit/0cf0e2c1566b33b72d086cd45dbc050e6c47ee72) by Yann de The).
 - Added header correction for nextcloud ([48ec8ea](https://github.com/johncloud-paas/stacks/commit/48ec8ea92192194853496ce8879ddf32410bfa1d) by Yann de The).
 - Added ldap server to fusionauth stack ([8e30ec0](https://github.com/johncloud-paas/stacks/commit/8e30ec0b26a5a22a5de31066a2e86cd17d436bfa) by Yann de The).
 - Added homepage labels to fusonauth ([4f70729](https://github.com/johncloud-paas/stacks/commit/4f70729a89842528ca244ce108ddaeb5b5f5a7ac) by Yann de The).
@@ -131,6 +153,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- Fixed qrgen logo ([6ec4e6e](https://github.com/johncloud-paas/stacks/commit/6ec4e6e6c93f3b97b022c59357a225eaa08cb914) by Yann de The).
+- Fixed ports ([776dcf0](https://github.com/johncloud-paas/stacks/commit/776dcf0b29a365b96495012bdc91495a20e6605c) by Yann de The).
+- Fixed inner hostnames ([a5d5b93](https://github.com/johncloud-paas/stacks/commit/a5d5b9381a78e12d8e7b4f3bd29184f24830963d) by Yann de The).
 - Fixed stalwart filters ([3fd4d2c](https://github.com/johncloud-paas/stacks/commit/3fd4d2cc50e1136463c5f87cb6334f61944f9bef) by Yann de The).
 - Fixed douceville env ([54c2575](https://github.com/johncloud-paas/stacks/commit/54c25752943943687a33103294668c2c2190b4c8) by Yann de The).
 - Fixed routing ([d95f792](https://github.com/johncloud-paas/stacks/commit/d95f7929be267591586c6b50c4fd9aa994a6d645) by Yann de The).
@@ -158,10 +183,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- Changed duplicat isource dir in rw mode to allow retore... ([23bebb3](https://github.com/johncloud-paas/stacks/commit/23bebb34cb8a2b8db45f698c707a8261e1ae6389) by Yann de The).
 - Changed wordpress db container name ([912559c](https://github.com/johncloud-paas/stacks/commit/912559c4ed70ec084e4f73eaab49c9e26531fd7c) by Yann de The).
 
 ### Removed
 
+- Removed secret ([2d721f2](https://github.com/johncloud-paas/stacks/commit/2d721f22ef0659ef7b1216f1d81e1a04ab2bcd7a) by Yann de The).
+- Removed speedtest ([0fcf339](https://github.com/johncloud-paas/stacks/commit/0fcf33919536fb4523fe1390c9b4a89d026af1f1) by Yann de The).
+- Removed unused ports ([7a0643c](https://github.com/johncloud-paas/stacks/commit/7a0643c9f9e75cfb97393a5b787ad92e57f49f5e) by Yann de The).
 - Removed qbittorrent widget ([e92d3ca](https://github.com/johncloud-paas/stacks/commit/e92d3ca1692c4ac74d0f4a607559556344224fe9) by Yann de The).
 - Removed ports opened in stalwart stack ([6386f10](https://github.com/johncloud-paas/stacks/commit/6386f100270c8d90a031ddeb6e05a26fe7b8a901) by Yann de The).
 - Removed fix ip address ([2f07308](https://github.com/johncloud-paas/stacks/commit/2f07308ebe2e8a73117268df085e39c978403a46) by Yann de The).

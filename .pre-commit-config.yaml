@@ -3,6 +3,13 @@ repos:
   - id: check-changelog
     args: [--version-regex, '<a href="[^"]+">(?P<version>[^<]+)', --bump=auto, -t, keepachangelog]
   - id: extract-todo
+    language_version: python3
     args: [--ignore, __pypackages__, .venv]
   repo: https://github.com/ydethe/pdm_template.git
   rev: v0.1.9
+# https://docs.gitguardian.com/ggshield-docs/integrations/git-hooks/pre-commit
+- repo: https://github.com/gitguardian/ggshield
+  rev: v1.45.0
+  hooks:
+    - id: ggshield
+      stages: [pre-commit]
