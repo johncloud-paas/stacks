@@ -13,5 +13,5 @@ SERVICE_DIR=`readlink -f $1`
   (if test -f setup_after_up.sh; then
     sudo bash ./setup_after_up.sh $SERVICE_DIR
   fi) &&
-  sudo docker compose logs -f
+  sudo docker compose logs -f $2
 )

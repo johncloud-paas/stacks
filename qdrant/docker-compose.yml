@@ -6,14 +6,18 @@ services:
       QDRANT__SERVICE__READ_ONLY_API_KEY: ${QDRANT__SERVICE__READ_ONLY_API_KEY}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.service=${COMPOSE_PROJECT_NAME}_admin"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=6333"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`$HOST`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.service=${COMPOSE_PROJECT_NAME}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=6333"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-

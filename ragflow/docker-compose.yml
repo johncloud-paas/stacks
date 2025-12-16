@@ -1,11 +1,22 @@
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.35
     environment:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
       MYSQL_DATABASE: $MYSQL_DBNAME
       MYSQL_USER: rag_flow
       MYSQL_PASSWORD: $MYSQL_PASSWORD
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-uroot", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    command:
+      --max_connections=1000
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --tls_version="TLSv1.2,TLSv1.3"
+      --binlog_expire_logs_seconds=604800
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mysql_data:/var/lib/mysql
     restart: unless-stopped
@@ -25,10 +36,17 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.3
     environment:
+      - node.name=${COMPOSE_PROJECT_NAME}-elasticsearch-1
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - bootstrap.memory_lock=false
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms2g -Xmx2g
-      - cluster.routing.allocation.disk.threshold_enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - cluster.routing.allocation.disk.watermark.low=5gb
+      - cluster.routing.allocation.disk.watermark.high=3gb
+      - cluster.routing.allocation.disk.watermark.flood_stage=2gb
+    mem_limit: ${MEM_LIMIT}
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/es_data:/usr/share/elasticsearch/data
     restart: unless-stopped
@@ -47,52 +65,70 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/minio_data:/data
     restart: unless-stopped
     command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 10s
+      retries: 120
 
   tei:
     image: ${TEI_IMAGE}
-    ports:
-      - ${TEI_PORT-6380}:80
+    # ports:
+    #   - ${TEI_PORT-6380}:80
     command: ["--model-id", "/data/${TEI_MODEL}", "--auto-truncate"]
-    restart: on-failure
+    restart: unless-stopped
 
   ragflow:
     image: infiniflow/ragflow:v0.22.1
     environment:
+      - COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME
+      - HOST=$HOST
+      - CLIENT_ID=$CLIENT_ID
+      - CLIENT_SECRET=$CLIENT_SECRET
+      - ISSUER_URL=$ISSUER_URL
       - MYSQL_PASSWORD=$MYSQL_PASSWORD
-      - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
       - MYSQL_USER=rag_flow
       - MYSQL_DB=$MYSQL_DBNAME
-      - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=$REDIS_PASSWORD
-      - ES_HOST=elasticsearch
       - ES_PORT=9200
-      - MINIO_HOST=minio
       - MINIO_PORT=9000
       - MINIO_USER=$MINIO_ROOT_USER
       - MINIO_PASSWORD=$MINIO_ROOT_PASSWORD
+      - ENABLE_ADMIN_SERVER=1
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/service_conf.yaml.template:/ragflow/conf/service_conf.yaml.template
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/entrypoint.sh:/ragflow/entrypoint.sh
     restart: unless-stopped
     depends_on:
-      - mysql
-      - redis
-      - elasticsearch
-      - minio
-      - tei
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
 
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_test.rule=Host(`test.$HOST`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_test.entryPoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_test.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_test.service=${COMPOSE_PROJECT_NAME}_test"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}_test.loadbalancer.server.port=80"
+
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.rule=Host(`$HOST`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.entryPoints=websecure"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_ui.service=${COMPOSE_PROJECT_NAME}_ui"
       - "traefik.http.services.${COMPOSE_PROJECT_NAME}_ui.loadbalancer.server.port=9380"
 
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.rule=Host(`admin.$HOST`)"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.entryPoints=websecure"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.service=${COMPOSE_PROJECT_NAME}_admin"
       - "traefik.http.services.${COMPOSE_PROJECT_NAME}_admin.loadbalancer.server.port=9381"
 
       # - "traefik.docker.network=traefik_net"

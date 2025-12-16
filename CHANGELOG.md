@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added qdrant ([abde332](https://github.com/johncloud-paas/stacks/commit/abde332ac023e9f27db37724aa5ec24fea025e2a) by Yann de Thé).
+- Added gitguardian pre-commit hook ([9643dfb](https://github.com/johncloud-paas/stacks/commit/9643dfbb407f9756e7743b86fab635fca7944e70) by Yann de The).
 - Added containerssh ([8676af4](https://github.com/johncloud-paas/stacks/commit/8676af45543f8ed5cfed88c8c7f1db5047009544) by Yann de The).
 - Added tags for quizzy and qrgen ([441ee77](https://github.com/johncloud-paas/stacks/commit/441ee77b82acd7d162cfc0e018e70b916be6d5ff) by Yann de The).
 - Added infisical ([2b2f1df](https://github.com/johncloud-paas/stacks/commit/2b2f1df8bd11874d7f690c17be8096442e857393) by Yann de The).
