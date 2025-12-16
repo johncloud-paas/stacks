@@ -1,0 +1,19 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT__SERVICE__API_KEY}
+      QDRANT__SERVICE__READ_ONLY_API_KEY: ${QDRANT__SERVICE__READ_ONLY_API_KEY}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_admin.service=${COMPOSE_PROJECT_NAME}_admin"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=6333"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+
