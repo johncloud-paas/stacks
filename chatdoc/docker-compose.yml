@@ -1,6 +1,6 @@
 services:
   qdrant:
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:v1.14.1
     restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/qdrant_data:/qdrant/storage
@@ -22,81 +22,47 @@ services:
       - "homepage.href=https://qdrant.$HOST/dashboard"
       - "homepage.description=$HOME_DESCRIPTION"
 
-  llama-server:
-    image: ghcr.io/ggml-org/llama.cpp:server
-    restart: unless-stopped
-    cpus: $LLAMA_CPU_LIMIT
-    # volumes:
-    #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/models:/models
-    command: >
-      --port 8000
-      --host 0.0.0.0
-      -hf $LLAMA_MODEL_PROVIDER
-      --hf-token $HF_TOKEN
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    labels:
-      - "traefik.enable=true"
-
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.rule=Host(`llama.$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.service=$COMPOSE_PROJECT_NAME-llama"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME-llama.loadbalancer.server.port=8000"
-      - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.bearerHeader=true"
-      - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.bearerHeaderName=Authorization"
-      - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.tokens=$LLAMA_SERVER_APIKEY"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.middlewares=api-token"
-
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.rule=Host(`llamaui.$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.service=$COMPOSE_PROJECT_NAME-llama2"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME-llama2.loadbalancer.server.port=8000"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.middlewares=authentik@file"
-
-      - "homepage.group=$HOME_GROUP"
-      - "homepage.name=$HOME_NAME - LLaMa"
-      - "homepage.icon=https://raw.githubusercontent.com/johncloud-paas/stacks/main/chatdoc/llama0-logo.png"
-      - "homepage.href=https://llamaui.$HOST"
-      - "homepage.description=$HOME_DESCRIPTION"
-
-  # neo4j:
-  #   image: neo4j:latest
+  # llama-server:
+  #   image: ghcr.io/ggml-org/llama.cpp:server
   #   restart: unless-stopped
-  #   volumes:
-  #       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/logs:/logs
-  #       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/config:/config
-  #       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/data:/data
-  #       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/neo4j/plugins:/plugins
-  #   environment:
-  #       - NEO4J_AUTH=neo4j/$NEO4J_PASSWORD
-  #   # ports:
-  #   #   - "7474:7474"
-  #   #   - "7687:7687"
+  #   cpus: $LLAMA_CPU_LIMIT
+  #   # volumes:
+  #   #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/models:/models
+  #   command: >
+  #     --port 8000
+  #     --host 0.0.0.0
+  #     -hf $LLAMA_MODEL_PROVIDER
+  #     --hf-token $HF_TOKEN
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+  #     interval: 30s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 10s
   #   labels:
   #     - "traefik.enable=true"
 
-  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.rule=Host(`neo4j.$HOST`)"
-  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.entrypoints=websecure"
-  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.tls.certresolver=letsencrypt"
-  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-neo4j.service=$COMPOSE_PROJECT_NAME-neo4j"
-  #     - "traefik.http.services.$COMPOSE_PROJECT_NAME-neo4j.loadbalancer.server.port=7474"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.rule=Host(`llama.$HOST`)"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.entrypoints=websecure"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.tls.certresolver=letsencrypt"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.service=$COMPOSE_PROJECT_NAME-llama"
+  #     - "traefik.http.services.$COMPOSE_PROJECT_NAME-llama.loadbalancer.server.port=8000"
+  #     - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.bearerHeader=true"
+  #     - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.bearerHeaderName=Authorization"
+  #     - "traefik.http.middlewares.api-token.plugin.traefik-api-token-middleware.tokens=$LLAMA_SERVER_APIKEY"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama.middlewares=api-token"
 
-  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.rule=Host(`neo4j.$HOST`)"
-  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.entrypoints=bolt"
-  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.tls.certresolver=letsencrypt"
-  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-bolt.service=$COMPOSE_PROJECT_NAME-bolt"
-  #     - "traefik.http.services.$COMPOSE_PROJECT_NAME-bolt.loadbalancer.server.port=7687"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.rule=Host(`llamaui.$HOST`)"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.entrypoints=websecure"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.tls.certresolver=letsencrypt"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.service=$COMPOSE_PROJECT_NAME-llama2"
+  #     - "traefik.http.services.$COMPOSE_PROJECT_NAME-llama2.loadbalancer.server.port=8000"
+  #     - "traefik.http.routers.$COMPOSE_PROJECT_NAME-llama2.middlewares=authentik@file"
 
   #     - "homepage.group=$HOME_GROUP"
-  #     - "homepage.name=$HOME_NAME - Neo4J"
-  #     - "homepage.icon=neo4j.svg"
-  #     - "homepage.href=https://neo4j.$HOST"
+  #     - "homepage.name=$HOME_NAME - LLaMa"
+  #     - "homepage.icon=https://raw.githubusercontent.com/johncloud-paas/stacks/main/chatdoc/llama0-logo.png"
+  #     - "homepage.href=https://llamaui.$HOST"
   #     - "homepage.description=$HOME_DESCRIPTION"
 
   ragindexer:
@@ -106,8 +72,8 @@ services:
       - qdrant
     volumes:
       - $DOCUMENTS_ROOT_FOLDER:/docs:ro
-      - $EMAILS_ROOT_FOLDER:/emails:ro
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/ragindexer:/code
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails:ro
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cache:/code/cache
     environment:
       - LOGLEVEL=$LOGLEVEL
       - QDRANT_URL=http://qdrant:6333
@@ -116,9 +82,8 @@ services:
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - DOCS_PATH=/docs
       - EMAILS_PATH=/emails
-      - STATE_DB_PATH=/code/index_state.db
+      - STATE_DB_PATH=/code/cache/index_state.db
       - COLLECTION_NAME=$COLLECTION_NAME
-      - DAV_ROOT=$DAV_ROOT
       - EMBEDDING_MODEL=$EMBEDDING_MODEL
       - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
       - MIN_EXPECTED_CHAR=$MIN_EXPECTED_CHAR
@@ -161,7 +126,6 @@ services:
       - QDRANT_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
       - OPENAI_API_KEY=$OPENAI_API_KEY
       - COLLECTION_NAME=$COLLECTION_NAME
-      - DAV_ROOT=$DAV_ROOT
       - EMBEDDING_MODEL=$EMBEDDING_MODEL
       - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
       - OPEN_MODEL_PREF=$OPEN_MODEL_PREF
