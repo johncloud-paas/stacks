@@ -1,0 +1,41 @@
+services:
+  notediscovery:
+    image: ghcr.io/gamosoft/notediscovery:latest
+    volumes:
+      # Persist notes and data
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/app/data
+      # Custom plugins
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/plugins:/app/plugins
+      # Custom themes (REQUIRED - must contain theme .css files)
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/themes:/app/themes
+      # Custom locales/translations (optional - add your own language files)
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/locales:/app/locales      
+      # Config file (REQUIRED - must exist as a file, not directory!)
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config.yaml:/app/config.yaml
+    restart: unless-stopped
+    environment:
+      - TZ=$TZ
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 60s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.rule=Host(`$HOST`)"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.entrypoints=websecure"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.service=${COMPOSE_PROJECT_NAME}"
+      - "traefik.http.services.${COMPOSE_PROJECT_NAME}.loadbalancer.server.port=8000"
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}.middlewares=authentik@file"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
