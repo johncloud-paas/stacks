@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added NoteDiscovery ([060f5c7](https://github.com/johncloud-paas/stacks/commit/060f5c79012e00d6ec14a08d40e17e00da2a8c0a) by Yann de The).
 - Added qdrant ([abde332](https://github.com/johncloud-paas/stacks/commit/abde332ac023e9f27db37724aa5ec24fea025e2a) by Yann de Thé).
 - Added gitguardian pre-commit hook ([9643dfb](https://github.com/johncloud-paas/stacks/commit/9643dfbb407f9756e7743b86fab635fca7944e70) by Yann de The).
 - Added containerssh ([8676af4](https://github.com/johncloud-paas/stacks/commit/8676af45543f8ed5cfed88c8c7f1db5047009544) by Yann de The).
