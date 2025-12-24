@@ -96,6 +96,7 @@ services:
       # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config/wazuh_dashboard/opensearch_dashboards.yml:/wazuh-config-mount/config/opensearch_dashboards.yml
     depends_on:
       - indexer
+      - manager
     links:
       - indexer:$COMPOSE_PROJECT_NAME-indexer-1
       - manager:$COMPOSE_PROJECT_NAME-manager-1
