@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Added TubeArchivist ([ed5973e](https://github.com/johncloud-paas/stacks/commit/ed5973ec3161ad3b530195df6c6848c965730f88) by Yann de The).
+- Added TubeArchivist ([ef0a503](https://github.com/johncloud-paas/stacks/commit/ef0a503b93483b0e27121eea83ce8348a81661c4) by Yann de The).
 - Added hometube ([62587b7](https://github.com/johncloud-paas/stacks/commit/62587b715722bc14bb333eed597b8b84c2bfa716) by Yann de The).
 - Added NoteDiscovery ([060f5c7](https://github.com/johncloud-paas/stacks/commit/060f5c79012e00d6ec14a08d40e17e00da2a8c0a) by Yann de The).
 - Added qdrant ([abde332](https://github.com/johncloud-paas/stacks/commit/abde332ac023e9f27db37724aa5ec24fea025e2a) by Yann de Thé).
