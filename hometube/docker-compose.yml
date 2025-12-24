@@ -1,0 +1,45 @@
+services:
+  hometube:
+    image: ghcr.io/egalitarianmonkey/hometube:latest
+    environment:
+      - TZ=${TZ}
+      - VIDEOS_FOLDER=/data/videos
+      - TMP_DOWNLOAD_FOLDER=/data/tmp
+      - YOUTUBE_COOKIES_FILE_PATH=/config/youtube_cookies.txt
+      - LANGUAGES_SECONDARIES=$LANGUAGES_SECONDARIES
+      - LANGUAGE_PRIMARY_INCLUDE_SUBTITLES=$LANGUAGE_PRIMARY_INCLUDE_SUBTITLES
+      - VO_FIRST=$VO_FIRST
+      - UI_LANGUAGE=$UI_LANGUAGE
+      - COOKIES_FROM_BROWSER=chrome
+      - LANGUAGE_PRIMARY=$LANGUAGE_PRIMARY
+      - STREAMLIT_SERVER_HEADLESS=true
+      - REMOVE_TMP_FILES_AFTER_DOWNLOAD=$REMOVE_TMP_FILES_AFTER_DOWNLOAD
+    volumes:
+      - ${VIDEOS_FOLDER_DOCKER_HOST}:/data/videos
+      - "${YOUTUBE_COOKIES_FILE_PATH_DOCKER_HOST}:/config/youtube_cookies.txt"
+      - ${TMP_DOWNLOAD_FOLDER_DOCKER_HOST}:/data/tmp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.entryPoints=websecure
+      - 'traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)'
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls=true
+      - traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8501
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik@file"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST/"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
