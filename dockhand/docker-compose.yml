@@ -3,7 +3,6 @@ services:
     image: fnsys/dockhand:latest
     restart: unless-stopped
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/app/data
     labels:
       - "traefik.enable=true"
@@ -33,28 +32,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  app:
-    image: ghcr.io/btouchard/shm:latest
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      SHM_DB_DSN: "postgres://shm:${DB_PASSWORD:-change-me}@db:5432/metrics?sslmode=disable"
-      PORT: "8080"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      # - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik@file"
-      - traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8000
-      - "homepage.group=$HOME_GROUP"
-      - "homepage.name=$HOME_NAME"
-      - "homepage.icon=$HOME_ICON"
-      - "homepage.href=https://$HOST"
-      - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
   default:
