@@ -159,6 +159,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- Fixed dockhand persistent storage ([07b6021](https://github.com/johncloud-paas/stacks/commit/07b6021e252f3574f8807dc73ce28c87528be0ee) by Yann de The).
 - Fixed traefik conf with authentik ([2c96445](https://github.com/johncloud-paas/stacks/commit/2c96445070e9a55b5c0308c2bf8e9ce166e27bc0) by Yann de The).
 - Fixed qrgen logo ([6ec4e6e](https://github.com/johncloud-paas/stacks/commit/6ec4e6e6c93f3b97b022c59357a225eaa08cb914) by Yann de The).
 - Fixed ports ([776dcf0](https://github.com/johncloud-paas/stacks/commit/776dcf0b29a365b96495012bdc91495a20e6605c) by Yann de The).

@@ -7,6 +7,8 @@ services:
     environment:
       - QDRANT__SERVICE__API_KEY=$QDRANT__SERVICE__API_KEY
       - QDRANT__SERVICE__READ_ONLY_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
+    networks:
+      - db_nw
     labels:
       - "traefik.enable=true"
 
@@ -70,6 +72,9 @@ services:
     restart: unless-stopped
     depends_on:
       - qdrant
+    networks:
+      - db_nw
+      - default
     volumes:
       - $DOCUMENTS_ROOT_FOLDER:/docs:ro
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails:ro
@@ -98,6 +103,9 @@ services:
     restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails
+    networks:
+      - db_nw
+      - default
     environment:
       - LOGLEVEL=$LOGLEVEL
       - SYNC_PERIOD=$SYNC_PERIOD
@@ -119,6 +127,9 @@ services:
     restart: unless-stopped
     depends_on:
       - qdrant
+    networks:
+      - db_nw
+      - default
     environment:
       - LOGLEVEL=$LOGLEVEL
       - QDRANT_URL=http://qdrant:6333
@@ -153,4 +164,7 @@ networks:
   default:
     external: true
     name: $TRAEFIK_NETWORK
-
+  db_nw:
+    # Specify driver options
+    driver: bridge
+    

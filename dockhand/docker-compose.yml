@@ -9,29 +9,12 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      # - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik@file"
       - traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=3000
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
-
-  db:
-    image: postgres:15-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: shm
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
-      POSTGRES_DB: metrics
-    volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres_data:/var/lib/postgresql/data
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/migrations:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U shm -d metrics"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 networks:
   default:
