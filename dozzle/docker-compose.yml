@@ -1,6 +1,18 @@
 services:
   dozzle:
     image: amir20/dozzle:latest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/dozzle", "healthcheck"]
+      interval: 3s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    environment:
+      DOZZLE_AUTH_PROVIDER: forward-proxy
+      DOZZLE_AUTH_HEADER_USER: X-Authentik-Username
+      DOZZLE_AUTH_HEADER_EMAIL: X-Authentik-Email
+      DOZZLE_AUTH_HEADER_NAME: X-Authentik-Name
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data/
