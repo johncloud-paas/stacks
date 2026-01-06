@@ -49,8 +49,8 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    ports:
-      - "9200:9200"
+    # ports:
+    #   - "9200:9200"
     environment:
       OPENSEARCH_JAVA_OPTS: "-Xms1g -Xmx1g"
     volumes:
@@ -58,7 +58,6 @@ services:
       #  if you need mount a custom opensearch.yml, uncomment the next line and delete the environment variables
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/opensearch.yml
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config/wazuh_indexer/internal_users.yml:/usr/share/wazuh-indexer/config/opensearch-security/internal_users.yml
-
 
   dashboard:
     image: wazuh/wazuh-dashboard:4.14.1
@@ -82,7 +81,7 @@ services:
       SERVER_HOST: 0.0.0.0
       SERVER_PORT: 5601
       OPENSEARCH_HOSTS: https://indexer:9200
-      OPENSEARCH_SSL_VERIFICATIONMODE: certificate
+      OPENSEARCH_SSL_VERIFICATIONMODE: none
       OPENSEARCH_REQUESTHEADERSALLOWLIST: '["securitytenant","Authorization"]'
       OPENSEARCH_SECURITY_MULTITENANCY_ENABLED: "false"
       SERVER_SSL_ENABLED: "false"
@@ -93,13 +92,24 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/dashboard-custom:/usr/share/wazuh-dashboard/plugins/wazuh/public/assets/custom
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config/wazuh_dashboard/wazuh.yml:/wazuh-config-mount/data/wazuh/config/wazuh.yml
       #  if you need mount a custom opensearch-dashboards.yml, uncomment the next line and delete the environment variables
-      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config/wazuh_dashboard/opensearch_dashboards.yml:/wazuh-config-mount/config/opensearch_dashboards.yml
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config/wazuh_dashboard/opensearch_dashboards.yml:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml
     depends_on:
       - indexer
       - manager
-    links:
-      - indexer:$COMPOSE_PROJECT_NAME-indexer-1
-      - manager:$COMPOSE_PROJECT_NAME-manager-1
+    # links:
+    #   - indexer:$COMPOSE_PROJECT_NAME-indexer-1
+    #   - manager:$COMPOSE_PROJECT_NAME-manager-1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=5601"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
   default:

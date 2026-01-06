@@ -4,3 +4,4 @@
 authentik/*.jpg
 containerssh/config.yaml
 teleport/teleport.yaml
+.cache_ggshield

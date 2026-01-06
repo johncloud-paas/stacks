@@ -196,6 +196,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 
+- Removed vaultwarden SSO ([17ac868](https://github.com/johncloud-paas/stacks/commit/17ac868bcd2195d028fe1d558479ee9d65027122) by Yann de The).
 - Removed secret ([2d721f2](https://github.com/johncloud-paas/stacks/commit/2d721f22ef0659ef7b1216f1d81e1a04ab2bcd7a) by Yann de The).
 - Removed speedtest ([0fcf339](https://github.com/johncloud-paas/stacks/commit/0fcf33919536fb4523fe1390c9b4a89d026af1f1) by Yann de The).
 - Removed unused ports ([7a0643c](https://github.com/johncloud-paas/stacks/commit/7a0643c9f9e75cfb97393a5b787ad92e57f49f5e) by Yann de The).
