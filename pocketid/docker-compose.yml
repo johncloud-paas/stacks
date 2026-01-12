@@ -1,0 +1,37 @@
+services:
+  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v2
+    restart: unless-stopped
+    environment:
+      - APP_URL=https://$HOST
+      - ENCRYPTION_KEY_FILE=/secrets/encryption_key.secret
+      - TRUST_PROXY=true
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/app/data"
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/secrets:/secrets"
+    # Optional healthcheck
+    healthcheck:
+      test: [ "CMD", "/app/pocket-id", "healthcheck" ]
+      interval: 1m30s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=1411"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+
