@@ -1,5 +1,5 @@
 x-flags: &penpot-flags
-  PENPOT_FLAGS: disable-email-verification enable-smtp enable-prepl-server disable-secure-session-cookies
+  PENPOT_FLAGS: disable-email-verification enable-smtp enable-prepl-server disable-secure-session-cookies enable-login-with-oidc enable-oidc-registration disable-registration disable-login-with-password
 
 x-uri: &penpot-public-uri
   PENPOT_PUBLIC_URI: https://$HOST
@@ -8,7 +8,6 @@ x-body-size: &penpot-http-body-size
   # Max body size (30MiB); Used for plain requests, should never be
   # greater than multi-part size
   PENPOT_HTTP_SERVER_MAX_BODY_SIZE: 31457280
-
   # Max multipart body size (350MiB)
   PENPOT_HTTP_SERVER_MAX_MULTIPART_BODY_SIZE: 367001600
 
@@ -16,19 +15,13 @@ services:
   penpot-frontend:
     image: "penpotapp/frontend:${PENPOT_VERSION:-latest}"
     restart: unless-stopped
-    # ports:
-    #   - 9001:8080
-
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/assets:/opt/data/assets
-
     depends_on:
       - penpot-backend
       - penpot-exporter
-
     environment:
       << : [*penpot-flags, *penpot-http-body-size]
-
     labels:
       - "traefik.enable=true"
 
@@ -46,16 +39,13 @@ services:
   penpot-backend:
     image: "penpotapp/backend:${PENPOT_VERSION:-latest}"
     restart: unless-stopped
-
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/assets:/opt/data/assets
-
     depends_on:
       penpot-postgres:
         condition: service_healthy
       penpot-redis:
         condition: service_healthy
-
     environment:
       << : [*penpot-flags, *penpot-public-uri, *penpot-http-body-size]
 
@@ -66,11 +56,11 @@ services:
       ## become invalid on container restart.
       ##
       ## If you going to uncomment this, we recommend to use a trully randomly generated
-      ## 512 bits base64 encoded string here.  You can generate one with:
+      ## 512 bits base64 encoded string here. You can generate one with:
       ##
       ## python3 -c "import secrets; print(secrets.token_urlsafe(64))"
 
-      # PENPOT_SECRET_KEY: my-insecure-key
+      PENPOT_SECRET_KEY: $SECRET_KEY
 
       ## The PREPL host. Mainly used for external programatic access to penpot backend
       ## (example: admin). By default it will listen on `localhost` but if you are going to use
@@ -110,7 +100,7 @@ services:
       ## based on real scenarios. If you want to help us, please leave it enabled. You can
       ## audit what data we send with the code available on github.
 
-      PENPOT_TELEMETRY_ENABLED: true
+      PENPOT_TELEMETRY_ENABLED: false
       PENPOT_TELEMETRY_REFERER: compose
 
       ## Example SMTP/Email configuration. By default, emails are sent to the mailcatch
@@ -127,15 +117,21 @@ services:
       PENPOT_SMTP_TLS: $SMTP_TLS
       PENPOT_SMTP_SSL: $SMTP_SSL
 
+      # https://help.penpot.app/technical-guide/configuration/#authentication-providers
+      PENPOT_OIDC_SCOPES: "openid profile email"
+      PENPOT_OIDC_CLIENT_ID: $OIDC_CLIENT_ID
+      PENPOT_OIDC_BASE_URI: $OIDC_BASE_URI
+      PENPOT_OIDC_CLIENT_SECRET: $OIDC_CLIENT_SECRET
+
   penpot-exporter:
     image: "penpotapp/exporter:${PENPOT_VERSION:-latest}"
     restart: unless-stopped
-
     depends_on:
       penpot-redis:
         condition: service_healthy
-
     environment:
+      PENPOT_SECRET_KEY: $SECRET_KEY
+
       # Don't touch it; this uses an internal docker network to
       # communicate with the frontend.
       PENPOT_PUBLIC_URI: http://penpot-frontend:8080
@@ -147,17 +143,14 @@ services:
     image: "postgres:15"
     restart: unless-stopped
     stop_signal: SIGINT
-
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U penpot"]
       interval: 2s
       timeout: 10s
       retries: 5
       start_period: 2s
-
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/postgres_v15:/var/lib/postgresql/data
-
     environment:
       - POSTGRES_INITDB_ARGS=--data-checksums
       - POSTGRES_DB=penpot
@@ -167,25 +160,12 @@ services:
   penpot-redis:
     image: redis:7.2
     restart: unless-stopped
-
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       interval: 1s
       timeout: 3s
       retries: 5
       start_period: 3s
-
-  ## A mailcatch service, used as temporal SMTP server. You can access via HTTP to the
-  ## port 1080 for read all emails the penpot platform has sent. Should be only used as a
-  ## temporal solution while no real SMTP provider is configured.
-
-  penpot-mailcatch:
-    image: sj26/mailcatcher:latest
-    restart: unless-stopped
-    expose:
-      - '1025'
-    # ports:
-    #   - "1080:1080"
 
 networks:
   default:
