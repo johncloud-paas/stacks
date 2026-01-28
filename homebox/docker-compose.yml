@@ -1,18 +1,27 @@
 services:
   homebox:
-    image: ghcr.io/hay-kot/homebox:latest
+    image: ghcr.io/sysadminsmedia/homebox:latest
     restart: unless-stopped
+    # https://homebox.software/en/configure/oidc.html
     environment:
+    - HBOX_MODE=production
     - HBOX_LOG_LEVEL=info
     - HBOX_LOG_FORMAT=json
-    - HBOX_WEB_PORT=17745
+    - HBOX_WEB_PORT=7745
     - HBOX_WEB_MAX_UPLOAD_SIZE=10
+    - HBOX_DATABASE_SQLITE_PATH=/data/homebox.db?_pragma=busy_timeout=999&_pragma=journal_mode=WAL&_fk=1&_time_format=sqlite
     - HBOX_MAILER_HOST=$HBOX_MAILER_HOST
     - HBOX_MAILER_PORT=$HBOX_MAILER_PORT
     - HBOX_MAILER_USERNAME=$HBOX_MAILER_USERNAME
     - HBOX_MAILER_PASSWORD=$HBOX_MAILER_PASSWORD
     - HBOX_MAILER_FROM=$HBOX_MAILER_FROM
     - HBOX_OPTIONS_ALLOW_REGISTRATION=$HBOX_OPTIONS_ALLOW_REGISTRATION
+    - HBOX_OIDC_ENABLED=true
+    - HBOX_OIDC_ISSUER_URL=$OIDC_ISSUER_URL
+    - HBOX_OIDC_CLIENT_ID=$OIDC_CLIENT_ID
+    - HBOX_OIDC_CLIENT_SECRET=$OIDC_CLIENT_SECRET
+    - HBOX_OPTIONS_TRUST_PROXY=true
+    - HBOX_OPTIONS_HOSTNAME=$HOST
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data/
     labels:
@@ -20,7 +29,7 @@ services:
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
       - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=17745"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=7745"
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
