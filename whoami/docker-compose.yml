@@ -3,17 +3,19 @@ services:
     image: traefik/whoami:latest
     restart: unless-stopped
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik@file"
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
-
+      - pangolin.public-resources.whoami.name=whoami
+      - pangolin.public-resources.whoami.full-domain=$HOST
+      - pangolin.public-resources.whoami.protocol=http
+      - pangolin.public-resources.whoami.ssl=true
+      - pangolin.public-resources.whoami.auth.sso-enabled=true
+      - pangolin.public-resources.whoami.auth.sso-roles[0]=Member
+      - pangolin.public-resources.whoami.targets[0].method=http
+      
 networks:
   default:
     external: true
