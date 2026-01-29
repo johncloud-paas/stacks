@@ -17,7 +17,7 @@ services:
       - $JOHNCLOUD_ROOT/vaultwarden:/data/
     labels:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$COMPOSE_PROJECT_NAME.$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
