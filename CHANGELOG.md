@@ -159,6 +159,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- Fixed homebox ([03b33cf](https://github.com/johncloud-paas/stacks/commit/03b33cfc1801f8b2e3d1a7fffdbd10d31c613f15) by Yann de The).
 - Fixed penpot ([ddaa039](https://github.com/johncloud-paas/stacks/commit/ddaa0391e2d7bfe57b8b0e9e72bce1cebad77e43) by Yann de The).
 - Fixed dockhand persistent storage ([07b6021](https://github.com/johncloud-paas/stacks/commit/07b6021e252f3574f8807dc73ce28c87528be0ee) by Yann de The).
 - Fixed traefik conf with authentik ([2c96445](https://github.com/johncloud-paas/stacks/commit/2c96445070e9a55b5c0308c2bf8e9ce166e27bc0) by Yann de The).
