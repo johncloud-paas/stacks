@@ -8,13 +8,14 @@ services:
       - "homepage.icon=$HOME_ICON"
       - "homepage.href=https://$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
-      - pangolin.public-resources.whoami.name=whoami
-      - pangolin.public-resources.whoami.full-domain=$HOST
-      - pangolin.public-resources.whoami.protocol=http
-      - pangolin.public-resources.whoami.ssl=true
-      - pangolin.public-resources.whoami.auth.sso-enabled=true
-      - pangolin.public-resources.whoami.auth.sso-roles[0]=Member
-      - pangolin.public-resources.whoami.targets[0].method=http
+      # - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik@file"
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
       
 networks:
   default:
