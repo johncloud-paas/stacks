@@ -40,19 +40,19 @@ services:
       - SFTPGO_HTTPD__BINDINGS__0__OIDC__ROLE_FIELD=$OIDC_ROLE_FIELD
       - SFTPGO_HTTPD__BINDINGS__0__OIDC__IMPLICIT_ROLES=$OIDC_IMPLICIT_ROLES
     labels:
-      - "traefik.enable=true"
-
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.rule=Host(`$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME-webdav.service=$COMPOSE_PROJECT_NAME-webdav"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME-webdav.loadbalancer.server.port=8081"
-
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`ui.$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.service=$COMPOSE_PROJECT_NAME"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8080"
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_ui.name=${COMPOSE_PROJECT_NAME}_ui
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_ui.full-domain=ui.$HOST
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_ui.protocol=http
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_ui.ssl=true
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_ui.targets[0].method=http
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_ui.targets[0].port=8080
+      
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.full-domain=$HOST
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.protocol=http
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.ssl=true
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.targets[0].method=http
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.targets[0].port=8081
 
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"

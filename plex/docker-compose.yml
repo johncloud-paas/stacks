@@ -17,13 +17,12 @@ services:
       - "32400:32400/tcp" # access to the Plex Media Server [required]
     restart: unless-stopped
     labels:
-      - "traefik.enable=true"
-
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=32400"
-
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=32400
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"

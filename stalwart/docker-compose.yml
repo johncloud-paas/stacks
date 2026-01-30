@@ -22,13 +22,12 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart
       - $JOHNCLOUD_ROOT/traefik/certs/mail.$HOST:/data/certs/mail.$HOST:ro
     labels:
-      - traefik.enable=true
-      # - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`mail.$HOST`) || Host(`autodiscover.$HOST`) || Host(`autoconfig.$HOST`) || Host(`mta-sts.$HOST`) || Host(`mx.$HOST`) || Host(`smtp.$HOST`) || Host(`pop.$HOST`) || Host(`imap.$HOST`) || Host(`jmap.$HOST`)'
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`mail.$HOST`)
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls=true
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure
-      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt
-      - traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=8080
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=mail.$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=8080
       - homepage.group=$HOME_GROUP
       - homepage.name=$HOME_NAME
       - homepage.icon=$HOME_ICON
