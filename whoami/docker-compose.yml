@@ -13,8 +13,8 @@ services:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
-      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
-      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
       
 networks:

@@ -199,6 +199,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 
+- Removed SSO on whoami ([c5b4e74](https://github.com/johncloud-paas/stacks/commit/c5b4e74303ef5d1fb870e4b9f8e39ebb8cffe64e) by Yann de The).
 - Removed authentik ([874e40c](https://github.com/johncloud-paas/stacks/commit/874e40ca1ceb7205e232c4e7dde54b7a97a75e6e) by Yann de The).
 - Removed vaultwarden SSO ([17ac868](https://github.com/johncloud-paas/stacks/commit/17ac868bcd2195d028fe1d558479ee9d65027122) by Yann de The).
 - Removed secret ([2d721f2](https://github.com/johncloud-paas/stacks/commit/2d721f22ef0659ef7b1216f1d81e1a04ab2bcd7a) by Yann de The).
