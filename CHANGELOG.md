@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added pangolin SSO ([6439d3c](https://github.com/johncloud-paas/stacks/commit/6439d3cf7456339e6b5b7fa687631977467ccaa9) by Yann de The).
 - Added pangolin labels ([b1387fd](https://github.com/johncloud-paas/stacks/commit/b1387fdb4099647e9d485facec6740a39ac4e3c0) by Yann de The).
 - Added shm, dockhend, edgeshark ([3ee1f84](https://github.com/johncloud-paas/stacks/commit/3ee1f84c6033c9a5ae3781e4ff5cb8e3f1ceee1a) by Yann de The).
 - Added TubeArchivist ([0dc970a](https://github.com/johncloud-paas/stacks/commit/0dc970a077f8f7e13641e1f0683b2c02c1d96e57) by Yann de The).
