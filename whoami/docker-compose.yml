@@ -20,7 +20,7 @@ services:
       - pangolin.private-resources.$COMPOSE_PROJECT_NAME.mode=host
       - pangolin.private-resources.$COMPOSE_PROJECT_NAME.destination=whoami-$COMPOSE_PROJECT_NAME-1
       - pangolin.private-resources.$COMPOSE_PROJECT_NAME.site=$NODE_ID
-      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.alias=$COMPOSE_PROJECT_NAME.$HOST
+      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.alias=$HOST
       
 networks:
   default:
