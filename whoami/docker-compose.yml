@@ -9,13 +9,18 @@ services:
       - "homepage.href=https://$HOST"
       - "homepage.description=$HOME_DESCRIPTION"
       # - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=authentik@file"
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.mode=host
+      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.destination=whoami-$COMPOSE_PROJECT_NAME-1
+      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.site=$NODE_ID
+      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.alias=$COMPOSE_PROJECT_NAME.$HOST
       
 networks:
   default:
