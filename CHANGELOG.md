@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added clickhouse ([4317d58](https://github.com/johncloud-paas/stacks/commit/4317d58009ff2668d6a7cc141a5ba29ebf4267a1) by Yann de The).
 - Added pangolin SSO ([6439d3c](https://github.com/johncloud-paas/stacks/commit/6439d3cf7456339e6b5b7fa687631977467ccaa9) by Yann de The).
 - Added pangolin labels ([b1387fd](https://github.com/johncloud-paas/stacks/commit/b1387fdb4099647e9d485facec6740a39ac4e3c0) by Yann de The).
 - Added shm, dockhend, edgeshark ([3ee1f84](https://github.com/johncloud-paas/stacks/commit/3ee1f84c6033c9a5ae3781e4ff5cb8e3f1ceee1a) by Yann de The).

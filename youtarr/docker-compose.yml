@@ -1,0 +1,81 @@
+services:
+  db:
+    image: mariadb:10.3
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: youtarr
+      MYSQL_TCP_PORT: 3321
+      # Set utf8mb4 as default for new installations
+      # Only set MYSQL_USER / MYSQL_PASSWORD if you configure a non-root DB_USER user in .env
+      MYSQL_USER: youtarr
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/database:/var/lib/mysql
+    command: --port=3321 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --innodb-file-per-table=1 --innodb-large-prefix=ON
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "3321", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  app:
+    image: ${YOUTARR_IMAGE:-dialmaster/youtarr:latest}
+    restart: unless-stopped
+    # Optional: Run as specific UID:GID for security (defaults to root if not set for backwards compatibility with existing users)
+    user: "${YOUTARR_UID:-0}:${YOUTARR_GID:-0}"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      TZ: ${TZ:-UTC}
+      DB_HOST: db
+      DB_PORT: 3321
+      DB_USER: youtarr
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: youtarr
+      # Optional: Disable authentication (for platforms with external auth like Elfhosted)
+      AUTH_ENABLED: ${AUTH_ENABLED}
+      # Logging configuration
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # This is just informational and lets the app know where the videos will be stored on the host
+      YOUTUBE_OUTPUT_DIR: /downloads
+      # Optional: Custom data path for platforms like Elfhosted (defaults to /usr/src/app/data)
+      # This is the internal path where videos download inside the container and is not needed for most users
+      # DATA_PATH: /storage/rclone/storagebox/youtube
+    # ports:
+    #   - "3087:3011"
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/downloads:/downloads
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/server/images:/app/server/images
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/app/config
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/jobs:/app/jobs
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--output", "/dev/null", "http://localhost:3011/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=3011
+      - pangolin.public-resources.databasus.auth.sso-enabled=true
+      - pangolin.public-resources.databasus.auth.sso-roles[0]=Member
+      - homepage.group=$HOME_GROUP
+      - homepage.name=$HOME_NAME
+      - homepage.icon=$HOME_ICON
+      - homepage.href=https://$HOST
+      - homepage.description=$HOME_DESCRIPTION
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
