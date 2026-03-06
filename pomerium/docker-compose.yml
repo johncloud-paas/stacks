@@ -17,7 +17,7 @@ services:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=80
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=443
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
