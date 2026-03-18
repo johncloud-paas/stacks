@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Added MetaMCP ([bb1e6d9](https://github.com/johncloud-paas/stacks/commit/bb1e6d9656e73c17b15a105d8f1dd2b27a8a0e1e) by Yann de The).
+- Added MetaMCP ([f312434](https://github.com/johncloud-paas/stacks/commit/f312434aab7e6fcb03873c36150db0bf3f9c1930) by Yann de The).
 - Added clickhouse ([4317d58](https://github.com/johncloud-paas/stacks/commit/4317d58009ff2668d6a7cc141a5ba29ebf4267a1) by Yann de The).
 - Added pangolin SSO ([6439d3c](https://github.com/johncloud-paas/stacks/commit/6439d3cf7456339e6b5b7fa687631977467ccaa9) by Yann de The).
 - Added pangolin labels ([b1387fd](https://github.com/johncloud-paas/stacks/commit/b1387fdb4099647e9d485facec6740a39ac4e3c0) by Yann de The).
