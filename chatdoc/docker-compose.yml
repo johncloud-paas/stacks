@@ -4,24 +4,23 @@ services:
     restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/qdrant_data:/qdrant/storage
+      - $JOHNCLOUD_ROOT/traefik/certs/$HOST:/tls:ro
     environment:
       - QDRANT__SERVICE__API_KEY=$QDRANT__SERVICE__API_KEY
-      - QDRANT__SERVICE__READ_ONLY_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
+      - QDRANT__SERVICE__ENABLE_TLS=true
+      - QDRANT__TLS__CERT=/tls/cert.pem
+      - QDRANT__TLS__KEY=/tls/key.pem
+    ports:
+      - 6333:6333
+      - 6334:6334
     networks:
       - backend
       - frontend
     labels:
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME-qdrant.name=$COMPOSE_PROJECT_NAME-qdrant
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME-qdrant.full-domain=qdrant.$HOST
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME-qdrant.protocol=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME-qdrant.ssl=true
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME-qdrant.targets[0].method=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME-qdrant.targets[0].port=6333
-
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME - Qdrant"
       - "homepage.icon=https://avatars.githubusercontent.com/u/73504361"
-      - "homepage.href=https://qdrant.$HOST/dashboard"
+      - "homepage.href=https://$HOST:6333/dashboard"
       - "homepage.description=$HOME_DESCRIPTION"
 
   # llama-server:
@@ -67,36 +66,36 @@ services:
   #     - "homepage.href=https://llamaui.$HOST"
   #     - "homepage.description=$HOME_DESCRIPTION"
 
-  ragindexer:
-    image: ydethe/ragindexer:latest
-    restart: unless-stopped
-    depends_on:
-      - qdrant
-    networks:
-      - backend
-      - frontend
-    volumes:
-      - $DOCUMENTS_ROOT_FOLDER:/docs:ro
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails:ro
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cache:/code/cache
-    environment:
-      - LOGLEVEL=$LOGLEVEL
-      - QDRANT_URL=http://qdrant:6333
-      - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
-      - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
-      - OPENAI_API_KEY=$OPENAI_API_KEY
-      - DOCS_PATH=/docs
-      - EMAILS_PATH=/emails
-      - STATE_DB_PATH=/code/cache/index_state.db
-      - COLLECTION_NAME=$COLLECTION_NAME
-      - EMBEDDING_MODEL=$EMBEDDING_MODEL
-      - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
-      - MIN_EXPECTED_CHAR=$MIN_EXPECTED_CHAR
-      - OPEN_MODEL_PREF=$OPEN_MODEL_PREF
-      - CHUNK_SIZE=$CHUNK_SIZE
-      - CHUNK_OVERLAP=$CHUNK_OVERLAP
-      - OCR_LANG=$OCR_LANG
-      - TORCH_NUM_THREADS=$TORCH_NUM_THREADS
+  # ragindexer:
+  #   image: ydethe/ragindexer:latest
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - qdrant
+  #   networks:
+  #     - backend
+  #     - frontend
+  #   volumes:
+  #     - $DOCUMENTS_ROOT_FOLDER:/docs:ro
+  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails:ro
+  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cache:/code/cache
+  #   environment:
+  #     - LOGLEVEL=$LOGLEVEL
+  #     - QDRANT_URL=http://qdrant:6333
+  #     - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
+  #     - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
+  #     - OPENAI_API_KEY=$OPENAI_API_KEY
+  #     - DOCS_PATH=/docs
+  #     - EMAILS_PATH=/emails
+  #     - STATE_DB_PATH=/code/cache/index_state.db
+  #     - COLLECTION_NAME=$COLLECTION_NAME
+  #     - EMBEDDING_MODEL=$EMBEDDING_MODEL
+  #     - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
+  #     - MIN_EXPECTED_CHAR=$MIN_EXPECTED_CHAR
+  #     - OPEN_MODEL_PREF=$OPEN_MODEL_PREF
+  #     - CHUNK_SIZE=$CHUNK_SIZE
+  #     - CHUNK_OVERLAP=$CHUNK_OVERLAP
+  #     - OCR_LANG=$OCR_LANG
+  #     - TORCH_NUM_THREADS=$TORCH_NUM_THREADS
 
   imapsync:
     image: ydethe/imapsync:latest
@@ -122,41 +121,41 @@ services:
       - IMAP_LIST__1__PASSWORD=$IMAP_LIST__1__PASSWORD
       - IMAP_LIST__1__MAILBOX=$IMAP_LIST__1__MAILBOX
 
-  ragwebui:
-    image: ydethe/ragwebui:latest
-    restart: unless-stopped
-    depends_on:
-      - qdrant
-    networks:
-      - backend
-      - frontend
-    environment:
-      - LOGLEVEL=$LOGLEVEL
-      - QDRANT_URL=http://qdrant:6333
-      - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
-      - QDRANT_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
-      - OPENAI_API_KEY=$OPENAI_API_KEY
-      - COLLECTION_NAME=$COLLECTION_NAME
-      - EMBEDDING_MODEL=$EMBEDDING_MODEL
-      - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
-      - OPEN_MODEL_PREF=$OPEN_MODEL_PREF
-      - TORCH_NUM_THREADS=$TORCH_NUM_THREADS
-      - CHUNK_SIZE=$CHUNK_SIZE
-      - CHUNK_OVERLAP=$CHUNK_OVERLAP
-      - RAG_AUGMENTATION=$RAG_AUGMENTATION
-    labels:
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=7860
+  # ragwebui:
+  #   image: ydethe/ragwebui:latest
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - qdrant
+  #   networks:
+  #     - backend
+  #     - frontend
+  #   environment:
+  #     - LOGLEVEL=$LOGLEVEL
+  #     - QDRANT_URL=http://qdrant:6333
+  #     - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
+  #     - QDRANT_API_KEY=$QDRANT__SERVICE__READ_ONLY_API_KEY
+  #     - OPENAI_API_KEY=$OPENAI_API_KEY
+  #     - COLLECTION_NAME=$COLLECTION_NAME
+  #     - EMBEDDING_MODEL=$EMBEDDING_MODEL
+  #     - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
+  #     - OPEN_MODEL_PREF=$OPEN_MODEL_PREF
+  #     - TORCH_NUM_THREADS=$TORCH_NUM_THREADS
+  #     - CHUNK_SIZE=$CHUNK_SIZE
+  #     - CHUNK_OVERLAP=$CHUNK_OVERLAP
+  #     - RAG_AUGMENTATION=$RAG_AUGMENTATION
+  #   labels:
+  #     - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+  #     - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+  #     - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+  #     - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+  #     - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+  #     - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=7860
 
-      - "homepage.group=$HOME_GROUP"
-      - "homepage.name=$HOME_NAME"
-      - "homepage.icon=$HOME_ICON"
-      - "homepage.href=https://$HOST"
-      - "homepage.description=$HOME_DESCRIPTION"
+  #     - "homepage.group=$HOME_GROUP"
+  #     - "homepage.name=$HOME_NAME"
+  #     - "homepage.icon=$HOME_ICON"
+  #     - "homepage.href=https://$HOST"
+  #     - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
   frontend:
