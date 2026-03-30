@@ -22,6 +22,10 @@ services:
       - "homepage.icon=https://avatars.githubusercontent.com/u/73504361"
       - "homepage.href=https://$HOST:6333/dashboard"
       - "homepage.description=$HOME_DESCRIPTION"
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}-qdrant.name=${COMPOSE_PROJECT_NAME}-qdrant
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}-qdrant.full-domain=$HOST
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}-qdrant.protocol=http
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}-qdrant.ssl=true
 
   # llama-server:
   #   image: ghcr.io/ggml-org/llama.cpp:server
