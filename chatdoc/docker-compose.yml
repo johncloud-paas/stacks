@@ -6,7 +6,7 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/qdrant_data:/qdrant/storage
       - $JOHNCLOUD_ROOT/traefik/certs/$HOST:/tls:ro
     environment:
-      - QDRANT__SERVICE__API_KEY=$QDRANT__SERVICE__API_KEY
+      - QDRANT__SERVICE__API_KEY=$QDRANT_API_KEY
       - QDRANT__SERVICE__ENABLE_TLS=true
       - QDRANT__TLS__CERT=/tls/cert.pem
       - QDRANT__TLS__KEY=/tls/key.pem
@@ -70,60 +70,51 @@ services:
   #     - "homepage.href=https://llamaui.$HOST"
   #     - "homepage.description=$HOME_DESCRIPTION"
 
-  # ragindexer:
-  #   image: ydethe/ragindexer:latest
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - qdrant
-  #   networks:
-  #     - backend
-  #     - frontend
-  #   volumes:
-  #     - $DOCUMENTS_ROOT_FOLDER:/docs:ro
-  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails:ro
-  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cache:/code/cache
-  #   environment:
-  #     - LOGLEVEL=$LOGLEVEL
-  #     - QDRANT_URL=http://qdrant:6333
-  #     - QDRANT_QUERY_LIMIT=$QDRANT_QUERY_LIMIT
-  #     - QDRANT_API_KEY=$QDRANT__SERVICE__API_KEY
-  #     - OPENAI_API_KEY=$OPENAI_API_KEY
-  #     - DOCS_PATH=/docs
-  #     - EMAILS_PATH=/emails
-  #     - STATE_DB_PATH=/code/cache/index_state.db
-  #     - COLLECTION_NAME=$COLLECTION_NAME
-  #     - EMBEDDING_MODEL=$EMBEDDING_MODEL
-  #     - EMBEDDING_MODEL_TRUST_REMOTE_CODE=$EMBEDDING_MODEL_TRUST_REMOTE_CODE
-  #     - MIN_EXPECTED_CHAR=$MIN_EXPECTED_CHAR
-  #     - OPEN_MODEL_PREF=$OPEN_MODEL_PREF
-  #     - CHUNK_SIZE=$CHUNK_SIZE
-  #     - CHUNK_OVERLAP=$CHUNK_OVERLAP
-  #     - OCR_LANG=$OCR_LANG
-  #     - TORCH_NUM_THREADS=$TORCH_NUM_THREADS
-
-  imapsync:
-    image: ydethe/imapsync:latest
+  ragindexer:
+    image: ydethe/ragindexer:latest
     restart: unless-stopped
-    volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails
+    depends_on:
+      - qdrant
     networks:
       - backend
       - frontend
+    volumes:
+      - $DOCUMENTS_ROOT_FOLDER:/docs:ro
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails:ro
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cache:/code/cache
     environment:
       - LOGLEVEL=$LOGLEVEL
-      - SYNC_PERIOD=$SYNC_PERIOD
-      - IMAP_LIST__0__LABEL=$IMAP_LIST__0__LABEL
-      - IMAP_LIST__0__IMAP_SERVER=$IMAP_LIST__0__IMAP_SERVER
-      - IMAP_LIST__0__IMAP_PORT=$IMAP_LIST__0__IMAP_PORT
-      - IMAP_LIST__0__USERNAME=$IMAP_LIST__0__USERNAME
-      - IMAP_LIST__0__PASSWORD=$IMAP_LIST__0__PASSWORD
-      - IMAP_LIST__0__MAILBOX=$IMAP_LIST__0__MAILBOX
-      - IMAP_LIST__1__LABEL=$IMAP_LIST__1__LABEL
-      - IMAP_LIST__1__IMAP_SERVER=$IMAP_LIST__1__IMAP_SERVER
-      - IMAP_LIST__1__IMAP_PORT=$IMAP_LIST__1__IMAP_PORT
-      - IMAP_LIST__1__USERNAME=$IMAP_LIST__1__USERNAME
-      - IMAP_LIST__1__PASSWORD=$IMAP_LIST__1__PASSWORD
-      - IMAP_LIST__1__MAILBOX=$IMAP_LIST__1__MAILBOX
+      - SCAN_ROOT=/docs
+      - EMBEDDING_MODEL=$EMBEDDING_MODEL
+      - EMBEDDING_MODEL_TRUST_REMOTE_CODE=false
+      - CHUNK_SIZE=$CHUNK_SIZE
+      - OVERLAP_SIZE=$OVERLAP_SIZE
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=$QDRANT_API_KEY
+
+  # imapsync:
+  #   image: ydethe/imapsync:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/emails:/emails
+  #   networks:
+  #     - backend
+  #     - frontend
+  #   environment:
+  #     - LOGLEVEL=$LOGLEVEL
+  #     - SYNC_PERIOD=$SYNC_PERIOD
+  #     - IMAP_LIST__0__LABEL=$IMAP_LIST__0__LABEL
+  #     - IMAP_LIST__0__IMAP_SERVER=$IMAP_LIST__0__IMAP_SERVER
+  #     - IMAP_LIST__0__IMAP_PORT=$IMAP_LIST__0__IMAP_PORT
+  #     - IMAP_LIST__0__USERNAME=$IMAP_LIST__0__USERNAME
+  #     - IMAP_LIST__0__PASSWORD=$IMAP_LIST__0__PASSWORD
+  #     - IMAP_LIST__0__MAILBOX=$IMAP_LIST__0__MAILBOX
+  #     - IMAP_LIST__1__LABEL=$IMAP_LIST__1__LABEL
+  #     - IMAP_LIST__1__IMAP_SERVER=$IMAP_LIST__1__IMAP_SERVER
+  #     - IMAP_LIST__1__IMAP_PORT=$IMAP_LIST__1__IMAP_PORT
+  #     - IMAP_LIST__1__USERNAME=$IMAP_LIST__1__USERNAME
+  #     - IMAP_LIST__1__PASSWORD=$IMAP_LIST__1__PASSWORD
+  #     - IMAP_LIST__1__MAILBOX=$IMAP_LIST__1__MAILBOX
 
   # ragwebui:
   #   image: ydethe/ragwebui:latest
