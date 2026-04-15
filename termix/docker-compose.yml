@@ -1,0 +1,34 @@
+services:
+  termix:
+    image: ghcr.io/lukegus/termix:latest
+    restart: unless-stopped
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/app/data
+    environment:
+      PORT: '8080'
+      ENABLE_GUACAMOLE: false
+      NODE_ENV: production
+      DATA_DIR: /app/data
+      OIDC_CLIENT_ID: $OIDC_CLIENT_ID
+      OIDC_CLIENT_SECRET: $OIDC_CLIENT_SECRET
+      OIDC_ISSUER_URL: $OIDC_ISSUER_URL
+      OIDC_AUTHORIZATION_URL: $OIDC_AUTHORIZATION_URL
+      OIDC_TOKEN_URL: $OIDC_TOKEN_URL
+    labels:
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=8080
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+      
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
