@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added Termix ([1a73795](https://github.com/johncloud-paas/stacks/commit/1a73795a079726ce4e6d175db7701a900ff25f07) by Yann de The).
 - Added excalidraw ([e62697d](https://github.com/johncloud-paas/stacks/commit/e62697d0c317714f17896bf7436f6efaf79fe418) by Yann de The).
 - Added MetaMCP ([f312434](https://github.com/johncloud-paas/stacks/commit/f312434aab7e6fcb03873c36150db0bf3f9c1930) by Yann de The).
 - Added clickhouse ([4317d58](https://github.com/johncloud-paas/stacks/commit/4317d58009ff2668d6a7cc141a5ba29ebf4267a1) by Yann de The).
