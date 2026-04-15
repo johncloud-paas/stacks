@@ -1,0 +1,63 @@
+services:
+  jumpserver:
+    image: jumpserver/jms_all:v3.10.9
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - SECRET_KEY=${SECRET_KEY:?err}
+      - BOOTSTRAP_TOKEN=${BOOTSTRAP_TOKEN:?err}
+      - DB_ENGINE=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=jumpserver
+      - DB_PASSWORD=${DB_PASSWORD:?err}
+      - DB_NAME=jumpserver
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/jumpserver/data
+    labels:
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=80
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
+      MYSQL_DATABASE: jumpserver
+      MYSQL_USER: jumpserver
+      MYSQL_PASSWORD: ${DB_PASSWORD:?err}
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mysql:/var/lib/mysql
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 20s
+      retries: 10
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    

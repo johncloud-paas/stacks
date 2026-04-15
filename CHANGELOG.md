@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added fusionauth ([368370f](https://github.com/johncloud-paas/stacks/commit/368370f3b3e9feb18a861ba4b2b7fa51502c9aac) by Yann de The).
 - Added Termix ([1a73795](https://github.com/johncloud-paas/stacks/commit/1a73795a079726ce4e6d175db7701a900ff25f07) by Yann de The).
 - Added excalidraw ([e62697d](https://github.com/johncloud-paas/stacks/commit/e62697d0c317714f17896bf7436f6efaf79fe418) by Yann de The).
 - Added MetaMCP ([f312434](https://github.com/johncloud-paas/stacks/commit/f312434aab7e6fcb03873c36150db0bf3f9c1930) by Yann de The).
@@ -149,7 +150,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added vikunja ([cc240e5](https://github.com/johncloud-paas/stacks/commit/cc240e5344564973f5da86d954de44a26e84c31e) by Yann de The).
 - Added redis in nextcloud stack ([a01cf05](https://github.com/johncloud-paas/stacks/commit/a01cf0594627b877004c9e959333c012fb406427) by Yann de The).
 - Added jellyfin ([99715c9](https://github.com/johncloud-paas/stacks/commit/99715c9abd0b0cc6dbb97d60da89b5f1b4ba5782) by Yann de The).
-- Added fusionauth ([39aa0cf](https://github.com/johncloud-paas/stacks/commit/39aa0cff2c8d52f5e1516da73ec8cc22cd12dcac) by Yann de The).
 - Added upload location venv ([0dde423](https://github.com/johncloud-paas/stacks/commit/0dde423ff8aba2411f7c9656a373045dd7cf7e4e) by Yann de The).
 - Added immich ([016007f](https://github.com/johncloud-paas/stacks/commit/016007f886baa0539b264e493ff41f3abd1a6b6d) by Yann de Thé).
 - Added shlink ([a28706e](https://github.com/johncloud-paas/stacks/commit/a28706ea8458e08f9247e123b8d016480693b47a) by Yann de The).
