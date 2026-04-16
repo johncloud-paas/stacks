@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added jumpserver ([7b9483c](https://github.com/johncloud-paas/stacks/commit/7b9483cfe2ba9e20c193412f5b51e7fc78c459d2) by Yann de The).
 - Added fusionauth ([368370f](https://github.com/johncloud-paas/stacks/commit/368370f3b3e9feb18a861ba4b2b7fa51502c9aac) by Yann de The).
 - Added Termix ([1a73795](https://github.com/johncloud-paas/stacks/commit/1a73795a079726ce4e6d175db7701a900ff25f07) by Yann de The).
 - Added excalidraw ([e62697d](https://github.com/johncloud-paas/stacks/commit/e62697d0c317714f17896bf7436f6efaf79fe418) by Yann de The).

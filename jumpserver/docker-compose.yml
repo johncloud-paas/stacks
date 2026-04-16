@@ -1,12 +1,12 @@
 services:
   jumpserver:
-    image: jumpserver/jms_all:v3.10.9
+    image: jumpserver/jms_all:v4.10.16
     restart: unless-stopped
     depends_on:
       mysql:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+    ports:
+      - "2222:2222"
     environment:
       - SECRET_KEY=${SECRET_KEY:?err}
       - BOOTSTRAP_TOKEN=${BOOTSTRAP_TOKEN:?err}
@@ -16,8 +16,8 @@ services:
       - DB_USER=jumpserver
       - DB_PASSWORD=${DB_PASSWORD:?err}
       - DB_NAME=jumpserver
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - SITE_URL=https://$HOST
+      - USE_X_FORWARDED_HOST=true
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/jumpserver/data
     labels:
@@ -47,14 +47,6 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:?err}
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mysql:/var/lib/mysql
-
-  redis:
-    image: redis:7
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      timeout: 20s
-      retries: 10
 
 networks:
   default:

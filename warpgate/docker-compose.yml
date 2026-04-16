@@ -11,7 +11,7 @@ services:
       disable: true
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
-      - $JOHNCLOUD_ROOT/traefik/certs/$HOST/:/data/certs/:ro
+      - $JOHNCLOUD_ROOT/traefik/certs/$HOST/:/certs/:ro
     stdin_open: true
     tty: true
     labels:
