@@ -1,35 +1,31 @@
-services: 
-  pomerium:
-    image: pomerium/pomerium:latest
-    restart: unless-stopped
-    environment:
-      SHARED_SECRET: $SHARED_SECRET
-      DATABROKER_STORAGE_TYPE: file
-      DATABROKER_STORAGE_CONNECTION_STRING: file:///data/pomerium
-      ADDRESS: ":8443"
-      AUTOCERT: FALSE
+services:
+  server:
+    image: mysteriumnetwork/myst:latest
+    restart: 'unless-stopped'
+    # ports:
+    #   - '4449:4449'
+    command: ["service", "--agreed-terms-and-conditions"]
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
     volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data/
-      - ./config.yaml:/pomerium/config.yaml:ro
+      - '$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/lib/mysterium-node'
     labels:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=8443
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=4449
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
-      - "homepage.href=https://${HOST}/"
+      - "homepage.href=https://$HOST/"
       - "homepage.description=$HOME_DESCRIPTION"
 
-  verify:
-    image: cr.pomerium.com/pomerium/verify:latest
-    restart: unless-stopped
-
 networks:
-  main:
+  default:
     external: true
     name: $TRAEFIK_NETWORK
     
