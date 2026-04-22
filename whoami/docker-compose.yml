@@ -18,9 +18,9 @@ services:
       # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
       - pangolin.private-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
       - pangolin.private-resources.$COMPOSE_PROJECT_NAME.mode=host
-      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.destination=whoami-$COMPOSE_PROJECT_NAME-1
       - pangolin.private-resources.$COMPOSE_PROJECT_NAME.site=$NODE_ID
-      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.alias=$HOST
+      - pangolin.private-resources.$COMPOSE_PROJECT_NAME.destination=whoami-$COMPOSE_PROJECT_NAME-1
+      # - pangolin.private-resources.$COMPOSE_PROJECT_NAME.alias=$HOST
       
 networks:
   default:
