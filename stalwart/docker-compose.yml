@@ -1,7 +1,7 @@
 services:
   mailserver:
     # swaks --to test-xxxxxxx@srv1.mail-tester.com --from admin@$HOST --server mail.$HOST --auth-user admin --protocol SSMTP --port 465 --auth-password xxx
-    image: stalwartlabs/stalwart:latest
+    image: stalwartlabs/stalwart:v0.16
     restart: unless-stopped
     hostname: mail.$HOST
     ports:
@@ -19,7 +19,9 @@ services:
       DISABLE_ROUNDCUBE: $DISABLE_ROUNDCUBE
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart
+      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc:/etc/stalwart
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/lib/stalwart
       - $JOHNCLOUD_ROOT/traefik/certs/mail.$HOST:/data/certs/mail.$HOST:ro
     labels:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
