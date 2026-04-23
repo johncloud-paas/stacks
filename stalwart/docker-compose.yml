@@ -19,9 +19,9 @@ services:
       DISABLE_ROUNDCUBE: $DISABLE_ROUNDCUBE
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/opt/stalwart
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc:/etc/stalwart
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/lib/stalwart
+      # - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/lib/stalwart
       - $JOHNCLOUD_ROOT/traefik/certs/mail.$HOST:/data/certs/mail.$HOST:ro
     labels:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
