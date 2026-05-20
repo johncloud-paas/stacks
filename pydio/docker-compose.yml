@@ -1,0 +1,48 @@
+services:
+  cells:
+    image: pydio/cells:latest
+    restart: unless-stopped
+    environment:
+      - CELLS_SITE_BIND=0.0.0.0:8080
+      - CELLS_SITE_EXTERNAL=https://$HOST
+      - CELLS_SITE_NO_TLS=1
+      - CELLS_WORKING_DIR=/var/cells
+      - CELLS_LOG=info
+      - CELLS_INSTALL_YAML=/pydio/config/install.yml
+      # Injected in install conf at run time
+      - CELLS_ADMIN_PWD=${CELLS_ADMIN_PWD}
+      - MYSQL_USER_LOGIN=pydio
+      - MYSQL_USER_PWD=${MYSQL_PASSWORD}
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cellsdir:/var/cells
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/cells/data
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/install-conf.yml:/pydio/config/install.yml:ro
+    labels:
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=8080
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: cells
+      MYSQL_USER: pydio
+      MYSQL_PASSWORD: $MYSQL_PASSWORD
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci]
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mysql:/var/lib/mysql
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
