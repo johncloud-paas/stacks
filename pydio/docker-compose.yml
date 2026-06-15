@@ -2,6 +2,9 @@ services:
   cells:
     image: pydio/cells:latest
     restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
     environment:
       - CELLS_SITE_BIND=0.0.0.0:8080
       - CELLS_SITE_EXTERNAL=https://$HOST
@@ -13,6 +16,7 @@ services:
       - CELLS_ADMIN_PWD=${CELLS_ADMIN_PWD}
       - MYSQL_USER_LOGIN=pydio
       - MYSQL_USER_PWD=${MYSQL_PASSWORD}
+      - DB_HOST=mysql
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cellsdir:/var/cells
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/cells/data
@@ -33,6 +37,10 @@ services:
   mysql:
     image: mysql:8
     restart: unless-stopped
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+        timeout: 20s
+        retries: 10
     environment:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
       MYSQL_DATABASE: cells
