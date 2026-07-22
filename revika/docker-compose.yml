@@ -29,7 +29,7 @@ services:
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
-      - "homepage.href=https://$HOST"
+      - "homepage.href=https://$HOST/status"
       - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
