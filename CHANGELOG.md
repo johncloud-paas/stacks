@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added reika ([6893b27](https://github.com/johncloud-paas/stacks/commit/6893b27a04a8332014d360ae195f704e0a15b3a8) by Yann de Thé).
 - Added pydio ([f4bb7cf](https://github.com/johncloud-paas/stacks/commit/f4bb7cf8a97c25f832af62bbc52843b516ada8a9) by Yann de The).
 - Added mysterium node ([546280f](https://github.com/johncloud-paas/stacks/commit/546280ffacfcf39cb4baed5a2542cdbe83317a07) by Yann de The).
 - Added jumpserver ([7b9483c](https://github.com/johncloud-paas/stacks/commit/7b9483cfe2ba9e20c193412f5b51e7fc78c459d2) by Yann de The).
