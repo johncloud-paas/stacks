@@ -11,21 +11,23 @@ services:
       - -listen=/ip4/0.0.0.0/tcp/4001
       - -mdns=false
       - -repair-interval=${REPAIR_INTERVAL:-1h}
+      - -bootstrap
+      - $SEED_ADDR
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9096/healthz/"]
-      interval: 2m
-      timeout: 10s
-      retries: 3
-      start_period: 30s
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
     labels:
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
-      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=9096
+      - pangolin.proxy-resources.$PANGOLIN_RESOURCE_NAME.name=$PANGOLIN_RESOURCE_NAME
+      - pangolin.proxy-resources.$PANGOLIN_RESOURCE_NAME.full-domain=$HOST
+      - pangolin.proxy-resources.$PANGOLIN_RESOURCE_NAME.protocol=http
+      - pangolin.proxy-resources.$PANGOLIN_RESOURCE_NAME.ssl=true
+      - pangolin.proxy-resources.$PANGOLIN_RESOURCE_NAME.auth.sso-enabled=true
+      - pangolin.proxy-resources.$PANGOLIN_RESOURCE_NAME.auth.sso-roles[0]=Member
+      - pangolin.proxy-resources.$PANGOLIN_RESOURCE_NAME.targets[0].method=http
+      - pangolin.proxy-resources.$PANGOLIN_RESOURCE_NAME.targets[0].port=9096
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
