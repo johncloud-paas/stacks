@@ -11,8 +11,8 @@ services:
       - -listen=/ip4/0.0.0.0/tcp/4001
       - -mdns=false
       - -repair-interval=${REPAIR_INTERVAL:-1h}
-      - -bootstrap
-      - $SEED_ADDR
+      # - -bootstrap
+      # - $SEED_ADDR
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
       interval: 15s
