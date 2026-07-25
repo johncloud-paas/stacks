@@ -1,0 +1,22 @@
+services:
+  node:
+    restart: unless-stopped
+    image: ghcr.io/ydethe/revika-node:latest
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
+    ports:
+      - "4001:4001"
+    command:
+      - -data=/data
+      - -listen=/ip4/0.0.0.0/tcp/4001
+      - -mdns=false
+      - -repair-interval=${REPAIR_INTERVAL:-1h}
+      - -bootstrap
+      - $SEED_ADDR
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
