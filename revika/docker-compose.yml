@@ -1,3 +1,6 @@
+# This is the file for the **seed** node
+# Use it only for the first node of your cluster, which will be used to bootstrap the other nodes.
+
 services:
   node:
     restart: unless-stopped
@@ -5,10 +8,10 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
     ports:
-      - "4001:4001"
+      - "${REVIKA_PORT:-4001}:${REVIKA_PORT:-4001}"
     command:
       - -data=/data
-      - -listen=/ip4/0.0.0.0/tcp/4001
+      - -listen=/ip4/0.0.0.0/tcp/${REVIKA_PORT:-4001}
       - -repair=true
       - -repair-interval=${REPAIR_INTERVAL:-1h}
       - -pow-difficulty=$POW_DIFFICULTY
@@ -23,8 +26,6 @@ services:
       - -rebalance=true
       - -rebalance-interval=$REBALANCE_INTERVAL
       - -rebalance-threshold=0.1
-      # - -bootstrap
-      # - $SEED_ADDR
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
       interval: 15s
