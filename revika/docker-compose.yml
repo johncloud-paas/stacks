@@ -9,11 +9,20 @@ services:
     command:
       - -data=/data
       - -listen=/ip4/0.0.0.0/tcp/4001
-      - -mdns=false
+      - -repair=true
       - -repair-interval=${REPAIR_INTERVAL:-1h}
       - -pow-difficulty=$POW_DIFFICULTY
       - -pow-puzzle=argon2id
       - -public-ip=$PUBLIC_IP
+      - -advertise=true
+      - -capacity=$CAPACITY
+      - -log-format=json
+      - -log-level=$LOGLEVEL
+      - -metrics=:9096
+      - -quota=$STORAGE_QUOTA
+      - -rebalance=true
+      - -rebalance-interval=$REBALANCE_INTERVAL
+      - -rebalance-threshold=0.1
       # - -bootstrap
       # - $SEED_ADDR
     healthcheck:
