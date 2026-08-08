@@ -25,6 +25,7 @@ services:
       - -rebalance=true
       - -rebalance-interval=$REBALANCE_INTERVAL
       - -rebalance-threshold=0.1
+      - -geoip=ip-api 
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
       interval: 15s

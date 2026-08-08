@@ -19,6 +19,7 @@ services:
       - -log-level=$LOGLEVEL
       - -metrics=:9096
       - -quota=$STORAGE_QUOTA
+      - -geoip=ip-api 
       - -bootstrap
       - $SEED_ADDR
     healthcheck:
