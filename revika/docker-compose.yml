@@ -7,6 +7,7 @@ services:
     image: ghcr.io/ydethe/revika-node:latest
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
+      - $JOHNCLOUD_ROOT/traefik/GeoLite2:/GeoLite2:ro
     ports:
       - "${REVIKA_PORT:-4001}:${REVIKA_PORT:-4001}"
     command:
@@ -25,7 +26,7 @@ services:
       - -rebalance=true
       - -rebalance-interval=$REBALANCE_INTERVAL
       - -rebalance-threshold=0.1
-      - -geoip=ip-api 
+      - -geoip=/GeoLite2/GeoLite2-City.mmdb
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
       interval: 15s
