@@ -12,7 +12,6 @@ services:
     command:
       - -data=/data
       - -listen=/ip4/0.0.0.0/tcp/${REVIKA_PORT:-4001}
-      - -public-ip=$PUBLIC_IP
       - -advertise=true
       - -capacity=$CAPACITY
       - -log-format=json
@@ -22,6 +21,8 @@ services:
       - -geoip=ip-api 
       - -bootstrap
       - $SEED_ADDR
+      - -repair-interval=$REPAIR_INTERVAL
+      - -rebalance-interval=$REBALANCE_INTERVAL
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
       interval: 15s

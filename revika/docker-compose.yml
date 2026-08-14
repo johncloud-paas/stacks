@@ -16,7 +16,6 @@ services:
       - -repair=true
       - -repair-interval=${REPAIR_INTERVAL:-1h}
       - -pow-difficulty=$POW_DIFFICULTY
-      - -public-ip=$PUBLIC_IP
       - -advertise=true
       - -capacity=$CAPACITY
       - -log-format=json
