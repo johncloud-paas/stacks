@@ -1,3 +1,6 @@
+# All new node that want to join the cluster shall use this file with the seed
+# given as env var
+
 services:
   node:
     restart: unless-stopped
@@ -5,14 +8,21 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
     ports:
-      - "4001:4001"
+      - "${REVIKA_PORT:-4001}:${REVIKA_PORT:-4001}"
     command:
       - -data=/data
-      - -listen=/ip4/0.0.0.0/tcp/4001
-      - -mdns=false
-      - -repair-interval=${REPAIR_INTERVAL:-1h}
+      - -listen=/ip4/0.0.0.0/tcp/${REVIKA_PORT:-4001}
+      - -advertise=true
+      - -capacity=$CAPACITY
+      - -log-format=json
+      - -log-level=$LOGLEVEL
+      - -metrics=:9096
+      - -quota=$STORAGE_QUOTA
+      - -geoip=ip-api 
       - -bootstrap
       - $SEED_ADDR
+      - -repair-interval=$REPAIR_INTERVAL
+      - -rebalance-interval=$REBALANCE_INTERVAL
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
       interval: 15s

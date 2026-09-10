@@ -1,18 +1,31 @@
+# This is the file for the **seed** node
+# Use it only for the first node of your cluster, which will be used to bootstrap the other nodes.
+
 services:
   node:
     restart: unless-stopped
     image: ghcr.io/ydethe/revika-node:latest
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data
+      - $JOHNCLOUD_ROOT/traefik/GeoLite2:/GeoLite2:ro
     ports:
-      - "4001:4001"
+      - "${REVIKA_PORT:-4001}:${REVIKA_PORT:-4001}"
     command:
       - -data=/data
-      - -listen=/ip4/0.0.0.0/tcp/4001
-      - -mdns=false
+      - -listen=/ip4/0.0.0.0/tcp/${REVIKA_PORT:-4001}
+      - -repair=true
       - -repair-interval=${REPAIR_INTERVAL:-1h}
-      # - -bootstrap
-      # - $SEED_ADDR
+      - -pow-difficulty=$POW_DIFFICULTY
+      - -advertise=true
+      - -capacity=$CAPACITY
+      - -log-format=json
+      - -log-level=$LOGLEVEL
+      - -metrics=:9096
+      - -quota=$STORAGE_QUOTA
+      - -rebalance=true
+      - -rebalance-interval=$REBALANCE_INTERVAL
+      - -rebalance-threshold=0.1
+      - -geoip=/GeoLite2/GeoLite2-City.mmdb
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9096/healthz"]
       interval: 15s
@@ -31,7 +44,7 @@ services:
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
-      - "homepage.href=https://$HOST/status"
+      - "homepage.href=https://$HOST/admin"
       - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
