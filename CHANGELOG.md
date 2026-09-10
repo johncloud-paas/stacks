@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added non seed node docker compose ([4c28472](https://github.com/johncloud-paas/stacks/commit/4c28472d7f9d1d3d4cb2ac799f516b226aea0af5) by Yann de Thé).
 - Added reika ([6893b27](https://github.com/johncloud-paas/stacks/commit/6893b27a04a8332014d360ae195f704e0a15b3a8) by Yann de Thé).
 - Added pydio ([f4bb7cf](https://github.com/johncloud-paas/stacks/commit/f4bb7cf8a97c25f832af62bbc52843b516ada8a9) by Yann de The).
 - Added mysterium node ([546280f](https://github.com/johncloud-paas/stacks/commit/546280ffacfcf39cb4baed5a2542cdbe83317a07) by Yann de The).

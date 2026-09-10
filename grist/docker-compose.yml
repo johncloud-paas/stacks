@@ -1,0 +1,60 @@
+services:
+  grist:
+    image: gristlabs/grist:latest
+    restart: unless-stopped
+    environment:
+      # The URL of given OIDC provider. Used for redirects, among other things.
+      GRIST_OIDC_IDP_ISSUER: ${OIDC_ISSUER_URL}
+      # Client ID, as configured with the OIDC provider.
+      GRIST_OIDC_IDP_CLIENT_ID: ${OIDC_CLIENT_ID}
+      # Client secret, as provided by the OIDC provider.
+      GRIST_OIDC_IDP_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      # The URL to redirect to with the OIDC provider to log out.
+      # Some OIDC providers will automatically configure this.
+      GRIST_OIDC_IDP_END_SESSION_ENDPOINT: ${OIDC_LOGOUT_URL}
+      # Allow self-signed certificates so this example behaves correctly.
+      # REMOVE THIS IF HOSTING ON THE INTERNET.
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+
+      # Forces Grist to only use a single team called 'Example'
+      GRIST_SINGLE_ORG: ${GRIST_SINGLE_ORG}   # alternatively, GRIST_ORG_IN_PATH: "true" for multi-team operation
+      # Force users to login (disable anonymous access)
+      GRIST_FORCE_LOGIN: true
+      # Base URL Grist redirects to when navigating. Change this to your domain.
+      APP_HOME_URL: https://${HOST}
+      # Default email for the "Admin" account
+      GRIST_DEFAULT_EMAIL: ${DEFAULT_ADMIN_EMAIL}
+      GRIST_ACTIVATION: ${GRIST_ACTIVATION}
+    volumes:
+      - ${JOHNCLOUD_ROOT}/$COMPOSE_PROJECT_NAME/data:/persist
+    labels:
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=8484
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.enabled=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.hostname=$COMPOSE_PROJECT_NAME-grist-1
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.port=8484
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.path=/status
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.method=GET
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.status=200
+
+      # Page de maintenance en mode automatique
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.maintenance.enabled=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.maintenance.type=automatic
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.maintenance.title=Maintenance en cours
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.maintenance.message=Le service est temporairement indisponible.
+
+      - "homepage.group=${HOME_GROUP}"
+      - "homepage.name=${HOME_NAME}"
+      - "homepage.icon=${HOME_ICON}"
+      - "homepage.href=https://${HOST}"
+      - "homepage.description=${HOME_DESCRIPTION}"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
