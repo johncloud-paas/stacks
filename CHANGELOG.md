@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added grist ([2bd681e](https://github.com/johncloud-paas/stacks/commit/2bd681ef1a48d14518383a46fc4077c16c2f77bb) by Yann de The).
+- Added rebalance ([d6a3ca1](https://github.com/johncloud-paas/stacks/commit/d6a3ca143efa5c24e819ad9f03ad1c753a015ba8) by Yann de Thé).
+- Added GeoLite dataa ([6f6029f](https://github.com/johncloud-paas/stacks/commit/6f6029f349996c0e5d3453d45832677ac105aa7d) by Yann de Thé).
+- Added examples of revika-ctl device ([16f8e96](https://github.com/johncloud-paas/stacks/commit/16f8e96a671cb243fcadc729c1b8f3979236735a) by Yann de Thé).
+- Added REVIKA_PORT ([5ad37d1](https://github.com/johncloud-paas/stacks/commit/5ad37d1de40926e7c87a312d64ba1c5966970e17) by Yann de Thé).
+- Added PUBLIC-IP ([9490d43](https://github.com/johncloud-paas/stacks/commit/9490d432be926785834233915c6f1cdfaea1936f) by Yann de Thé).
+- Added PoW difficulty ([b110de6](https://github.com/johncloud-paas/stacks/commit/b110de65261d4df549e34de7eeeba1f261d6bfc3) by Yann de Thé).
 - Added non seed node docker compose ([4c28472](https://github.com/johncloud-paas/stacks/commit/4c28472d7f9d1d3d4cb2ac799f516b226aea0af5) by Yann de Thé).
 - Added reika ([6893b27](https://github.com/johncloud-paas/stacks/commit/6893b27a04a8332014d360ae195f704e0a15b3a8) by Yann de Thé).
 - Added pydio ([f4bb7cf](https://github.com/johncloud-paas/stacks/commit/f4bb7cf8a97c25f832af62bbc52843b516ada8a9) by Yann de The).
@@ -170,6 +177,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 
+- Fixed non seed nodes ([0c8d595](https://github.com/johncloud-paas/stacks/commit/0c8d595eca00bb2077e29edb4a02ceaaf7f0333d) by Yann de Thé).
 - Fixed homebox ([03b33cf](https://github.com/johncloud-paas/stacks/commit/03b33cfc1801f8b2e3d1a7fffdbd10d31c613f15) by Yann de The).
 - Fixed penpot ([ddaa039](https://github.com/johncloud-paas/stacks/commit/ddaa0391e2d7bfe57b8b0e9e72bce1cebad77e43) by Yann de The).
 - Fixed dockhand persistent storage ([07b6021](https://github.com/johncloud-paas/stacks/commit/07b6021e252f3574f8807dc73ce28c87528be0ee) by Yann de The).
@@ -204,11 +212,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- Changed shortcut target ([70b0f67](https://github.com/johncloud-paas/stacks/commit/70b0f67de5fd139c27bb109d8b8d9836f2670fa9) by Yann de Thé).
 - Changed duplicat isource dir in rw mode to allow retore... ([23bebb3](https://github.com/johncloud-paas/stacks/commit/23bebb34cb8a2b8db45f698c707a8261e1ae6389) by Yann de The).
 - Changed wordpress db container name ([912559c](https://github.com/johncloud-paas/stacks/commit/912559c4ed70ec084e4f73eaab49c9e26531fd7c) by Yann de The).
 
 ### Removed
 
+- Removed pow-puzzle flag ([c3838a0](https://github.com/johncloud-paas/stacks/commit/c3838a0dc1e94072f26ba09b48496835e2f39b79) by Yann de Thé).
 - Removed SSO on whoami ([c5b4e74](https://github.com/johncloud-paas/stacks/commit/c5b4e74303ef5d1fb870e4b9f8e39ebb8cffe64e) by Yann de The).
 - Removed authentik ([874e40c](https://github.com/johncloud-paas/stacks/commit/874e40ca1ceb7205e232c4e7dde54b7a97a75e6e) by Yann de The).
 - Removed vaultwarden SSO ([17ac868](https://github.com/johncloud-paas/stacks/commit/17ac868bcd2195d028fe1d558479ee9d65027122) by Yann de The).

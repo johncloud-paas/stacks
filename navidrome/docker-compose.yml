@@ -1,0 +1,29 @@
+# This is the file for the **seed** node
+# Use it only for the first node of your cluster, which will be used to bootstrap the other nodes.
+
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    user: 1000:1000 # must own the data folder and be able to read music folder(s). See Permissions below
+    # ports:
+    #   - "4533:4533"
+    restart: unless-stopped
+    # environment:
+    #   # Optional: put your config options customization here. Examples:
+    #   ND_LOGLEVEL: debug
+    volumes:
+      - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data"
+      - "$MUSIC_PATH:/music:ro"
+    labels:
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=4533
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
