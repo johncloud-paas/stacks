@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Added navidrome ([b21ca95](https://github.com/johncloud-paas/stacks/commit/b21ca952a03dc44cf4e753d69ad422ea0f1aeca1) by Yann de The).
 - Added grist ([2bd681e](https://github.com/johncloud-paas/stacks/commit/2bd681ef1a48d14518383a46fc4077c16c2f77bb) by Yann de The).
 - Added rebalance ([d6a3ca1](https://github.com/johncloud-paas/stacks/commit/d6a3ca143efa5c24e819ad9f03ad1c753a015ba8) by Yann de Thé).
 - Added GeoLite dataa ([6f6029f](https://github.com/johncloud-paas/stacks/commit/6f6029f349996c0e5d3453d45832677ac105aa7d) by Yann de Thé).

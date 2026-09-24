@@ -21,6 +21,11 @@ services:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=4533
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://${HOST}/web/index.html"
+      - "homepage.description=$HOME_DESCRIPTION"
 
 networks:
   default:
