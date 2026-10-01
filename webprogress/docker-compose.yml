@@ -16,7 +16,7 @@ services:
 
       # --- Server ---
       # Public base URL of this server; used to build the /auth redirect URI.
-      WEBPROGRESS_BASE_URL: "${WEBPROGRESS_BASE_URL:-http://127.0.0.1:8775}"
+      WEBPROGRESS_BASE_URL: "https://${HOST}"
       # Strong random value in production, e.g. `openssl rand -hex 32`.
       WEBPROGRESS_SESSION_SECRET: "${WEBPROGRESS_SESSION_SECRET:-change-me}"
       # SQLite path inside the container; kept on a volume for persistence.
