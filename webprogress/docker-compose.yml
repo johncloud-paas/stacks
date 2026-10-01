@@ -3,7 +3,7 @@
 
 services:
   webprogress:
-    image: ghcr.io/ydethe/webprogress:latest
+    image: ghcr.io/ydethe/webprogress-server:latest
     # ports:
     #   - "8775:8775"
     restart: unless-stopped
