@@ -1,12 +1,18 @@
-version: '3.1'
-
 services:
   wordpress:
     image: bitnami/wordpress
     restart: unless-stopped
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://localhost:8080/wp-login.php || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     environment:
+      WORDPRESS_HOSTNAME: "${HOST}"
       WORDPRESS_USERNAME: "${WORDPRESS_USERNAME}"
       WORDPRESS_PASSWORD: "${WORDPRESS_PASSWORD}"
       WORDPRESS_DATABASE_HOST: "${COMPOSE_PROJECT_NAME}-mysql-1"
@@ -16,10 +22,25 @@ services:
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/wordpress:/bitnami/wordpress
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=8080
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.enabled=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.hostname=$COMPOSE_PROJECT_NAME-wordpress-1
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.port=8080
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.path=/wp-login.php
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.method=GET
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].healthcheck.status=200
+
+      # Page de maintenance en mode automatique
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.maintenance.enabled=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.maintenance.type=automatic
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.maintenance.title=Maintenance en cours
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.maintenance.message=Le service est temporairement indisponible.
+      
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
@@ -34,6 +55,12 @@ services:
       MYSQL_USER: "${DB_USER}"
       MYSQL_PASSWORD: "${DB_PASSWORD}"
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_RANDOM_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/mysql
     labels:
