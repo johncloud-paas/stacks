@@ -25,7 +25,6 @@ services:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/lib/stalwart
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/logs:/var/log/stalwart/
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc:/etc/stalwart
-      # - $JOHNCLOUD_ROOT/traefik/certs/$HOST:/data/certs/$HOST:ro
     labels:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST

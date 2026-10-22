@@ -1,5 +1,11 @@
-Copy config.toml to `$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data/etc`
+To save emails in sqlite format (e.g. backup.sqlite):
 
-sudo docker exec stalwart-mailserver-1 stalwart-cli -u http://192.168.203.xxx:8080 -c admin:xxx server delete-config security.ip-blocked.192.168.203.xxx
-sudo docker exec stalwart-mailserver-1 stalwart-cli -u http://192.168.203.xxx:8080 -c admin:xxx server reload-config
+```bash
+vandelay import jmap --url https://mail.domain.tld --auth-basic admin --auth-password 'yourpassword' --account-name foo@domain.tld --max-retries 5 backup.sqlite
+```
 
+To restore emails from sqlite format 
+
+```bash
+vandelay export --url https://mail.domain.tld --auth-basic foo@domain.tld --account-name foo@domain.tld  backup.sqlite
+```

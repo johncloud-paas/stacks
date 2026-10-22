@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/qdrant_data:/qdrant/storage
-      - $JOHNCLOUD_ROOT/traefik/certs/$HOST:/tls:ro
+      # - $JOHNCLOUD_ROOT/traefik/certs/$HOST:/tls:ro
     environment:
       - QDRANT__SERVICE__API_KEY=$QDRANT_API_KEY
       - QDRANT__SERVICE__ENABLE_TLS=true
