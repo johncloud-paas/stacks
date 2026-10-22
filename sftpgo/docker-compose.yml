@@ -2,7 +2,6 @@ services:
   app:
     image: drakkan/sftpgo:latest
     restart: unless-stopped
-    user: $UID:$GID
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/srv/sftpgo/data
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/home:/var/lib/sftpgo
