@@ -23,7 +23,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/lib/stalwart
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/logs:/var/log/stalwart/
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/logs:/var/log/stalwart
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc:/etc/stalwart
     labels:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
