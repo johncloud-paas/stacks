@@ -1,7 +1,7 @@
 services:
   tubearchivist:
-    restart: unless-stopped
     image: bbilly1/tubearchivist
+    restart: unless-stopped
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/media:/youtube
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/cache:/cache
@@ -40,8 +40,6 @@ services:
   archivist-redis:
     image: redis
     restart: unless-stopped
-    # expose:
-    #   - "6379"
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis:/data
   
@@ -54,15 +52,9 @@ services:
       - "xpack.security.enabled=true"
       - "discovery.type=single-node"
       - "path.repo=/usr/share/elasticsearch/data/snapshot"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/es:/usr/share/elasticsearch/data    # check for permission error when using bind mount, see readme
-    # expose:
-    #   - "9200"
-
+    
 networks:
   default:
     external: true
