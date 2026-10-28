@@ -6,3 +6,5 @@ containerssh/config.yaml
 teleport/teleport.yaml
 .cache_ggshield
 *.sqlite*
+colnetdesign.env
+mdn2023.env
