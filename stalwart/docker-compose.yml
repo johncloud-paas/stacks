@@ -85,7 +85,7 @@ services:
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.targets[0].port=3000
 
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.targets[0].healthcheck.enabled=true
-      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.targets[0].healthcheck.hostname=${COMPOSE_PROJECT_NAME}-mailserver-1
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.targets[0].healthcheck.hostname=${COMPOSE_PROJECT_NAME}-webmail-1
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.targets[0].healthcheck.port=3000
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.targets[0].healthcheck.path=/api/health
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.targets[0].healthcheck.method=GET
