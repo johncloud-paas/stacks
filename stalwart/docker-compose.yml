@@ -58,8 +58,13 @@ services:
     environment:
       HOSTNAME: "0.0.0.0" # Use "::" for IPv6
       PORT: "3000"
-      # Stalwart's public HTTPS address. Browsers talk JMAP to it directly.
-      JMAP_SERVER_URL: https://$WEBMAIL_SUBDOMAIN.$HOST
+      SESSION_SECRET: $SESSION_SECRET
+      SETTINGS_SYNC_ENABLED: "true"
+    volumes:
+      - $JOHNCLOUD_ROOT/${COMPOSE_PROJECT_NAME}_wm/settings:/app/data/settings    # encrypted user settings
+      - $JOHNCLOUD_ROOT/${COMPOSE_PROJECT_NAME}_wm/config:/app/data/admin         # wizard / admin-managed config
+      - $JOHNCLOUD_ROOT/${COMPOSE_PROJECT_NAME}_wm/state:/app/data/admin-state    # audit log, login timestamps
+      - $JOHNCLOUD_ROOT/${COMPOSE_PROJECT_NAME}_wm/telemetry:/app/data/telemetry  # instance_id + consent
     depends_on:
       - mailserver
     healthcheck:
