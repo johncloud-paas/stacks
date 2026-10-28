@@ -55,6 +55,7 @@ services:
   webmail:
     image: ghcr.io/bulwarkmail/webmail:latest
     restart: unless-stopped
+    user: "1000:1000"
     environment:
       HOSTNAME: "0.0.0.0" # Use "::" for IPv6
       PORT: "3000"
