@@ -3,7 +3,7 @@ services:
     # swaks --to test-xxxxxxx@srv1.mail-tester.com --from admin@$HOST --server $HOST --auth-user admin --protocol SSMTP --port 465 --auth-password xxx
     image: stalwartlabs/stalwart:v0.16
     restart: unless-stopped
-    hostname: $HOST
+    hostname: $SERVER_SUBDOMAIN.$HOST
     ports:
       - '25:25'
       - '587:587'
@@ -17,7 +17,7 @@ services:
       DISABLE_CLAMAV: $DISABLE_CLAMAV
       DISABLE_RSPAMD: $DISABLE_RSPAMD
       DISABLE_ROUNDCUBE: $DISABLE_ROUNDCUBE
-      STALWART_PUBLIC_URL: https://$HOST
+      STALWART_PUBLIC_URL: https://$SERVER_SUBDOMAIN.$HOST
       # STALWART_RECOVERY_MODE: 1
       # STALWART_RECOVERY_ADMIN: admin:yourpassword
     volumes:
@@ -27,7 +27,7 @@ services:
       - $JOHNCLOUD_ROOT/${COMPOSE_PROJECT_NAME}/etc:/etc/stalwart
     labels:
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.name=${COMPOSE_PROJECT_NAME}
-      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.full-domain=$HOST
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.full-domain=$SERVER_SUBDOMAIN.$HOST
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.protocol=http
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.ssl=true
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}.targets[0].method=http
@@ -49,7 +49,7 @@ services:
       - homepage.group=$HOME_GROUP
       - homepage.name=$HOME_NAME
       - homepage.icon=$HOME_ICON
-      - homepage.href=https://$HOST
+      - homepage.href=https://$SERVER_SUBDOMAIN.$HOST
       - homepage.description=$HOME_DESCRIPTION
 
   webmail:
@@ -59,7 +59,7 @@ services:
       HOSTNAME: "0.0.0.0" # Use "::" for IPv6
       PORT: "3000"
       # Stalwart's public HTTPS address. Browsers talk JMAP to it directly.
-      JMAP_SERVER_URL: https://$HOST
+      JMAP_SERVER_URL: https://$WEBMAIL_SUBDOMAIN.$HOST
     depends_on:
       - mailserver
     healthcheck:
@@ -78,7 +78,7 @@ services:
       start_period: 10s
     labels:
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.name=${COMPOSE_PROJECT_NAME}_webmail
-      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.full-domain=$HOST
+      - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.full-domain=$WEBMAIL_SUBDOMAIN.$HOST
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.protocol=http
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.ssl=true
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.targets[0].method=http
@@ -98,9 +98,9 @@ services:
       - pangolin.public-resources.${COMPOSE_PROJECT_NAME}_wm.maintenance.message=Le service est temporairement indisponible.
 
       - homepage.group=$HOME_GROUP
-      - homepage.name=$HOME_NAME
+      - homepage.name=Bulwark
       - homepage.icon=$HOME_ICON
-      - homepage.href=https://$HOST
+      - homepage.href=https://$WEBMAIL_SUBDOMAIN.$HOST
       - homepage.description=$HOME_DESCRIPTION
 
 networks:
