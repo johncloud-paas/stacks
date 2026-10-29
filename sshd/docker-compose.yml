@@ -13,8 +13,8 @@ services:
       - "$EXPOSED_PORT:22"
     volumes:
       - ./scripts:/scripts:ro
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/config
-    
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/etc:/etc/ssh
+
 networks:
   default:
     external: true
