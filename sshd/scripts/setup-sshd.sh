@@ -58,7 +58,6 @@ set_option PermitRootLogin no
 set_option AuthorizedKeysFile none
 set_option AuthorizedKeysCommand "/usr/local/bin/opkssh verify %u %k %t"
 set_option AuthorizedKeysCommandUser opksshuser
-set_option AuthorizedPrincipalsFile /etc/opk/principals/%u
 
 # 6. Create opksshuser (dedicated unprivileged user for AuthorizedKeysCommand)
 if ! id opksshuser >/dev/null 2>&1; then
@@ -77,12 +76,6 @@ chmod 640 "${POLICY_FILE}"
 printf '%s %s %s\n' "${OIDC_ISSUER}" "${CLIENT_ID}" "${KEY_EXPIRATION}" > /etc/opk/providers
 chown root:opksshuser /etc/opk/providers
 chmod 640 /etc/opk/providers
-
-# Write the authorized principals file: maps SSH username → authorized OIDC email.
-# sshd uses this to accept opkssh certificates whose principal is the user's email.
-mkdir -p /etc/opk/principals
-echo "${REMOTE_USER_EMAIL}" > "/etc/opk/principals/${USER_NAME}"
-chmod 644 "/etc/opk/principals/${USER_NAME}"
 
 # Create log file with correct ownership so opksshuser can write to it
 touch /var/log/opkssh.log
