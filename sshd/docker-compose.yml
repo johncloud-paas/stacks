@@ -1,6 +1,6 @@
 services:
   sshd:
-    image: alpine:3.20
+    image: debian:12-slim
     command: ["/bin/sh", "/scripts/setup-sshd.sh"]
     restart: unless-stopped
     environment:

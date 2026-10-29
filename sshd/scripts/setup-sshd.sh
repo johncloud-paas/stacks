@@ -2,7 +2,7 @@
 set -eu
 
 USER_NAME="${SSH_USER:-sshuser}"
-OPKSSH_VERSION="${OPKSSH_VERSION:-0.4.0}"
+OPKSSH_VERSION="${OPKSSH_VERSION:-latest}"
 SSHD_CONFIG="/etc/ssh/sshd_config"
 POLICY_FILE="/etc/opk/auth_id"
 CLIENT_ID="${CLIENT_ID:-}"
@@ -11,7 +11,9 @@ HOME_DIR="/home/${USER_NAME}"
 
 # 1. Install openssh only if sshd is missing
 if ! command -v sshd >/dev/null 2>&1; then
-  apk add --no-cache openssh
+  DEBIAN_FRONTEND=noninteractive apt-get update -qq
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-server
+  rm -rf /var/lib/apt/lists/*
 fi
 
 # 2. Install opkssh only if missing
@@ -22,19 +24,25 @@ if ! command -v opkssh >/dev/null 2>&1; then
     aarch64) ARCH=arm64 ;;
     *) echo "error: unsupported arch ${ARCH}" >&2; exit 1 ;;
   esac
-  # gcompat provides the glibc loader shim (/lib64/ld-linux-x86-64.so.2) so
-  # the glibc-linked opkssh binary runs on Alpine (musl).
-  apk add --no-cache curl gcompat
+  if ! command -v curl >/dev/null 2>&1; then
+    DEBIAN_FRONTEND=noninteractive apt-get update -qq
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends curl ca-certificates
+    rm -rf /var/lib/apt/lists/*
+  fi
+  if [ "${OPKSSH_VERSION}" = "latest" ]; then
+    OPKSSH_VERSION=$(curl -fsSL "https://api.github.com/repos/openpubkey/opkssh/releases/latest" \
+      | grep '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')
+    echo "Resolved opkssh latest -> ${OPKSSH_VERSION}"
+  fi
   curl -fsSL \
-    "https://github.com/openpubkey/opkssh/releases/download/v${OPKSSH_VERSION}/opkssh-linux-${ARCH}" \
+    "https://github.com/openpubkey/opkssh/releases/download/${OPKSSH_VERSION}/opkssh-linux-${ARCH}" \
     -o /usr/local/bin/opkssh
   chmod 755 /usr/local/bin/opkssh
 fi
 
-# 3. Create the user only if it doesn't exist; unlock the account so sshd
-#    allows public-key auth (adduser -D leaves the password locked with '!').
+# 3. Create the user only if it doesn't exist
 if ! id "${USER_NAME}" >/dev/null 2>&1; then
-  adduser -D "${USER_NAME}"
+  adduser --disabled-password --gecos "" "${USER_NAME}"
 fi
 passwd -u "${USER_NAME}" 2>/dev/null || true
 
@@ -61,7 +69,7 @@ set_option AuthorizedKeysCommandUser opksshuser
 
 # 6. Create opksshuser (dedicated unprivileged user for AuthorizedKeysCommand)
 if ! id opksshuser >/dev/null 2>&1; then
-  adduser -D -H -s /sbin/nologin opksshuser
+  adduser --disabled-password --gecos "" --no-create-home --shell /usr/sbin/nologin opksshuser
 fi
 
 # 7. Write opkssh policy from env vars, then set group ownership for opksshuser
