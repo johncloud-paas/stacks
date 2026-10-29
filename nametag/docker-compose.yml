@@ -1,0 +1,65 @@
+# https://github.com/mattogodoy/nametag?tab=readme-ov-file#self-hosting-with-docker
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nametag
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: nametag_db
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/redis:/data
+
+  app:
+    image: ghcr.io/mattogodoy/nametag:latest
+    restart: unless-stopped
+    # ports:
+    #   - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://nametag:${DB_PASSWORD}@db:5432/nametag_db
+      - NEXTAUTH_URL=https://${HOST}
+      - NEXT_PUBLIC_APP_URL=https://${HOST}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - CRON_SECRET=${CRON_SECRET}
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - db
+      - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
+      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
+      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=3000"
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+  cron:
+    image: alpine:3.19
+    restart: unless-stopped
+    command: >
+      sh -c "
+        echo '0 8 * * * wget -q -O - --header=\"Authorization: Bearer '\"$$CRON_SECRET\"'\" http://app:3000/api/cron/send-reminders > /proc/1/fd/1 2>&1' > /etc/crontabs/root &&
+        crond -f -l 2
+      "
+    environment:
+      - CRON_SECRET=${CRON_SECRET}
+    depends_on:
+      - app
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+

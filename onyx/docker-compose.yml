@@ -1,0 +1,299 @@
+services:
+  relational_db:
+    image: postgres:15.2-alpine
+    shm_size: 1g
+    command: -c 'max_connections=250'
+    restart: unless-stopped
+    # POSTGRES_USER and POSTGRES_PASSWORD should be set in .env file
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db_volume:/var/lib/postgresql/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "6"
+
+  cache:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    # ports:
+    #   - "6379:6379"
+    # docker silently mounts /data even without an explicit volume mount, which enables
+    # persistence. explicitly setting save and appendonly forces ephemeral behavior.
+    command: redis-server --save "" --appendonly no
+    # Use tmpfs to prevent creation of anonymous volumes for /data
+    tmpfs:
+      - /data
+
+  minio:
+    image: minio/minio:RELEASE.2025-07-23T15-54-02Z-cpuv1
+    restart: unless-stopped
+    environment:
+      MC_HOST_local: http://localhost:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_DEFAULT_BUCKETS: ${S3_FILE_STORE_BUCKET_NAME}
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.entryPoints=websecure
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.rule=Host(`minio.$HOST`)
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.tls.certresolver=letsencrypt
+      - traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.tls=true
+      - "traefik.http.routers.${COMPOSE_PROJECT_NAME}_minio.service=${COMPOSE_PROJECT_NAME}_minio"
+      - traefik.http.services.${COMPOSE_PROJECT_NAME}_minio.loadbalancer.server.port=9001
+
+  inference_model_server:
+    image: onyxdotapp/onyx-model-server:${IMAGE_TAG:-latest}
+    command: >
+      /bin/sh -c "if [ \"${DISABLE_MODEL_SERVER:-}\" = \"True\" ] || [ \"${DISABLE_MODEL_SERVER:-}\" = \"true\" ]; then
+        echo 'Skipping service...';
+        exit 0;
+      else
+        exec uvicorn model_server.main:app --host 0.0.0.0 --port 9000;
+      fi"
+    restart: unless-stopped
+    environment:
+      - MIN_THREADS_ML_MODELS=${MIN_THREADS_ML_MODELS:-}
+      # Set to debug to get more fine-grained logs
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      # Not necessary, this is just to reduce download time during startup
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/model_cache_huggingface:/app/.cache/huggingface/
+      # optional, only for debugging purposes
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/inference_model_server_logs:/var/log/onyx
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "6"
+
+  # This container name cannot have an underscore in it due to Vespa expectations of the URL
+  index:
+    # image: vespaengine/vespa:8.609.39
+    # Using a generic x86 container image
+    image: vespaengine/vespa-generic-intel-x86_64
+    restart: unless-stopped
+    environment:
+      - VESPA_SKIP_UPGRADE_CHECK=true
+    # ports:
+    #   - "19071:19071"
+    #   - "8081:8081"
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/vespa_volume:/opt/vespa/var
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "6"
+
+  api_server:
+    image: onyxdotapp/onyx-backend:${IMAGE_TAG:-latest}
+    command: >
+      /bin/sh -c "
+      alembic upgrade head &&
+      echo \"Starting Onyx Api Server\" &&
+      uvicorn onyx.main:app --host 0.0.0.0 --port 8080"
+    depends_on:
+      - relational_db
+      - index
+      - cache
+      - minio
+      - inference_model_server
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    environment:
+      - WEB_DOMAIN=https://$HOST
+      - AUTH_TYPE=${AUTH_TYPE:-oidc}
+      - OPENID_CONFIG_URL=$OPENID_CONFIG_URL
+      - OAUTH_CLIENT_ID=$OAUTH_CLIENT_ID
+      - OAUTH_CLIENT_SECRET=$OAUTH_CLIENT_SECRET
+      - POSTGRES_HOST=relational_db
+      - VESPA_HOST=index
+      - REDIS_HOST=cache
+      - MODEL_SERVER_HOST=inference_model_server
+      - USE_IAM_AUTH=false
+      - AWS_REGION_NAME=${AWS_REGION_NAME-}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY-}
+      # MinIO configuration
+      - S3_ENDPOINT_URL=${S3_ENDPOINT_URL:-http://minio:9000}
+      - S3_FILE_STORE_BUCKET_NAME=$S3_FILE_STORE_BUCKET_NAME
+      - S3_AWS_ACCESS_KEY_ID=${S3_AWS_ACCESS_KEY_ID}
+      - S3_AWS_SECRET_ACCESS_KEY=${S3_AWS_SECRET_ACCESS_KEY}
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "6"
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/api_server_logs:/var/log/onyx
+
+  indexing_model_server:
+    image: onyxdotapp/onyx-model-server:${IMAGE_TAG:-latest}
+    command: >
+      /bin/sh -c "if [ \"${DISABLE_MODEL_SERVER:-}\" = \"True\" ] || [ \"${DISABLE_MODEL_SERVER:-}\" = \"true\" ]; then
+        echo 'Skipping service...';
+        exit 0;
+      else
+        exec uvicorn model_server.main:app --host 0.0.0.0 --port 9000;
+      fi"
+    restart: unless-stopped
+    environment:
+      - MIN_THREADS_ML_MODELS=${MIN_THREADS_ML_MODELS:-}
+      - INDEXING_ONLY=True
+      # Set to debug to get more fine-grained logs
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - VESPA_SEARCHER_THREADS=${VESPA_SEARCHER_THREADS:-1}
+    volumes:
+      # Not necessary, this is just to reduce download time during startup
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/indexing_huggingface_model_cache:/app/.cache/huggingface/
+      # optional, only for debugging purposes
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/indexing_model_server_logs:/var/log/onyx
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "6"
+
+  backend:
+    image: onyxdotapp/onyx-backend:${IMAGE_TAG:-latest}
+    command: /app/scripts/supervisord_entrypoint.sh
+    user: "1000:1000"
+    # command: >
+    #   /bin/sh -c "
+    #   if [ -f /etc/ssl/certs/custom-ca.crt ]; then
+    #     update-ca-certificates;
+    #   fi &&
+    #   /app/scripts/supervisord_entrypoint.sh"
+    depends_on:
+      - relational_db
+      - index
+      - cache
+      - inference_model_server
+      - indexing_model_server
+    restart: unless-stopped
+    environment:
+      - WEB_DOMAIN=https://$HOST
+      - USE_LIGHTWEIGHT_BACKGROUND_WORKER=${USE_LIGHTWEIGHT_BACKGROUND_WORKER:-true}
+      - AUTH_TYPE=${AUTH_TYPE}
+      - POSTGRES_HOST=relational_db
+      - VESPA_HOST=index
+      - REDIS_HOST=cache
+      - MODEL_SERVER_HOST=inference_model_server
+      - INDEXING_MODEL_SERVER_HOST=${INDEXING_MODEL_SERVER_HOST:-indexing_model_server}
+      - USE_IAM_AUTH=false
+      - AWS_REGION_NAME=${AWS_REGION_NAME-}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID-}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY-}
+      # MinIO configuration
+      - S3_ENDPOINT_URL=${S3_ENDPOINT_URL:-http://minio:9000}
+      - S3_FILE_STORE_BUCKET_NAME=$S3_FILE_STORE_BUCKET_NAME
+      - S3_AWS_ACCESS_KEY_ID=${S3_AWS_ACCESS_KEY_ID}
+      - S3_AWS_SECRET_ACCESS_KEY=${S3_AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/background_logs:/var/log/onyx
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "6"
+    # Uncomment the following lines if you need to include a custom CA certificate
+    # This section enables the use of a custom CA certificate
+    # If present, the custom CA certificate is mounted as a volume
+    # The container checks for its existence and updates the system's CA certificates
+    # This allows for secure communication with services using custom SSL certificates
+    # volumes:
+    #   # Maps to the CA_CERT_PATH environment variable in the Dockerfile
+    #   - ${CA_CERT_PATH:-./custom-ca.crt}:/etc/ssl/certs/custom-ca.crt:ro
+
+  web_server:
+    image: onyxdotapp/onyx-web-server:${IMAGE_TAG:-latest}
+    depends_on:
+      - api_server
+    restart: unless-stopped
+    environment:
+      - WEB_DOMAIN=https://$HOST
+      - INTERNAL_URL=http://api_server:8080
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "6"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.entryPoints=websecure
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`)
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt
+      - traefik.http.routers.$COMPOSE_PROJECT_NAME.tls=true
+      - traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=3000
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST/"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+  # mcp_server:
+  #   image: onyxdotapp/onyx-backend:${IMAGE_TAG:-latest}
+  #   command: >
+  #     /bin/sh -c "if [ \"${MCP_SERVER_ENABLED:-}\" != \"True\" ] && [ \"${MCP_SERVER_ENABLED:-}\" != \"true\" ]; then
+  #       echo 'MCP server is disabled (MCP_SERVER_ENABLED=false), skipping...';
+  #       exit 0;
+  #     else
+  #       exec python -m onyx.mcp_server_main;
+  #     fi"
+  #   depends_on:
+  #     - relational_db
+  #     - cache
+  #   restart: "no"
+  #   environment:
+  #     - POSTGRES_HOST=relational_db
+  #     - REDIS_HOST=cache
+  #     # MCP Server Configuration
+  #     - MCP_SERVER_ENABLED=${MCP_SERVER_ENABLED:-false}
+  #     - MCP_SERVER_PORT=${MCP_SERVER_PORT:-8090}
+  #     - MCP_SERVER_CORS_ORIGINS=${MCP_SERVER_CORS_ORIGINS:-}
+  #     - API_SERVER_PROTOCOL=${API_SERVER_PROTOCOL:-http}
+  #     - API_SERVER_HOST=${API_SERVER_HOST:-api_server}
+  #     - API_SERVER_PORT=${API_SERVER_PORT:-8080}
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "50m"
+  #       max-file: "6"
+  #   volumes:
+  #     - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/mcp_server_logs:/var/log/onyx
+
+  # code-interpreter:
+  #   image: onyxdotapp/code-interpreter:${CODE_INTERPRETER_IMAGE_TAG:-latest}
+  #   entrypoint: ["/bin/bash", "-c"]
+  #   command: >
+  #     "
+  #     if [ \"$${CODE_INTERPRETER_BETA_ENABLED}\" = \"True\" ] || [ \"$${CODE_INTERPRETER_BETA_ENABLED}\" = \"true\" ]; then
+  #       exec bash ./entrypoint.sh code-interpreter-api;
+  #     else
+  #       echo 'Skipping code interpreter';
+  #       exec tail -f /dev/null;
+  #     fi
+  #     "
+  #   restart: unless-stopped
+  
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    

@@ -1,0 +1,8 @@
+# Pomerium will automatically obtain certificates from Let's Encrypt
+
+# Routes
+routes:
+  - from: https://verify.pomerium.johncloud.fr
+    to: http://verify:8000
+    pass_identity_headers: true
+    

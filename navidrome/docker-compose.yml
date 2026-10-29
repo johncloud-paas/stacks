@@ -4,12 +4,7 @@
 services:
   navidrome:
     image: deluan/navidrome:latest
-    # ports:
-    #   - "4533:4533"
     restart: unless-stopped
-    # environment:
-    #   # Optional: put your config options customization here. Examples:
-    #   ND_LOGLEVEL: debug
     volumes:
       - "$JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data"
       - "$MUSIC_PATH:/music:ro"

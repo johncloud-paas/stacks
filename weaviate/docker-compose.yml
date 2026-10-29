@@ -1,0 +1,47 @@
+services:
+  app:
+    # https://www.docker.com/blog/how-to-get-started-weaviate-vector-database-on-docker/
+    image: cr.weaviate.io/semitechnologies/weaviate:1.36.6
+    ports:
+    - 50051:50051
+    command:
+    - --host
+    - 0.0.0.0
+    - --port
+    - '8080'
+    - --scheme
+    - http
+    environment:
+      # https://docs.weaviate.io/deploy/configuration/env-vars
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'false'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: text2vec-transformers
+      ENABLE_MODULES: text2vec-transformers
+      TRANSFORMERS_INFERENCE_API: http://t2v-transformers:8080
+      CLUSTER_HOSTNAME: 'node1'
+    restart: unless-stopped
+    volumes:
+    - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/var/lib/weaviate
+    labels:
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST"
+      - "homepage.description=$HOME_DESCRIPTION"
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
+      # - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=8080
+
+  t2v-transformers:
+    image: semitechnologies/transformers-inference:sentence-transformers-paraphrase-multilingual-MiniLM-L12-v2
+    
+    
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
