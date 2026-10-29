@@ -5,6 +5,7 @@ USER_NAME="${SSH_USER:-sshuser}"
 OPKSSH_VERSION="${OPKSSH_VERSION:-0.4.0}"
 SSHD_CONFIG="/etc/ssh/sshd_config"
 POLICY_FILE="/config/auth_id"
+CLIENT_ID="${CLIENT_ID:-}"
 
 # Persist SSH config and host keys via the /config volume
 mkdir -p /config/etc
@@ -56,18 +57,20 @@ set_option() {
 set_option PasswordAuthentication no
 set_option PubkeyAuthentication yes
 set_option PermitRootLogin no
+set_option AuthorizedKeysFile none
 set_option AuthorizedKeysCommand "/usr/local/bin/opkssh verify %u %k %t"
 set_option AuthorizedKeysCommandUser nobody
 
-# 6. Link opkssh policy from /config; fail if missing since no policy means no login
+# 6. Write opkssh policy from env vars, then link it
 mkdir -p /etc/opk
-if [ ! -f "${POLICY_FILE}" ]; then
-  echo "error: ${POLICY_FILE} not found" >&2
-  echo "Create it with lines of the form: <email> <oidc-provider-url> ${USER_NAME}" >&2
-  echo "Example: alice@gmail.com https://accounts.google.com ${USER_NAME}" >&2
+if [ -z "${REMOTE_USER_EMAIL:-}" ] || [ -z "${OIDC_ISSUER:-}" ] || [ -z "${KEY_EXPIRATION:-}" ] || [ -z "${CLIENT_ID:-}" ]; then
+  echo "error: REMOTE_USER_EMAIL, OIDC_ISSUER, CLIENT_ID, and KEY_EXPIRATION must be set" >&2
   exit 1
 fi
+mkdir -p "$(dirname "${POLICY_FILE}")"
+printf '%s %s %s\n' "${REMOTE_USER_EMAIL}" "${OIDC_ISSUER}" "${USER_NAME}" > "${POLICY_FILE}"
 ln -sfn "${POLICY_FILE}" /etc/opk/auth_id
+printf '%s %s %s\n' "${OIDC_ISSUER}" "${CLIENT_ID}" "${KEY_EXPIRATION}" > /etc/opk/providers
 
 # 7. Start sshd in the foreground
 mkdir -p /run/sshd
