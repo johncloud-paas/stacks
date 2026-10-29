@@ -1,0 +1,17 @@
+services:
+  sshd:
+    image: alpine:3.20
+    command: ["/bin/sh", "/scripts/setup-sshd.sh"]
+    restart: unless-stopped
+    environment:
+      SSH_USER: $SSH_USER
+    ports:
+      - "$EXPOSED_PORT:22"
+    volumes:
+      - ./scripts:/scripts:ro
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/config:/config
+    
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
