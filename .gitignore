@@ -8,3 +8,4 @@ teleport/teleport.yaml
 *.sqlite*
 colnetdesign.env
 mdn2023.env
+.infisical.yaml
