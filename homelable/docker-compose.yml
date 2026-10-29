@@ -1,0 +1,68 @@
+services:
+  backend:
+    image: ghcr.io/pouzor/homelable-backend:latest
+    restart: unless-stopped
+    environment:
+      SQLITE_PATH: /app/data/homelab.db
+      CORS_ORIGINS: '["http://localhost:3000"]'
+      UPLOAD_DIR: /app/data/uploads
+      SECRET_KEY: $SECRET_KEY
+    volumes:
+      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/app/data
+    cap_add:
+      - NET_RAW
+    # MAC addresses: on this bridge network the scanner can never see them —
+    # ARP is layer 2 and every LAN host is one hop away behind the Docker
+    # gateway. To collect MACs (and so keep DHCP devices matched across an IP
+    # change), put the backend on the LAN: comment out the `networks:` key
+    # above and uncomment the line below (Linux hosts only).
+    # network_mode: host
+
+  frontend:
+    image: ghcr.io/pouzor/homelable-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      - backend
+    # Backend on network_mode: host (see INSTALLATION.md, "Scanning from Docker")?
+    # `backend` no longer resolves from this network; keep the frontend here and
+    # point nginx at the host instead:
+    # environment:
+    #   BACKEND_UPSTREAM: "host.docker.internal:8000"
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+    environment:
+      AUTH_MODE: oidc
+      SCANNER_RANGES: $SCANNER_RANGES
+      SCANNER_HTTP_RANGES: $SCANNER_HTTP_RANGES
+      SCANNER_HTTP_PROBE_ENABLED: $SCANNER_HTTP_PROBE_ENABLED
+      SCANNER_HTTP_VERIFY_TLS: $SCANNER_HTTP_VERIFY_TLS
+      STATUS_CHECKER_INTERVAL: $STATUS_CHECKER_INTERVAL
+      SECRET_KEY: $SECRET_KEY
+      OIDC_DISCOVERY_URL: $OIDC_DISCOVERY_URL
+      OIDC_CLIENT_ID: $OIDC_CLIENT_ID
+      OIDC_CLIENT_SECRET: $OIDC_CLIENT_SECRET
+      OIDC_REDIRECT_URI: $OIDC_REDIRECT_URI
+      OIDC_SCOPES: $OIDC_SCOPES
+      OIDC_COOKIE_SECURE: $OIDC_COOKIE_SECURE
+      OIDC_SESSION_EXPIRE_MINUTES: $OIDC_SESSION_EXPIRE_MINUTES
+      OIDC_TRANSACTION_EXPIRE_SECONDS: $OIDC_TRANSACTION_EXPIRE_SECONDS
+    labels:
+      - pangolin.proxy-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.proxy-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.proxy-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.proxy-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      # - pangolin.proxy-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
+      # - pangolin.proxy-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
+      - pangolin.proxy-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.proxy-resources.$COMPOSE_PROJECT_NAME.targets[0].port=80
+      - "homepage.group=$HOME_GROUP"
+      - "homepage.name=$HOME_NAME"
+      - "homepage.icon=$HOME_ICON"
+      - "homepage.href=https://$HOST/"
+      - "homepage.description=$HOME_DESCRIPTION"
+
+networks:
+  default:
+    external: true
+    name: $TRAEFIK_NETWORK
+    
