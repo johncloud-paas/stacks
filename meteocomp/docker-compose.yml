@@ -2,9 +2,13 @@ services:
   app:
     image: ghcr.io/ydethe/meteocomp:latest
     restart: unless-stopped
+    # Rootless Docker: container root maps to the host user, so data/ is owned by them.
+    user: "0:0"
     environment:
     - OWM_API_KEY=${OWM_API_KEY}
     - WEATHER_API_KEY=${WEATHER_API_KEY}
+    - METEOCOMP_DB_PATH=/data/meteocomp.db
+    - METEOCOMP_HTTP_ADDR=:8080
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data/
     labels:
@@ -14,6 +18,8 @@ services:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=8080
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-enabled=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.auth.sso-roles[0]=Member
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
