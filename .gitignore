@@ -9,3 +9,4 @@ teleport/teleport.yaml
 colnetdesign.env
 mdn2023.env
 .infisical.yaml
+.secrets
