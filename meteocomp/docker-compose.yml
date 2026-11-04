@@ -1,5 +1,5 @@
 services:
-  db:
+  mcdb:
     image: postgres:17-alpine3.23
     user: "0:0"
     restart: unless-stopped
@@ -27,14 +27,14 @@ services:
     # Rootless Docker: container root maps to the host user, so data/ is owned by them.
     user: "0:0"
     depends_on:
-      db:
+      mcdb:
         condition: service_healthy
     environment:
     - OWM_API_KEY=${OWM_API_KEY:?Missing OWM_API_KEY}
     - WEATHER_API_KEY=${WEATHER_API_KEY:?Missing WEATHER_API_KEY}
     - INFOCLIMAT_API_KEY=${INFOCLIMAT_API_KEY:?Missing INFOCLIMAT_API_KEY}
     - METEOCOMP_HTTP_ADDR=:8080
-    - DATABASE_URI=postgresql://meteocomp:${POSTGRES_PASSWORD:?Missing POSTGRES_PASSWORD}@db:5432/meteocomp
+    - DATABASE_URI=postgresql://meteocomp:${POSTGRES_PASSWORD:?Missing POSTGRES_PASSWORD}@mcdb:5432/meteocomp?sslmode=disable
     volumes:
       - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/data/
     labels:
