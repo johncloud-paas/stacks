@@ -22,7 +22,7 @@ services:
       POSTGRES_DB: meteocomp
   
   app:
-    image: ghcr.io/ydethe/meteocomp:latest
+    image: ghcr.io/umaneldi/meteocomp:latest
     restart: unless-stopped
     # Rootless Docker: container root maps to the host user, so data/ is owned by them.
     user: "0:0"
