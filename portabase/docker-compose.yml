@@ -30,7 +30,7 @@ services:
     volumes:
         # Montage du fichier de configuration des DBs (bases déclarées côté agent, optionnel)
         # - ./databases.toml:/config/config.toml
-        - ./databases.json:/config/config.json
+        - ${JOHNCLOUD_ROOT:?Missing JOHNCLOUD_ROOT}/${COMPOSE_PROJECT_NAME:?Missing COMPOSE_PROJECT_NAME}/agent/databases.json:/config/config.json
     environment:
         LOG: info
         # Enregistrer aussi les logs dans /var/log/app (voir Agent > Variables d'environnement > Logs)
