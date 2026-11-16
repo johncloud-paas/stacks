@@ -35,7 +35,7 @@ services:
       - "homepage.description=$HOME_DESCRIPTION"
 
   geodb:
-    image: postgis/postgis
+    image: postgis/postgis:18-3.7
     restart: unless-stopped
     user: "0:0"
     healthcheck:
