@@ -1,5 +1,5 @@
 services:
-  douceville:
+  app:
     image: ghcr.io/umaneldi/douceville:latest
     restart: unless-stopped
     depends_on:
