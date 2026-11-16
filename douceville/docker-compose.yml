@@ -1,84 +1,78 @@
 services:
-  backend:
-    image: ydethe/douceville-backend:latest
+  douceville:
+    image: ghcr.io/umaneldi/douceville:latest
     restart: unless-stopped
     depends_on:
-      db:
+      geodb:
         condition: service_healthy
-      # addok:
-      #   condition: service_started
     environment:
-      - LOGFIRE_TOKEN=$LOGFIRE_TOKEN
-      - LOGLEVEL=$LOGLEVEL
-      - OPENROUTESERVICE_KEY=$OPENROUTESERVICE_KEY
-      - POSTGRES_HOST=db
-      - ADDOK_HOST=addok
-      - POSTGRES_DB=$POSTGRES_DB
-      - POSTGRES_USER=$POSTGRES_USER
-      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-      - API_PATH=$API_PATH
-      - NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-      - SUPABASE_TEST_USER=$SUPABASE_TEST_USER
-      - SUPABASE_TEST_PASSWORD=$SUPABASE_TEST_PASSWORD
-      - SUPABASE_JWT_SECRET=$SUPABASE_JWT_SECRET
-      - SUPABASE_ADMIN_KEY=$SUPABASE_ADMIN_KEY
-    volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/data:/code
+      POSTGRES_HOST: geodb
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: douceville
+      POSTGRES_USER: douceville
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      JWT_SECRET: $JWT_SECRET
+      OPENROUTESERVICE_KEY: $OPENROUTESERVICE_KEY
+      ADDOK_HOST: ${ADDOK_HOST:-}
+      LOGLEVEL: ${LOGLEVEL:-INFO}
+      PUBLIC_URL: https://${HOST}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.rule=Host(`$HOST`) && PathPrefix(`$API_PATH`)"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.entrypoints=websecure"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.$COMPOSE_PROJECT_NAME.middlewares=$COMPOSE_PROJECT_NAME-stripprefix@docker"
-      - "traefik.http.services.$COMPOSE_PROJECT_NAME.loadbalancer.server.port=3566"
-      - "traefik.http.middlewares.$COMPOSE_PROJECT_NAME-stripprefix.stripprefix.prefixes=$API_PATH"
-      - "traefik.http.middlewares.$COMPOSE_PROJECT_NAME-stripprefix.stripprefix.forceSlash=false"
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.protocol=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.ssl=true
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].method=http
+      - pangolin.public-resources.$COMPOSE_PROJECT_NAME.targets[0].port=3566
       - "homepage.group=$HOME_GROUP"
       - "homepage.name=$HOME_NAME"
       - "homepage.icon=$HOME_ICON"
-      - "homepage.href=https://${HOST}${API_PATH}/docs"
+      - "homepage.href=https://${HOST}"
       - "homepage.description=$HOME_DESCRIPTION"
 
-  db:
+  geodb:
     image: postgis/postgis
     restart: unless-stopped
+    user: "0:0"
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U $POSTGRES_USER']
+      test: ['CMD-SHELL', 'pg_isready -U douceville']
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
-      - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/db:/var/lib/postgresql/data
+      - '${JOHNCLOUD_ROOT:?Missing JOHNCLOUD_ROOT}/${COMPOSE_PROJECT_NAME:?Missing COMPOSE_PROJECT_NAME}/db:/var/lib/postgresql'
     environment:
-      TZ: $TZ
-      POSTGRES_DB: $POSTGRES_DB
-      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_DB: douceville
+      POSTGRES_USER: douceville
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
-  addok:
-    # https://github.com/BaseAdresseNationale/addok-docker
-    # curl "http://localhost:7878/search?q=1+rue+de+la+paix+paris"
-    image: etalab/addok
-    depends_on:
-    - addok-redis
-    volumes:
-    - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/addok.conf:/etc/addok/addok.conf
-    - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/addok.db:/data/addok.db
-    - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/logs:/logs
-    links:
-    - addok-redis:redis
-    environment:
-      WORKERS: 1
-      WORKER_TIMEOUT: 30
-      LOG_QUERIES: 1
-      LOG_NOT_FOUND: 1
-      SLOW_QUERIES: 200
+  # addok:
+  #   # https://github.com/BaseAdresseNationale/addok-docker
+  #   # curl "http://localhost:7878/search?q=1+rue+de+la+paix+paris"
+  #   image: etalab/addok
+  #   depends_on:
+  #   - addok-redis
+  #   volumes:
+  #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/addok.conf:/etc/addok/addok.conf
+  #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/addok.db:/data/addok.db
+  #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/logs:/logs
+  #   links:
+  #   - addok-redis:redis
+  #   environment:
+  #     WORKERS: 1
+  #     WORKER_TIMEOUT: 30
+  #     LOG_QUERIES: 1
+  #     LOG_NOT_FOUND: 1
+  #     SLOW_QUERIES: 200
 
-  addok-redis:
-    image: etalab/addok-redis
-    volumes:
-    - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/dump.rdb:/data/dump.rdb
+  # addok-redis:
+  #   image: etalab/addok-redis
+  #   volumes:
+  #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/dump.rdb:/data/dump.rdb
 
 networks:
   default:
