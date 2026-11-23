@@ -21,6 +21,12 @@ services:
       SMTP_USERNAME: ${SMTP_USERNAME:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-}
+      OIDC_ISSUER_URL: ${OIDC_ISSUER_URL}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OIDC_PROVIDER_NAME: ${OIDC_PROVIDER_NAME:-SSO}
+      OIDC_SCOPES: ${OIDC_SCOPES:-"openid email profile"}
+      OIDC_DEFAULT_PERMS: ${OIDC_DEFAULT_PERMS:-verified}
     labels:
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.name=$COMPOSE_PROJECT_NAME
       - pangolin.public-resources.$COMPOSE_PROJECT_NAME.full-domain=$HOST
