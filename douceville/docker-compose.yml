@@ -5,6 +5,8 @@ services:
     depends_on:
       geodb:
         condition: service_healthy
+      valhalla:
+        condition: service_healthy
     environment:
       POSTGRES_HOST: geodb
       POSTGRES_PORT: 5432
@@ -12,7 +14,10 @@ services:
       POSTGRES_USER: douceville
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       JWT_SECRET: $JWT_SECRET
-      OPENROUTESERVICE_KEY: $OPENROUTESERVICE_KEY
+      OPENROUTESERVICE_KEY: ${OPENROUTESERVICE_KEY:-}
+      ROUTING_PROVIDER: ${ROUTING_PROVIDER:-valhalla}
+      VALHALLA_URL: http://valhalla:8002
+      VALHALLA_CONCURRENCY: ${VALHALLA_CONCURRENCY:-8}
       ADDOK_HOST: ${ADDOK_HOST:-}
       LOGLEVEL: ${LOGLEVEL:-INFO}
       PUBLIC_URL: https://${HOST}
@@ -59,29 +64,45 @@ services:
       POSTGRES_USER: douceville
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
 
-  # addok:
-  #   # https://github.com/BaseAdresseNationale/addok-docker
-  #   # curl "http://localhost:7878/search?q=1+rue+de+la+paix+paris"
-  #   image: etalab/addok
-  #   depends_on:
-  #   - addok-redis
-  #   volumes:
-  #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/addok.conf:/etc/addok/addok.conf
-  #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/addok.db:/data/addok.db
-  #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/logs:/logs
-  #   links:
-  #   - addok-redis:redis
-  #   environment:
-  #     WORKERS: 1
-  #     WORKER_TIMEOUT: 30
-  #     LOG_QUERIES: 1
-  #     LOG_NOT_FOUND: 1
-  #     SLOW_QUERIES: 200
-
-  # addok-redis:
-  #   image: etalab/addok-redis
-  #   volumes:
-  #   - $JOHNCLOUD_ROOT/$COMPOSE_PROJECT_NAME/addok/dump.rdb:/data/dump.rdb
+  # Valhalla (ROUTING_PROVIDER=valhalla) : lit les tuiles à la demande sur un
+  # stockage S3 compatible (VALHALLA_TILE_URL, terminée par /{tilePath}) et les
+  # garde dans ./.valhalla/tiles. La carte de connectivité est désactivée :
+  # Valhalla la construit au démarrage à partir des seules tuiles locales
+  # (aucune ici au départ) et rejetterait alors tous les itinéraires
+  # (« unconnected regions »). Aucune construction de tuiles ici : elles
+  # sont produites et déposées par scripts/build_valhalla_tiles.sh, sur une
+  # machine de build. Démarrage : docker compose --profile valhalla up -d
+  valhalla:
+    image: ${VALHALLA_IMAGE:-ghcr.io/valhalla/valhalla:3.9.3}
+    restart: unless-stopped
+    volumes:
+      - ${JOHNCLOUD_ROOT:?Missing JOHNCLOUD_ROOT}/${COMPOSE_PROJECT_NAME:?Missing COMPOSE_PROJECT_NAME}/valhalla:/data
+    environment:
+      VALHALLA_TILE_URL: ${VALHALLA_TILE_URL:-}
+      VALHALLA_CACHE_BYTES: ${VALHALLA_CACHE_BYTES:-300000000}
+      VALHALLA_THREADS: ${VALHALLA_THREADS:-4}
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', '-o', '/dev/null', 'http://localhost:8002/status']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    command:
+      - bash
+      - -euc
+      - |
+        : "$${VALHALLA_TILE_URL:?VALHALLA_TILE_URL is required (public S3 URL ending with /{tilePath})}"
+        mkdir -p /data/tiles
+        auth=()
+        valhalla_build_config \
+          --mjolnir-tile-dir /data/tiles --mjolnir-tile-extract '' --mjolnir-traffic-extract '' \
+          --mjolnir-tile-url "$$VALHALLA_TILE_URL" "$${auth[@]}" \
+          --mjolnir-use-lru-mem-cache True --mjolnir-max-cache-size "$$VALHALLA_CACHE_BYTES" \
+          --mjolnir-admin '' --mjolnir-timezone '' \
+          --loki-use-connectivity False \
+          --service-limits-isochrone-max-contours 12 --service-limits-isochrone-max-time-contour 120 \
+          > /data/valhalla.json
+        exec valhalla_service /data/valhalla.json "$$VALHALLA_THREADS"
 
 networks:
   default:
